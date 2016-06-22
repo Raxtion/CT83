@@ -1,0 +1,3437 @@
+//---------------------------------------------------------------------------
+
+#include <vcl.h>
+#pragma hdrstop
+
+#include "frmMain.h"
+#include "DominoVision.h"
+#include "PCIM114GL.h"
+#include "IniFile.h"
+#include "MainThread.h"
+#include "CEVision.h"
+
+#include "time.h"
+
+#include "fmIOCheck.h"
+#include "fmChoiceMotor.h"
+#include "fmMotorCheck.h"
+#include "fmMachinParam.h"
+#include "fmProductParam.h""
+#include "frmPrivilege.h"
+#include "fmPassword.h"
+#include "C_GetTime.h"
+#include "frmManual.h"
+#include "DominoVision.h"
+
+#include "KenenceLaser.h"
+#include "frmOption.h"
+
+#include "dir.h"
+#include "CtkLedControll.h"
+#include "EQPXML.h"
+#include "math.h"
+#include "tlhelp32.h"
+#include "SMSXML.h"
+#include "fmUserID.h"
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma link "MSMQ_OCX"
+#pragma resource "*.dfm"
+TfmMain *fmMain;
+
+extern CIniFile g_IniFile;
+extern CMainThread *g_pMainThread;
+extern PCIM114GL g_MNet;
+extern CKeyenceLaser g_Laser;
+extern bool g_bOnRefresh;
+extern CEQPXML g_eqpXML;
+extern CTK_Led g_LED;
+extern CEVision theVision;
+extern bool g_bStopMainThread;
+extern DominoVision g_Grabber;
+extern bool g_bOnRefresh;
+extern CSMSXML g_SMSXML;
+//---------------------------------------------------------------------------
+__fastcall TfmMain::TfmMain(TComponent* Owner)
+        : TForm(Owner)
+{   
+        memset(m_nSubstrateMap,0,sizeof(__int16)*10000);
+
+}
+ //---------------------------------------------------------------------------
+void TfmMain::RefreshImage()
+{
+        double nScaleTempX=1.0;
+         double nScaleTempY=1.0;
+
+         
+
+         /*    //for full Substrate
+         theVision.CreateMapArray(TRect(theVision.m_roiMark[0].GetOrgX()*nScaleTempX,theVision.m_roiMark[0].GetOrgY()*nScaleTempY,
+                                theVision.m_roiMark[0].GetOrgX()*nScaleTempX+theVision.m_roiMark[0].GetWidth()*nScaleTempX,
+                                theVision.m_roiMark[0].GetOrgY()*nScaleTempY+theVision.m_roiMark[0].GetHeight()*nScaleTempY),
+                                g_IniFile.m_nPackageX,g_IniFile.m_nPackageY,g_IniFile.m_nPackageGap,
+                                g_IniFile.m_nDeviceX,g_IniFile.m_nDeviceY);
+         */
+         /*
+         int nAllX=g_IniFile.m_nDeviceX*g_IniFile.m_nPackageX;
+         int nMut=nAllX/4;
+         int nMode=nAllX % 4;
+
+         g_IniFile.m_nBlockColumn[0]=nMut;
+         g_IniFile.m_nBlockColumn[1]=nMut;
+         g_IniFile.m_nBlockColumn[2]=nMut;
+         g_IniFile.m_nBlockColumn[3]=nMut+nMode;
+         */
+
+         theVision.CreateMapArray(TRect(theVision.m_roiBlock[theVision.m_nCurrentRoiBlock].GetOrgX()*nScaleTempX,theVision.m_roiBlock[theVision.m_nCurrentRoiBlock].GetOrgY()*nScaleTempY,
+                                theVision.m_roiBlock[theVision.m_nCurrentRoiBlock].GetOrgX()*nScaleTempX+theVision.m_roiBlock[theVision.m_nCurrentRoiBlock].GetWidth()*nScaleTempX,
+                                theVision.m_roiBlock[theVision.m_nCurrentRoiBlock].GetOrgY()*nScaleTempY+theVision.m_roiBlock[theVision.m_nCurrentRoiBlock].GetHeight()*nScaleTempY),
+                                1,1,0,
+                                g_IniFile.m_nBlockColumn[theVision.m_nCurrentRoiBlock],g_IniFile.m_nDeviceY);
+
+
+        fmMain->ImagePaintBox->Width=theVision.m_ImageTmpBW8.GetWidth()*theVision.m_dScaleSizeX;
+        fmMain->ImagePaintBox->Height=theVision.m_ImageTmpBW8.GetHeight()*theVision.m_dScaleSizeY;
+
+        RECT RectImageSize = {fmMain->ImagePaintBox->Left, fmMain->ImagePaintBox->Top,
+        fmMain->ImagePaintBox->Left+fmMain->ImagePaintBox->Width ,
+        fmMain->ImagePaintBox->Top+fmMain->ImagePaintBox->Height};
+
+        ::InvalidateRect(fmMain->ScrollBox1->Handle, &RectImageSize, false);
+
+        
+        RECT XXX = { fmMain->paintMap->BoundsRect.Left,
+                fmMain->paintMap->BoundsRect.Top,
+        fmMain->paintMap->BoundsRect.Left+fmMain->paintMap->BoundsRect.Width(),
+        fmMain->paintMap->BoundsRect.Top+fmMain->paintMap->BoundsRect.Height()};
+
+
+        ::InvalidateRect(fmMain->Panel1->Handle, &XXX, false);
+        
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::ImagePaintBoxMouseMove(TObject *Sender,
+      TShiftState Shift, int X, int Y)
+{
+        if(m_nUserLevel<1) return;
+
+        if (Shift.Contains(ssLeft))
+        {
+        // Mouse button down, drag the ROI border
+                if(checkShowSearchROI0->Checked)
+                {
+                        //theVision.m_roiMark[0].Drag(theVision.m_eHandle, X, Y,theVision.m_dScaleSizeX,theVision.m_dScaleSizeY) ;
+                        theVision.m_roiBlock[theVision.m_nCurrentRoiBlock].Drag(theVision.m_eHandle, X, Y,theVision.m_dScaleSizeX,theVision.m_dScaleSizeY) ;
+                }
+                if(checkShowPatternROI0->Checked) theVision.m_roiMarkPattern[0].Drag(theVision.m_eHandle, X, Y,theVision.m_dScaleSizeX,theVision.m_dScaleSizeY) ;
+                if(checkShowSearchROI1->Checked) theVision.m_roiMark[1].Drag(theVision.m_eHandle, X, Y,theVision.m_dScaleSizeX,theVision.m_dScaleSizeY) ;
+                if(checkShowPatternROI1->Checked) theVision.m_roiMarkPattern[1].Drag(theVision.m_eHandle, X, Y,theVision.m_dScaleSizeX,theVision.m_dScaleSizeY) ;
+                if(checkShowSearchROI2->Checked) theVision.m_roiMark[2].Drag(theVision.m_eHandle, X, Y,theVision.m_dScaleSizeX,theVision.m_dScaleSizeY) ;
+                if(checkShowPatternROI2->Checked) theVision.m_roiMarkPattern[2].Drag(theVision.m_eHandle, X, Y,theVision.m_dScaleSizeX,theVision.m_dScaleSizeY) ;
+                RefreshImage();
+        }
+        else
+        {
+                if(checkShowSearchROI0->Checked)
+                {
+                        //theVision.m_eHandle=theVision.m_roiMark[0].HitTest(X,Y,theVision.m_dScaleSizeX,theVision.m_dScaleSizeY);
+                        theVision.m_eHandle=theVision.m_roiBlock[theVision.m_nCurrentRoiBlock].HitTest(X,Y,theVision.m_dScaleSizeX,theVision.m_dScaleSizeY);
+                }
+                if(checkShowPatternROI0->Checked) theVision.m_eHandle=theVision.m_roiMarkPattern[0].HitTest(X,Y,theVision.m_dScaleSizeX,theVision.m_dScaleSizeY);
+                if(checkShowSearchROI1->Checked) theVision.m_eHandle=theVision.m_roiMark[1].HitTest(X,Y,theVision.m_dScaleSizeX,theVision.m_dScaleSizeY);
+                if(checkShowPatternROI1->Checked) theVision.m_eHandle=theVision.m_roiMarkPattern[1].HitTest(X,Y,theVision.m_dScaleSizeX,theVision.m_dScaleSizeY);
+                if(checkShowSearchROI2->Checked) theVision.m_eHandle=theVision.m_roiMark[2].HitTest(X,Y,theVision.m_dScaleSizeX,theVision.m_dScaleSizeY);
+                if(checkShowPatternROI2->Checked) theVision.m_eHandle=theVision.m_roiMarkPattern[2].HitTest(X,Y,theVision.m_dScaleSizeX,theVision.m_dScaleSizeY);
+
+        }
+
+        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::btnFileOpenClick(TObject *Sender)
+{
+        AnsiString strMsg;
+  if(Application->MessageBoxA("開檔前是否要儲存目前檔案?","Confirm",MB_ICONQUESTION|MB_OKCANCEL)==IDOK)
+  {
+
+    g_IniFile.MachineFile(false);
+    g_IniFile.ProductFile(Caption.c_str(),false);
+
+    theVision.SaveTool(g_IniFile.GetFileNameWithNewExt(Caption.c_str(),"cev").c_str(),"Dummy");
+    ShowMessage("檔案儲存完成!");
+  }
+
+  OpenDialog1->DefaultExt = "INI";
+  OpenDialog1->FileName = "*.ini";
+
+  if(OpenDialog1->Execute())
+  {
+         g_IniFile.m_strLastFileName=OpenDialog1->FileName;
+        Caption=g_IniFile.m_strLastFileName;
+
+        g_IniFile.MachineFile(true);
+        g_IniFile.ProductFile(Caption.c_str(),true);
+
+        theVision.LoadTool(g_IniFile.GetFileNameWithNewExt(Caption.c_str(),"cev").c_str(),"Dummy");
+  }
+
+  SetLEDDimmer();
+
+  g_SMSXML.m_strMachineID=g_IniFile.m_strSMSMachineID;
+  g_SMSXML.m_strUserID=g_IniFile.m_strSMSUserID;
+  g_SMSXML.m_strPartNo=g_IniFile.m_strSMSPartNo;
+  g_SMSXML.m_strLotNo=g_IniFile.m_strSMSLotNo;
+
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::btnFileSaveClick(TObject *Sender)
+{
+        if(Application->MessageBoxA("確定要存檔?","Confi rm",MB_ICONQUESTION|MB_OKCANCEL)==IDCANCEL) return;
+
+    g_IniFile.MachineFile(false);
+    g_IniFile.ProductFile(Caption.c_str(),false);
+
+    theVision.SaveTool(g_IniFile.GetFileNameWithNewExt(Caption.c_str(),"cev").c_str(),"Dummy");
+
+    ShowMessage("檔案儲存完成!");        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::btnSaveAsClick(TObject *Sender)
+{
+  AnsiString InputString = InputBox("請輸入將要另存檔案名稱", "檔案名稱", "Default");
+
+   if(Application->MessageBox("確定要存檔嗎?", "Look", MB_OKCANCEL)!=IDOK) return;
+
+        
+   MkDir("C:\\Product Data\\"+InputString+"\\");
+
+   AnsiString strPathName="C:\\Product Data\\"+InputString+"\\"+InputString+".ini";
+   g_IniFile.m_strLastFileName=strPathName;//pWnd->editFileName->Text;
+   Caption=strPathName;//pWnd->editFileName->Text;
+
+   g_IniFile.ProductFile(g_IniFile.m_strLastFileName.c_str(),false);
+   g_IniFile.MachineFile(false);
+
+   theVision.SaveTool(g_IniFile.GetFileNameWithNewExt(Caption.c_str(),"cev").c_str(),"Dummy");
+
+
+  
+
+ 
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::InitMSMQ()
+{
+        //Sned
+        AnsiString strDir="DIRECT=TCP:"+g_IniFile.m_strMSMQ_HOSTIP+"\\private$\\ECS_"+g_IniFile.m_strMachineID;
+
+         //MSMQQueueInfo1->set_FormatName(L"DIRECT=TCP:192.168.101.100\\private$\\ECS_K002JL");
+         //MSMQQueueInfo1->set_Label(L"DIRECT=TCP:192.168.101.100\\private$\\ECS_K002JL");
+         MSMQQueueInfo1->set_FormatName(WideString(strDir));
+         MSMQQueueInfo1->set_Label(WideString(strDir));
+
+         //MSMQQueueInfo1->set_FormatName(L"DIRECT=TCP:127.0.0.1\\private$\\ECS_K002JL");
+         //MSMQQueueInfo1->set_Label(L"DIRECT=TCP:127.0.0.1\\private$\\ECS_K002JL");
+         MSMQQueueInfo1->Create();
+         IMSMQQTX = MSMQQueueInfo1->Open(MQ_SEND_ACCESS ,MQ_DENY_NONE);
+
+         MSMQQueue1->ConnectTo(IMSMQQTX);
+
+         //RX event
+        MSMQQueueInfo2->set_PathName(L".\\private$\\EQP_COVER");
+        MSMQQueueInfo2->set_Label(L".\\private$\\EQP_COVER");
+        try
+        {
+                MSMQQueueInfo2->Delete();
+                MSMQQueueInfo2->Create();
+        }
+        catch(const EAccessViolation &e)
+        {
+                g_IniFile.AddLog(e.Message.c_str(),e.Message.Length());
+        }
+
+        IMSMQQRX1 = MSMQQueueInfo2->Open(MQ_RECEIVE_ACCESS  ,MQ_DENY_NONE);
+        MSMQQueue2->ConnectTo(IMSMQQRX1);
+
+        MSMQQueue2->EnableNotification(MSMQEvent1->GetDefaultInterface());
+
+        //RX event
+        MSMQQueueInfo3->set_PathName(L".\\private$\\EQP_CARRIER");
+        MSMQQueueInfo3->set_Label(L".\\private$\\EQP_CARRIER");
+
+        try
+        {
+                MSMQQueueInfo3->Delete();
+                MSMQQueueInfo3->Create();
+        }
+        catch(const EAccessViolation &e)
+        {
+                g_IniFile.AddLog(e.Message.c_str(),e.Message.Length());
+        }
+
+        IMSMQQRX2 = MSMQQueueInfo3->Open(MQ_RECEIVE_ACCESS  ,MQ_DENY_NONE);
+        MSMQQueue3->ConnectTo(IMSMQQRX2);
+
+        MSMQQueue3->EnableNotification(MSMQEvent2->GetDefaultInterface());
+
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::FormCreate(TObject *Sender)
+{
+    g_pMainThread=new CMainThread(false);
+
+    g_IniFile.MachineFile(true);
+    g_IniFile.ProductFile(g_IniFile.m_strLastFileName.c_str(),true);
+
+    Caption=g_IniFile.m_strLastFileName;
+
+    //MSMQ
+    InitMSMQ();
+
+    //ftp Map
+    ftpMap->Vendor = NMOS_AUTO;
+    ftpMap->Host=g_IniFile.m_strMapFtpIP;
+    ftpMap->UserID=g_IniFile.m_strMapFtpUserName;
+    ftpMap->Password=g_IniFile.m_strMapFtpPassword;
+
+    //socket IP
+    clientVenderID->Address=g_IniFile.m_strVenderID_IP;
+    clientLaserID->Address=g_IniFile.m_strLaserID_IP;
+    clientCoverID->Address=g_IniFile.m_strCoverID_IP;
+    clientBoatID->Address=g_IniFile.m_strBoatID_IP;
+
+    clientVenderID->Active=true;
+    clientLaserID->Active=true;
+    clientCoverID->Active=true;
+    clientBoatID->Active=true;
+
+    serverSMS->Port=g_IniFile.m_nSMSServerPort;
+    serverSMS->Active=true;
+
+    clientSMS->Address=g_IniFile.m_strSMSClientIP;
+    clientSMS->Port=g_IniFile.m_nSMSClientPort;
+
+    g_SMSXML.m_strMachineID=g_IniFile.m_strSMSMachineID;
+    g_SMSXML.m_strUserID=g_IniFile.m_strSMSUserID;
+    g_SMSXML.m_strPartNo=g_IniFile.m_strSMSPartNo;
+    g_SMSXML.m_strLotNo=g_IniFile.m_strSMSLotNo;
+
+    g_eqpXML.StartProcess=fmMain->StartProcess;
+    g_eqpXML.OpenFile=fmMain->OpenFilebyCIM;
+    g_eqpXML.EventReportAck=fmMain->CIMEventReportAck;
+
+    GetVersion();
+
+    if(!g_Laser.OpenPort(1)) ShowMessage("開啟雷射通訊 COM1 失敗");
+
+    g_LED.OpenPort(2);
+
+    SetLEDDimmer();
+
+    theVision.LoadTool(g_IniFile.GetFileNameWithNewExt(Caption.c_str(),"cev").c_str(),"Dummy");
+
+    PageControl1->ActivePage=tabInfo;
+
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TfmMain::GetVersion()
+{
+  void *pValue;
+  int n;
+  DWORD infoHandle;
+  unsigned int len;
+  AnsiString exeName, tmpStr;
+
+  exeName = Application->ExeName.c_str();
+  n = GetFileVersionInfoSize( exeName.c_str(), &infoHandle );
+
+  if(n>0)
+  {
+    char *pBuf = (char *) malloc(n);
+
+    GetFileVersionInfo( exeName.c_str(), infoHandle, n, pBuf );
+    VerQueryValue( pBuf, "\\VarFileInfo\\Translation", &pValue, &len );
+
+    tmpStr = (AnsiString)"\\StringFileInfo\\" + IntToHex( *((__int16 *)pValue), 4 ) + IntToHex( *((__int16 *)pValue+1), 4 ) + "\\FileVersion";
+
+    if ( VerQueryValue( pBuf, tmpStr.c_str(), &pValue, &len) )
+        Version1->Caption =(AnsiString)"Ver:"+(char *)pValue;
+
+    free(pBuf);
+  }
+  else Version1->Caption="[Ver 0.0.0.0]";
+} 
+
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::btnIOCheckClick(TObject *Sender)
+{
+        TIOCheckDlg *pIOCheckDlg=new TIOCheckDlg(this);
+
+        //CreateCaptionFile(pIOCheckDlg);
+        this->ReadCaptionFile(pIOCheckDlg);
+        pIOCheckDlg->ShowModal();
+        delete pIOCheckDlg;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::btnMotorCheckClick(TObject *Sender)
+{
+        TfrmChoiceMotor *pChoiceMotorDlg=new TfrmChoiceMotor(this);
+     TfrmMotorCheck *pMotorCheckDlg;
+
+    while(pChoiceMotorDlg->ShowModal()!=mrCancel)
+    {
+        pMotorCheckDlg=new TfrmMotorCheck(this); 
+        pMotorCheckDlg->m_nActiveAxis=pChoiceMotorDlg->m_nSelectAxis;
+        pMotorCheckDlg->Caption=pChoiceMotorDlg->m_strCaption;
+        pMotorCheckDlg->ShowModal();
+        delete pMotorCheckDlg;
+    }
+    
+    delete pChoiceMotorDlg;        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::btnExitClick(TObject *Sender)
+{
+        if(Application->MessageBoxA("確定離開程式?","Confirm",MB_ICONQUESTION|MB_OKCANCEL)==IDCANCEL) return;
+
+
+
+  if(Application->MessageBoxA("離開前要存檔嗎?","Confirm",MB_ICONQUESTION|MB_OKCANCEL)==IDOK)
+  {
+
+    g_IniFile.MachineFile(false);
+    g_IniFile.ProductFile(Caption.c_str(),false);
+
+    ShowMessage("檔案儲存完成!");
+
+  } 
+
+  
+  exit(0);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::btnMachineParaClick(TObject *Sender)
+{
+        TfrmMachineParam *pMachineDlg=new TfrmMachineParam(this);
+
+        AnsiString strCtl;
+        bool bRead=true;
+
+        for(int nIndex=0;nIndex<10;nIndex++)
+        {
+        DDX_Float(bRead,g_IniFile.m_dACCSpeed[nIndex],(TEdit *)pMachineDlg->FindComponent(strCtl.sprintf("editAcc%d",nIndex+1)) );
+        DDX_Float(bRead,g_IniFile.m_dDECSpeed[nIndex],(TEdit *)pMachineDlg->FindComponent(strCtl.sprintf("editDec%d",nIndex+1)));
+        DDX_Float(bRead,g_IniFile.m_dJogSpeed[nIndex],(TEdit *)pMachineDlg->FindComponent(strCtl.sprintf("editJogSpeed%d",nIndex+1)));
+        DDX_Float(bRead,g_IniFile.m_dWorkSpeed[nIndex],(TEdit *)pMachineDlg->FindComponent(strCtl.sprintf("editWorkSpeed%d",nIndex+1)));
+        }
+
+        DDX_Int(bRead,g_IniFile.m_nImageWidth,pMachineDlg->m_nImageWidth);
+        DDX_Float(bRead,g_IniFile.m_dImageAngle,pMachineDlg->m_dImageAngle);
+
+        DDX_Float(bRead,g_IniFile.m_dTableMapCCDPosX[0],pMachineDlg->m_dTableMapCCDPosX0);
+        DDX_Float(bRead,g_IniFile.m_dTableMapCCDPosY[0],pMachineDlg->m_dTableMapCCDPosY0);
+        DDX_Float(bRead,g_IniFile.m_dTableMapCCDPosX[1],pMachineDlg->m_dTableMapCCDPosX1);
+        DDX_Float(bRead,g_IniFile.m_dTableMapCCDPosY[1],pMachineDlg->m_dTableMapCCDPosY1);
+
+        DDX_Float(bRead,g_IniFile.m_dTableMapCCDPitch,pMachineDlg->m_dTableMapCCDPitch);
+        DDX_Check(bRead,g_IniFile.m_bForceEject,pMachineDlg->m_bForceEject);
+
+        DDX_Float(bRead,g_IniFile.m_dFMCCDResolution[0],pMachineDlg->m_dFMCCDResolution0);
+        DDX_Float(bRead,g_IniFile.m_dFMCCDResolution[1],pMachineDlg->m_dFMCCDResolution1);
+
+        DDX_String(bRead,g_IniFile.m_strSMSServerIP,pMachineDlg->m_strSMSServerIP);
+        DDX_String(bRead,g_IniFile.m_strSMSClientIP,pMachineDlg->m_strSMSClientIP);
+        DDX_Int(bRead,g_IniFile.m_nSMSServerPort,pMachineDlg->m_nSMSServerPort);
+        DDX_Int(bRead,g_IniFile.m_nSMSClientPort,pMachineDlg->m_nSMSClientPort);
+
+        if(pMachineDlg->ShowModal()==mrOk)
+        {
+                bRead=false;
+                
+                for(int nIndex=0;nIndex<10;nIndex++)
+                {
+                DDX_Float(bRead,g_IniFile.m_dACCSpeed[nIndex],(TEdit *)pMachineDlg->FindComponent(strCtl.sprintf("editAcc%d",nIndex+1)) );
+                DDX_Float(bRead,g_IniFile.m_dDECSpeed[nIndex],(TEdit *)pMachineDlg->FindComponent(strCtl.sprintf("editDec%d",nIndex+1)));
+                DDX_Float(bRead,g_IniFile.m_dJogSpeed[nIndex],(TEdit *)pMachineDlg->FindComponent(strCtl.sprintf("editJogSpeed%d",nIndex+1)));
+                DDX_Float(bRead,g_IniFile.m_dWorkSpeed[nIndex],(TEdit *)pMachineDlg->FindComponent(strCtl.sprintf("editWorkSpeed%d",nIndex+1)));
+                }
+
+                DDX_Int(bRead,g_IniFile.m_nImageWidth,pMachineDlg->m_nImageWidth);
+                DDX_Float(bRead,g_IniFile.m_dImageAngle,pMachineDlg->m_dImageAngle);
+
+                DDX_Float(bRead,g_IniFile.m_dTableMapCCDPosX[0],pMachineDlg->m_dTableMapCCDPosX0);                 
+                DDX_Float(bRead,g_IniFile.m_dTableMapCCDPosY[0],pMachineDlg->m_dTableMapCCDPosY0);                 
+                DDX_Float(bRead,g_IniFile.m_dTableMapCCDPosX[1],pMachineDlg->m_dTableMapCCDPosX1);                 
+                DDX_Float(bRead,g_IniFile.m_dTableMapCCDPosY[1],pMachineDlg->m_dTableMapCCDPosY1);                 
+                                                                                                                   
+                DDX_Float(bRead,g_IniFile.m_dTableMapCCDPitch,pMachineDlg->m_dTableMapCCDPitch);
+                DDX_Check(bRead,g_IniFile.m_bForceEject,pMachineDlg->m_bForceEject);
+
+                DDX_Float(bRead,g_IniFile.m_dFMCCDResolution[0],pMachineDlg->m_dFMCCDResolution0);
+                DDX_Float(bRead,g_IniFile.m_dFMCCDResolution[1],pMachineDlg->m_dFMCCDResolution1);
+
+                DDX_Int(bRead,g_IniFile.m_nSMSServerPort,pMachineDlg->m_nSMSServerPort);
+                DDX_Int(bRead,g_IniFile.m_nSMSClientPort,pMachineDlg->m_nSMSClientPort);
+
+                serverSMS->Active=false;
+                serverSMS->Port=g_IniFile.m_nSMSServerPort;
+                serverSMS->Active=true;
+
+                clientSMS->Active=false;
+                clientSMS->Address=g_IniFile.m_strSMSClientIP;
+                clientSMS->Port=g_IniFile.m_nSMSClientPort;
+
+        }                                                                                                          
+                                                                                                                   
+}                                                                                                                  
+//---------------------------------------------------------------------------
+                                                                                                                   
+                                                                                                                   
+void __fastcall TfmMain::btnProductParaClick(TObject *Sender)                                                      
+{                                                                                                                  
+        TfrmProductParam *pWnd=new TfrmProductParam(this);
+                                                                                                                   
+        bool bRead=true;                                                                                                          
+                                                                                                                   
+        DDX_Int(bRead,g_IniFile.m_nPackageX,pWnd->m_nPackageX);
+        DDX_Int(bRead,g_IniFile.m_nPackageY,pWnd->m_nPackageY);
+        DDX_Int(bRead,g_IniFile.m_nDeviceX,pWnd->m_nDeviceX);
+        DDX_Int(bRead,g_IniFile.m_nDeviceY,pWnd->m_nDeviceY);
+        DDX_Int(bRead,g_IniFile.m_nDeviceY,pWnd->m_nDeviceY);                                                      
+                                                                                                                   
+        DDX_Int(bRead,g_IniFile.m_nPackageGap,pWnd->m_nPackageGap);
+         DDX_Check(bRead,g_IniFile.m_bFindOKMark,pWnd->m_bFindOKMark);                                                
+                                                                                                                   
+        pWnd->m_dMarkScore0->Text=FormatFloat("0.00",theVision.m_markMatch[0].GetMinScore());
+        pWnd->m_dMarkScore1->Text=FormatFloat("0.00",theVision.m_markMatch[1].GetMinScore());
+        pWnd->m_dMarkScore2->Text=FormatFloat("0.00",theVision.m_markMatch[2].GetMinScore());
+                                                                                                                   
+        DDX_Int(bRead,g_IniFile.m_nLaserProgramNo[0],pWnd->m_nLaserProgramNo0);
+        DDX_Int(bRead,g_IniFile.m_nLaserProgramNo[1],pWnd->m_nLaserProgramNo1);
+        pWnd->UpDown1->Position=g_IniFile.m_nLaserProgramNo[0];
+        pWnd->UpDown2->Position=g_IniFile.m_nLaserProgramNo[1];
+
+        DDX_Float(bRead,g_IniFile.m_dSSPickerPickPos,pWnd->m_dSSPickerPickPos);
+        DDX_Float(bRead,g_IniFile.m_dSSPickerPickRailPos,pWnd->m_dSSPickerPickRailPos);
+        DDX_Float(bRead,g_IniFile.m_dSSPickerPutPos[0],pWnd->m_dSSPickerPutPos0);
+        DDX_Float(bRead,g_IniFile.m_dSSPickerPutPos[1],pWnd->m_dSSPickerPutPos1);
+        DDX_Float(bRead,g_IniFile.m_dSpaPickerPickPos,pWnd->m_dSpaPickerPickPos);
+        DDX_Float(bRead,g_IniFile.m_dSpaPickerThrowPos,pWnd->m_dSpaPickerThrowPos);
+
+        DDX_Float(bRead,g_IniFile.m_dTablePutDownPos[0],pWnd->m_dTablePutDownPos0);
+        DDX_Float(bRead,g_IniFile.m_dTableMarkPosX[0],pWnd->m_dTableMarkPosX0);
+        DDX_Float(bRead,g_IniFile.m_dTableMarkPosY[0],pWnd->m_dTableMarkPosY0);
+        DDX_Float(bRead,g_IniFile.m_dTableVenderCodePosX[0],pWnd->m_dTableVenderCodePosX0);
+        DDX_Float(bRead,g_IniFile.m_dTableVenderCodePosY[0],pWnd->m_dTableVenderCodePosY0);
+        DDX_Float(bRead,g_IniFile.m_dTablePutDownPos[1],pWnd->m_dTablePutDownPos1);
+        DDX_Float(bRead,g_IniFile.m_dTableMarkPosX[1],pWnd->m_dTableMarkPosX1);
+        DDX_Float(bRead,g_IniFile.m_dTableMarkPosY[1],pWnd->m_dTableMarkPosY1);
+        DDX_Float(bRead,g_IniFile.m_dTableVenderCodePosX[1],pWnd->m_dTableVenderCodePosX1);
+        DDX_Float(bRead,g_IniFile.m_dTableVenderCodePosY[1],pWnd->m_dTableVenderCodePosY1);
+
+        DDX_Float(bRead,g_IniFile.m_dTableLaserPos[0],pWnd->m_dTableLaserPos0);
+        DDX_Float(bRead,g_IniFile.m_dTableLaserCodePosX[0],pWnd->m_dTableLaserCodePosX0);
+        DDX_Float(bRead,g_IniFile.m_dTableLaserCodePosY[0],pWnd->m_dTableLaserCodePosY0);
+        DDX_Float(bRead,g_IniFile.m_dTablePickUpPos[0],pWnd->m_dTablePickUpPos0);
+        DDX_Float(bRead,g_IniFile.m_dTableLaserPos[1],pWnd->m_dTableLaserPos1);
+        DDX_Float(bRead,g_IniFile.m_dTableLaserCodePosX[1],pWnd->m_dTableLaserCodePosX1);
+        DDX_Float(bRead,g_IniFile.m_dTableLaserCodePosY[1],pWnd->m_dTableLaserCodePosY1);
+        DDX_Float(bRead,g_IniFile.m_dTablePickUpPos[1],pWnd->m_dTablePickUpPos1);
+
+        DDX_Float(bRead,g_IniFile.m_dSCPickerPickCoverPosY,pWnd->m_dSCPickerPickCoverPosY);
+        DDX_Float(bRead,g_IniFile.m_dSCPickerPickCoverPosZ,pWnd->m_dSCPickerPickCoverPosZ);
+        DDX_Float(bRead,g_IniFile.m_dSCPickerPickSSPosY[0],pWnd->m_dSCPickerPickSSPosY0);
+        DDX_Float(bRead,g_IniFile.m_dSCPickerPickSSPosY[1],pWnd->m_dSCPickerPickSSPosY1);
+
+        DDX_Float(bRead,g_IniFile.m_dSCPickerPickSSPosZ[0],pWnd->m_dSCPickerPickSSPosZ0);
+        DDX_Float(bRead,g_IniFile.m_dSCPickerPutSSPosY[0],pWnd->m_dSCPickerPutSSPosY0);
+        DDX_Float(bRead,g_IniFile.m_dSCPickerPutSSPosZ[0],pWnd->m_dSCPickerPutSSPosZ0);
+        DDX_Float(bRead,g_IniFile.m_dSCPickerPickSSPosZ[1],pWnd->m_dSCPickerPickSSPosZ1);
+        DDX_Float(bRead,g_IniFile.m_dSCPickerPutSSPosY[1],pWnd->m_dSCPickerPutSSPosY1);
+        DDX_Float(bRead,g_IniFile.m_dSCPickerPutSSPosZ[1],pWnd->m_dSCPickerPutSSPosZ1);
+        DDX_Float(bRead,g_IniFile.m_dSCPickerPutCoverPosY,pWnd->m_dSCPickerPutCoverPosY);
+        DDX_Float(bRead,g_IniFile.m_dSCPickerPutCoverPosZ,pWnd->m_dSCPickerPutCoverPosZ);
+        DDX_Float(bRead,g_IniFile.m_dSCPickerPutNGCoverPosY,pWnd->m_dSCPickerPutNGCoverPosY);
+        DDX_Float(bRead,g_IniFile.m_dSCPickerPutNGCoverPosZ,pWnd->m_dSCPickerPutNGCoverPosZ);
+
+        DDX_Float(bRead,g_IniFile.m_dBoatPickerPickPosY[0],pWnd->m_dBoatPickerPickPosY0);
+        DDX_Float(bRead,g_IniFile.m_dBoatPickerPickPosZ[0],pWnd->m_dBoatPickerPickPosZ0);
+        DDX_Float(bRead,g_IniFile.m_dBoatPickerPickPosY[1],pWnd->m_dBoatPickerPickPosY1);
+        DDX_Float(bRead,g_IniFile.m_dBoatPickerPickPosZ[1],pWnd->m_dBoatPickerPickPosZ1);
+        DDX_Float(bRead,g_IniFile.m_dBoatPickerPickPosY[2],pWnd->m_dBoatPickerPickPosY2);
+        DDX_Float(bRead,g_IniFile.m_dBoatPickerPickPosZ[2],pWnd->m_dBoatPickerPickPosZ2);
+
+        DDX_Float(bRead,g_IniFile.m_dBoatPickerPutPosY,pWnd->m_dBoatPickerPutPosY);
+        DDX_Float(bRead,g_IniFile.m_dBoatPickerPutPosZ,pWnd->m_dBoatPickerPutPosZ);
+
+        DDX_String(bRead,g_IniFile.m_strScheduleNo,pWnd->m_strScheduleNo);
+        DDX_Int(bRead,g_IniFile.m_nSubLotSize,pWnd->m_nSubLotSize);
+        DDX_Int(bRead,g_IniFile.m_nScheduleQty,pWnd->m_nScheduleQty);
+
+        pWnd->trackLED0->Position=g_IniFile.m_nLEDDimmer[0];
+        pWnd->trackLED1->Position=g_IniFile.m_nLEDDimmer[1];
+
+        DDX_String(bRead,g_IniFile.m_strSBTType,pWnd->m_strSBTType);
+        DDX_String(bRead,g_IniFile.m_strSBTSize,pWnd->m_strSBTSize);
+        DDX_String(bRead,g_IniFile.m_strSN,pWnd->m_strSN);
+
+        DDX_Radio(bRead,g_IniFile.m_nSBTCorner,pWnd->m_nSBTCorner);
+
+        DDX_Int(bRead,g_IniFile.m_nBlockColumn[0],pWnd->m_nBlockColumn0);
+        DDX_Int(bRead,g_IniFile.m_nBlockColumn[1],pWnd->m_nBlockColumn1);
+        DDX_Int(bRead,g_IniFile.m_nBlockColumn[2],pWnd->m_nBlockColumn2);
+        DDX_Int(bRead,g_IniFile.m_nBlockColumn[3],pWnd->m_nBlockColumn3);
+
+        if(pWnd->ShowModal()==mrOk)
+        {                                                                                                                           
+                bRead=false;                                                                                                        
+                DDX_Int(bRead,g_IniFile.m_nPackageX,pWnd->m_nPackageX);                                                             
+                DDX_Int(bRead,g_IniFile.m_nPackageY,pWnd->m_nPackageY);                                                             
+                DDX_Int(bRead,g_IniFile.m_nDeviceX,pWnd->m_nDeviceX);                                                               
+                DDX_Int(bRead,g_IniFile.m_nDeviceY,pWnd->m_nDeviceY);
+                DDX_Int(bRead,g_IniFile.m_nPackageGap,pWnd->m_nPackageGap);                                                         
+
+                DDX_Check(bRead,g_IniFile.m_bFindOKMark,pWnd->m_bFindOKMark);
+
+                theVision.m_markMatch[0].SetMinScore(pWnd->m_dMarkScore0->Text.ToDouble());
+                theVision.m_markMatch[1].SetMinScore(pWnd->m_dMarkScore1->Text.ToDouble());
+                theVision.m_markMatch[2].SetMinScore(pWnd->m_dMarkScore2->Text.ToDouble());
+
+                DDX_Int(bRead,g_IniFile.m_nLaserProgramNo[0],pWnd->m_nLaserProgramNo0);
+                DDX_Int(bRead,g_IniFile.m_nLaserProgramNo[1],pWnd->m_nLaserProgramNo1);
+
+                DDX_Float(bRead,g_IniFile.m_dSSPickerPickPos,pWnd->m_dSSPickerPickPos);
+                DDX_Float(bRead,g_IniFile.m_dSSPickerPickRailPos,pWnd->m_dSSPickerPickRailPos);
+                DDX_Float(bRead,g_IniFile.m_dSSPickerPutPos[0],pWnd->m_dSSPickerPutPos0);
+                DDX_Float(bRead,g_IniFile.m_dSSPickerPutPos[1],pWnd->m_dSSPickerPutPos1);
+                DDX_Float(bRead,g_IniFile.m_dSpaPickerPickPos,pWnd->m_dSpaPickerPickPos);
+                DDX_Float(bRead,g_IniFile.m_dSpaPickerThrowPos,pWnd->m_dSpaPickerThrowPos);
+
+                DDX_Float(bRead,g_IniFile.m_dTablePutDownPos[0],pWnd->m_dTablePutDownPos0);
+                DDX_Float(bRead,g_IniFile.m_dTableMarkPosX[0],pWnd->m_dTableMarkPosX0);
+                DDX_Float(bRead,g_IniFile.m_dTableMarkPosY[0],pWnd->m_dTableMarkPosY0);
+                DDX_Float(bRead,g_IniFile.m_dTableVenderCodePosX[0],pWnd->m_dTableVenderCodePosX0);
+                DDX_Float(bRead,g_IniFile.m_dTableVenderCodePosY[0],pWnd->m_dTableVenderCodePosY0);
+                DDX_Float(bRead,g_IniFile.m_dTablePutDownPos[1],pWnd->m_dTablePutDownPos1);
+                DDX_Float(bRead,g_IniFile.m_dTableMarkPosX[1],pWnd->m_dTableMarkPosX1);
+                DDX_Float(bRead,g_IniFile.m_dTableMarkPosY[1],pWnd->m_dTableMarkPosY1);
+                DDX_Float(bRead,g_IniFile.m_dTableVenderCodePosX[1],pWnd->m_dTableVenderCodePosX1);
+                DDX_Float(bRead,g_IniFile.m_dTableVenderCodePosY[1],pWnd->m_dTableVenderCodePosY1);
+
+                DDX_Float(bRead,g_IniFile.m_dTableLaserPos[0],pWnd->m_dTableLaserPos0);
+                DDX_Float(bRead,g_IniFile.m_dTableLaserCodePosX[0],pWnd->m_dTableLaserCodePosX0);
+                DDX_Float(bRead,g_IniFile.m_dTableLaserCodePosY[0],pWnd->m_dTableLaserCodePosY0);
+                DDX_Float(bRead,g_IniFile.m_dTablePickUpPos[0],pWnd->m_dTablePickUpPos0);
+                DDX_Float(bRead,g_IniFile.m_dTableLaserPos[1],pWnd->m_dTableLaserPos1);
+                DDX_Float(bRead,g_IniFile.m_dTableLaserCodePosX[1],pWnd->m_dTableLaserCodePosX1);
+                DDX_Float(bRead,g_IniFile.m_dTableLaserCodePosY[1],pWnd->m_dTableLaserCodePosY1);
+                DDX_Float(bRead,g_IniFile.m_dTablePickUpPos[1],pWnd->m_dTablePickUpPos1);
+
+                DDX_Float(bRead,g_IniFile.m_dSCPickerPickCoverPosY,pWnd->m_dSCPickerPickCoverPosY);
+                DDX_Float(bRead,g_IniFile.m_dSCPickerPickCoverPosZ,pWnd->m_dSCPickerPickCoverPosZ);
+                DDX_Float(bRead,g_IniFile.m_dSCPickerPickSSPosY[0],pWnd->m_dSCPickerPickSSPosY0);
+                DDX_Float(bRead,g_IniFile.m_dSCPickerPickSSPosY[1],pWnd->m_dSCPickerPickSSPosY1);
+
+                DDX_Float(bRead,g_IniFile.m_dSCPickerPickSSPosZ[0],pWnd->m_dSCPickerPickSSPosZ0);
+                DDX_Float(bRead,g_IniFile.m_dSCPickerPutSSPosY[0],pWnd->m_dSCPickerPutSSPosY0);
+                DDX_Float(bRead,g_IniFile.m_dSCPickerPutSSPosZ[0],pWnd->m_dSCPickerPutSSPosZ0);
+                DDX_Float(bRead,g_IniFile.m_dSCPickerPickSSPosZ[1],pWnd->m_dSCPickerPickSSPosZ1);
+                DDX_Float(bRead,g_IniFile.m_dSCPickerPutSSPosY[1],pWnd->m_dSCPickerPutSSPosY1);
+                DDX_Float(bRead,g_IniFile.m_dSCPickerPutSSPosZ[1],pWnd->m_dSCPickerPutSSPosZ1);
+                DDX_Float(bRead,g_IniFile.m_dSCPickerPutCoverPosY,pWnd->m_dSCPickerPutCoverPosY);
+                DDX_Float(bRead,g_IniFile.m_dSCPickerPutCoverPosZ,pWnd->m_dSCPickerPutCoverPosZ);
+                DDX_Float(bRead,g_IniFile.m_dSCPickerPutNGCoverPosY,pWnd->m_dSCPickerPutNGCoverPosY);
+                DDX_Float(bRead,g_IniFile.m_dSCPickerPutNGCoverPosZ,pWnd->m_dSCPickerPutNGCoverPosZ);
+
+                
+                DDX_Float(bRead,g_IniFile.m_dBoatPickerPutPosY,pWnd->m_dBoatPickerPutPosY);
+                DDX_Float(bRead,g_IniFile.m_dBoatPickerPutPosZ,pWnd->m_dBoatPickerPutPosZ);
+
+                DDX_Float(bRead,g_IniFile.m_dBoatPickerPickPosY[0],pWnd->m_dBoatPickerPickPosY0);
+                DDX_Float(bRead,g_IniFile.m_dBoatPickerPickPosZ[0],pWnd->m_dBoatPickerPickPosZ0);
+                DDX_Float(bRead,g_IniFile.m_dBoatPickerPickPosY[1],pWnd->m_dBoatPickerPickPosY1);
+                DDX_Float(bRead,g_IniFile.m_dBoatPickerPickPosZ[1],pWnd->m_dBoatPickerPickPosZ1);
+                DDX_Float(bRead,g_IniFile.m_dBoatPickerPickPosY[2],pWnd->m_dBoatPickerPickPosY2);
+                DDX_Float(bRead,g_IniFile.m_dBoatPickerPickPosZ[2],pWnd->m_dBoatPickerPickPosZ2);
+
+                DDX_String(bRead,g_IniFile.m_strScheduleNo,pWnd->m_strScheduleNo);
+                DDX_Int(bRead,g_IniFile.m_nSubLotSize,pWnd->m_nSubLotSize);
+                DDX_Int(bRead,g_IniFile.m_nScheduleQty,pWnd->m_nScheduleQty);
+
+                DDX_String(bRead,g_IniFile.m_strSBTType,pWnd->m_strSBTType);
+                DDX_String(bRead,g_IniFile.m_strSBTSize,pWnd->m_strSBTSize);
+                DDX_String(bRead,g_IniFile.m_strSN,pWnd->m_strSN);
+                
+                DDX_Radio(bRead,g_IniFile.m_nSBTCorner,pWnd->m_nSBTCorner);
+
+                g_IniFile.m_nLEDDimmer[0]=pWnd->trackLED0->Position;
+                g_IniFile.m_nLEDDimmer[1]=pWnd->trackLED1->Position;
+
+                SetLEDDimmer();
+
+                DDX_Int(bRead,g_IniFile.m_nBlockColumn[0],pWnd->m_nBlockColumn0);
+                DDX_Int(bRead,g_IniFile.m_nBlockColumn[1],pWnd->m_nBlockColumn1);
+                DDX_Int(bRead,g_IniFile.m_nBlockColumn[2],pWnd->m_nBlockColumn2);
+                DDX_Int(bRead,g_IniFile.m_nBlockColumn[3],pWnd->m_nBlockColumn3);
+
+        
+        }
+
+        if(GetSchedule(1)=="INVALID") ShowMessage("批號格式不正確 請重新輸入!!");
+
+        RefreshImage();
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::btnPriviledgeClick(TObject *Sender)
+{
+        TfmPrivilege *pDlg=new TfmPrivilege(this);
+    TfrmPassword *pPwdDlg=new TfrmPassword(this);
+    int nD=pDlg->ShowModal()-1;
+    delete pDlg;
+
+    switch(nD)
+    {
+        case 1:
+        case 2:
+            pPwdDlg->labelOldPassword->Caption="請輸入密碼";
+            pPwdDlg->labelNewPassword->Visible=false;
+            pPwdDlg->editNewPassword->Visible=false;
+            if(pPwdDlg->ShowModal()==mrOk)
+            {
+                if(pPwdDlg->editOldPassword->Text==g_IniFile.m_strENGPassword) m_nUserLevel=1;
+                else if(pPwdDlg->editOldPassword->Text==g_IniFile.m_strARTPassword) m_nUserLevel=2;
+                else {Application->MessageBox("密碼錯誤!!", "錯誤", MB_OK);m_nUserLevel=0;}
+             }
+             SetPrivilege(m_nUserLevel);
+             break;
+        case 0:
+                m_nUserLevel=0;
+            SetPrivilege(0);
+            break;
+        case 3:
+            if(pPwdDlg->ShowModal()==mrOk)
+            {
+                if(pPwdDlg->editOldPassword->Text==g_IniFile.m_strENGPassword)
+                    g_IniFile.m_strENGPassword=pPwdDlg->editNewPassword->Text;
+            }
+            break;
+    }
+
+    delete pPwdDlg;        
+}
+//---------------------------------------------------------------------------
+void __fastcall TfmMain::SetPrivilege(int nLevel)
+{
+    switch(nLevel)
+    {
+        case 0:
+            Parameter1->Enabled=false;
+            Operate1->Enabled=false;
+            Exit1->Enabled=false;
+
+            PageControl1->ActivePage=tabInfo;
+
+            break;
+        case 1:
+            Parameter1->Enabled=true;
+            Operate1->Enabled=true;
+            Exit1->Enabled=true;
+
+            break;
+        case 2:
+            Parameter1->Enabled=true;
+            Operate1->Enabled=true;
+            Exit1->Enabled=true;
+
+        break;
+    }
+
+
+}
+//---------------------------------------------------------------------------  
+
+void __fastcall TfmMain::btnMotorManulClick(TObject *Sender)
+{
+        if(AxisMoveCheck())
+        {
+                TfmManual *pWnd=new TfmManual(this);
+
+                pWnd->ShowModal();
+        }
+} 
+//--------------------------------------------------------------------------- 
+void __fastcall TfmMain::btnOptionClick(TObject *Sender)
+{
+        TfmOption *pWnd=new TfmOption(this);
+
+        bool bRead=true;
+
+        DDX_Check(bRead,g_IniFile.m_bIsRailLoad,pWnd->m_bIsRailLoad);
+        DDX_Check(bRead,g_IniFile.m_bReadVenderID,pWnd->m_bReadVenderID);
+
+        DDX_Check(bRead,g_IniFile.m_bUseFMCCD,pWnd->m_bUseFMCCD);
+        DDX_Check(bRead,g_IniFile.m_bUseMapCCD,pWnd->m_bUseMapCCD);
+
+        DDX_Check(bRead,g_IniFile.m_bUseLaserMark,pWnd->m_bUseLaserMark);
+        DDX_Check(bRead,g_IniFile.m_bUseLaserCodeReader,pWnd->m_bUseLaserCodeReader);
+
+        DDX_Check(bRead,g_IniFile.m_bUseCover,pWnd->m_bUseCover);
+        DDX_Check(bRead,g_IniFile.m_bUseBoat,pWnd->m_bUseBoat);
+        DDX_Check(bRead,g_IniFile.m_bEAPCoverControl,pWnd->m_bEAPCoverControl);
+        DDX_Check(bRead,g_IniFile.m_bEAPBoatControl,pWnd->m_bEAPBoatControl);
+
+        DDX_Check(bRead,g_IniFile.m_bIsSingleSubstrate,pWnd->m_bIsSingleSubstrate);
+
+        DDX_Check(bRead,g_IniFile.m_bUpLoadMapFile,pWnd->m_bUpLoadMapFile);
+
+        DDX_Radio(bRead,g_IniFile.m_nUseTable,pWnd->m_nUseTable);
+
+        if(pWnd->ShowModal()==mrOk)
+        {
+                bRead=false;
+
+                DDX_Check(bRead,g_IniFile.m_bIsRailLoad,pWnd->m_bIsRailLoad);
+                DDX_Check(bRead,g_IniFile.m_bReadVenderID,pWnd->m_bReadVenderID);
+
+                DDX_Check(bRead,g_IniFile.m_bUseFMCCD,pWnd->m_bUseFMCCD);
+                DDX_Check(bRead,g_IniFile.m_bUseMapCCD,pWnd->m_bUseMapCCD);
+
+                DDX_Check(bRead,g_IniFile.m_bUseLaserMark,pWnd->m_bUseLaserMark);
+                DDX_Check(bRead,g_IniFile.m_bUseLaserCodeReader,pWnd->m_bUseLaserCodeReader);
+
+                DDX_Check(bRead,g_IniFile.m_bUseCover,pWnd->m_bUseCover);
+                DDX_Check(bRead,g_IniFile.m_bUseBoat,pWnd->m_bUseBoat);
+                DDX_Check(bRead,g_IniFile.m_bEAPCoverControl,pWnd->m_bEAPCoverControl);
+                DDX_Check(bRead,g_IniFile.m_bEAPBoatControl,pWnd->m_bEAPBoatControl);
+
+                DDX_Check(bRead,g_IniFile.m_bIsSingleSubstrate,pWnd->m_bIsSingleSubstrate);
+
+                DDX_Check(bRead,g_IniFile.m_bUpLoadMapFile,pWnd->m_bUpLoadMapFile);
+
+                DDX_Radio(bRead,g_IniFile.m_nUseTable,pWnd->m_nUseTable);
+        }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::CreateCaptionFile(TForm *pForm)
+{ 
+        AnsiString strFile;
+        TIniFile *pIniFile;
+
+        strFile.sprintf("%s%s","C:\\","Caption_C77.ini");
+        pIniFile = new TIniFile(strFile);
+
+        const char *Section=pForm->Name.c_str();
+
+       for(int nIndex=0;nIndex<pForm->ControlCount;nIndex++)
+        {
+
+                if(pForm->Controls[nIndex]->ClassNameIs("TToolBar"))
+                {
+                        for(int nIndex2=0;nIndex2<((TToolBar *)pForm->Controls[nIndex])->ControlCount;nIndex2++)
+                        {
+                                if(((TToolBar *)pForm->Controls[nIndex])->Controls[nIndex2]->ClassNameIs("TToolButton"))
+                                {
+                                        AnsiString strCaption=((TToolButton *)((TToolBar *)pForm->Controls[nIndex])->Controls[nIndex2])->Caption;
+                                        AnsiString strName=((TToolButton *)((TToolBar *)pForm->Controls[nIndex])->Controls[nIndex2])->Name;
+
+                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+                                }
+                        }
+                }
+
+                if(pForm->Controls[nIndex]->ClassNameIs("TGroupBox"))
+                {
+                        for(int nIndex2=0;nIndex2<((TGroupBox *)pForm->Controls[nIndex])->ControlCount;nIndex2++)
+                        {
+                                 AnsiString strCaption=((TGroupBox *)pForm->Controls[nIndex])->Caption;
+                                 AnsiString strName=((TGroupBox *)pForm->Controls[nIndex])->Name;
+
+                                 DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+
+                                if(((TGroupBox *)pForm->Controls[nIndex])->Controls[nIndex2]->ClassNameIs("TSpeedButton"))
+                                {
+                                        AnsiString strCaption=((TSpeedButton *)((TGroupBox *)pForm->Controls[nIndex])->Controls[nIndex2])->Caption;
+                                        AnsiString strName=((TSpeedButton *)((TGroupBox *)pForm->Controls[nIndex])->Controls[nIndex2])->Name;
+
+                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+                                }
+
+                                if(((TGroupBox *)pForm->Controls[nIndex])->Controls[nIndex2]->ClassNameIs("TBitBtn"))
+                                {
+                                        AnsiString strCaption=((TBitBtn *)((TGroupBox *)pForm->Controls[nIndex])->Controls[nIndex2])->Caption;
+                                        AnsiString strName=((TBitBtn *)((TGroupBox *)pForm->Controls[nIndex])->Controls[nIndex2])->Name;
+
+                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+                                }
+
+                                 if(((TGroupBox *)pForm->Controls[nIndex])->Controls[nIndex2]->ClassNameIs("TCheckBox"))
+                                {
+                                        AnsiString strCaption=((TCheckBox *)((TGroupBox *)pForm->Controls[nIndex])->Controls[nIndex2])->Caption;
+                                        AnsiString strName=((TCheckBox *)((TGroupBox *)pForm->Controls[nIndex])->Controls[nIndex2])->Name;
+
+                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+                                }
+
+                                if(((TGroupBox *)pForm->Controls[nIndex])->Controls[nIndex2]->ClassNameIs("TLabel"))
+                                {
+                                        AnsiString strCaption=((TLabel *)((TGroupBox *)pForm->Controls[nIndex])->Controls[nIndex2])->Caption;
+                                        AnsiString strName=((TLabel *)((TGroupBox *)pForm->Controls[nIndex])->Controls[nIndex2])->Name;
+
+                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+                                }
+
+                                if(((TGroupBox *)pForm->Controls[nIndex])->Controls[nIndex2]->ClassNameIs("TStaticText"))
+                                {
+                                        AnsiString strCaption=((TStaticText *)((TGroupBox *)pForm->Controls[nIndex])->Controls[nIndex2])->Caption;
+                                        AnsiString strName=((TStaticText *)((TGroupBox *)pForm->Controls[nIndex])->Controls[nIndex2])->Name;
+
+                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+                                }
+                        }
+                }
+
+                if(pForm->Controls[nIndex]->ClassNameIs("TPageControl"))
+                {
+                        TPageControl *pPage=(TPageControl *)pForm->Controls[nIndex];
+                        for(int nIndex2=0;nIndex2<pPage->ControlCount;nIndex2++)
+                        {
+                                if(pPage->Controls[nIndex2]->ClassNameIs("TTabSheet"))
+                                {
+                                        TTabSheet *pSheet=(TTabSheet *)pPage->Controls[nIndex2];
+                                        AnsiString strCaption=pSheet->Caption;
+                                        AnsiString strName=pSheet->Name;
+
+                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+
+                                        for(int nIndex3=0;nIndex3<pSheet->ControlCount;nIndex3++)
+                                        {
+                                                if(pSheet->Controls[nIndex3]->ClassNameIs("TStaticText"))
+                                                {
+                                                        TStaticText *pText=(TStaticText *)pSheet->Controls[nIndex3];
+                                                        AnsiString strCaption=pText->Caption;
+                                                        AnsiString strName=pText->Name;
+
+                                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+                                                }
+
+                                                if(pSheet->Controls[nIndex3]->ClassNameIs("TGroupBox"))
+                                                {
+                                                        TGroupBox *pGroup=(TGroupBox *)pSheet->Controls[nIndex3];
+                                                        AnsiString strCaption=pGroup->Caption;
+                                                        AnsiString strName=pGroup->Name;
+
+                                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+
+                                                        for(int nIndex4=0;nIndex4<pGroup->ControlCount;nIndex4++)
+                                                        {
+                                                                if(pGroup->Controls[nIndex4]->ClassNameIs("TStaticText"))
+                                                                {
+                                                                        TStaticText *pText=(TStaticText *)pGroup->Controls[nIndex4];
+                                                                        AnsiString strCaption=pText->Caption;
+                                                                        AnsiString strName=pText->Name;
+
+                                                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+                                                                }
+                                                        }
+                                                }
+
+                                                if(pSheet->Controls[nIndex3]->ClassNameIs("TSpeedButton"))
+                                                {
+                                                        TSpeedButton *pBtn=(TSpeedButton *)pSheet->Controls[nIndex3];
+                                                        AnsiString strCaption=pBtn->Caption;
+                                                        AnsiString strName=pBtn->Name;
+
+                                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+                                                }
+
+                                                if(pSheet->Controls[nIndex3]->ClassNameIs("TPanel"))
+                                                {
+                                                        TPanel *pPanel=(TPanel *)pSheet->Controls[nIndex3];
+                                                        AnsiString strCaption=pPanel->Caption;
+                                                        AnsiString strName=pPanel->Name;
+
+                                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+                                                }
+
+
+                                        }
+                                }
+                        }
+                }
+
+
+                if(pForm->Controls[nIndex]->ClassNameIs("TPanel"))
+                {
+                        TPanel *pPanel=(TPanel *)pForm->Controls[nIndex];
+                        for(int nIndex2=0;nIndex2<pPanel->ControlCount;nIndex2++)
+                        {
+                                if(pPanel->Controls[nIndex2]->ClassNameIs("TLabel"))
+                                {
+                                        TLabel *pLabel=(TLabel *)pPanel->Controls[nIndex2];
+                                        AnsiString strCaption=pLabel->Caption;
+                                        AnsiString strName=pLabel->Name;
+
+                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+                                }
+
+                                if(pPanel->Controls[nIndex2]->ClassNameIs("TBitBtn"))
+                                {
+                                        TBitBtn *pBtn=(TBitBtn *)pPanel->Controls[nIndex2];
+                                        AnsiString strCaption=pBtn->Caption;
+                                        AnsiString strName=pBtn->Name;
+
+                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+                                }
+
+                                if(pPanel->Controls[nIndex2]->ClassNameIs("TStaticText"))
+                                {
+                                        TStaticText *pTxt=(TStaticText *)pPanel->Controls[nIndex2];
+                                        AnsiString strCaption=pTxt->Caption;
+                                        AnsiString strName=pTxt->Name;
+
+                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+                                }
+
+                                if(pPanel->Controls[nIndex2]->ClassNameIs("TPageControl"))
+                                {
+                                        TPageControl *pPage=(TPageControl *)pPanel->Controls[nIndex2];
+                                        for(int nIndex3=0;nIndex3<pPage->ControlCount;nIndex3++)
+                                        {
+                                                if(pPage->Controls[nIndex3]->ClassNameIs("TTabSheet"))
+                                                {
+                                                        TTabSheet *pSheet=(TTabSheet *)pPage->Controls[nIndex3];
+                                                        AnsiString strCaption=pSheet->Caption;
+                                                        AnsiString strName=pSheet->Name;
+
+                                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+
+                                                        for(int nIndex4=0;nIndex4<pSheet->ControlCount;nIndex4++)
+                                                        {
+                                                                if(pSheet->Controls[nIndex4]->ClassNameIs("TSpeedButton"))
+                                                                {
+                                                                        TSpeedButton *pBtn=(TSpeedButton *)pSheet->Controls[nIndex4];
+                                                                        AnsiString strCaption=pBtn->Caption;
+                                                                        AnsiString strName=pBtn->Name;
+
+                                                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+                                                                }
+
+                                                                if(pSheet->Controls[nIndex4]->ClassNameIs("TPanel"))
+                                                                {
+                                                                        TPanel *pPanel=(TPanel *)pSheet->Controls[nIndex4];
+                                                                        AnsiString strCaption=pPanel->Caption;
+                                                                        AnsiString strName=pPanel->Name;
+
+                                                                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+                                                                }
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
+                }
+
+                if(pForm->Controls[nIndex]->ClassNameIs("TBitBtn"))
+                {
+                        AnsiString strCaption=((TBitBtn *)pForm->Controls[nIndex])->Caption;
+                        AnsiString strName=((TBitBtn *)pForm->Controls[nIndex])->Name;
+
+                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+
+                }
+
+                if(pForm->Controls[nIndex]->ClassNameIs("TSpeedButton"))
+                {
+                        AnsiString strCaption=((TSpeedButton *)pForm->Controls[nIndex])->Caption;
+                        AnsiString strName=((TSpeedButton *)pForm->Controls[nIndex])->Name;
+
+                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+
+                }
+
+                if(pForm->Controls[nIndex]->ClassNameIs("TButton"))
+                {
+                        AnsiString strCaption=((TButton *)pForm->Controls[nIndex])->Caption;
+                        AnsiString strName=((TButton *)pForm->Controls[nIndex])->Name;
+
+                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+
+                }
+
+                if(pForm->Controls[nIndex]->ClassNameIs("TLabel"))
+                {
+                        AnsiString strCaption=((TLabel *)pForm->Controls[nIndex])->Caption;
+                        AnsiString strName=((TLabel *)pForm->Controls[nIndex])->Name;
+
+                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+
+                }
+
+                if(pForm->Controls[nIndex]->ClassNameIs("TCheckBox"))
+                {
+                        AnsiString strCaption=((TLabel *)pForm->Controls[nIndex])->Caption;
+                        AnsiString strName=((TLabel *)pForm->Controls[nIndex])->Name;
+
+                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+
+                }
+
+                if(pForm->Controls[nIndex]->ClassNameIs("TStaticText"))
+                {
+                        AnsiString strCaption=((TStaticText *)pForm->Controls[nIndex])->Caption;
+                        AnsiString strName=((TStaticText *)pForm->Controls[nIndex])->Name;
+
+                        DDXFile_String(false,pIniFile,Section,strName,strCaption,"NA");
+
+                }
+
+        }
+
+        delete pIniFile;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::ReadCaptionFile(TForm *pForm,int nLanguage)
+{
+        AnsiString strFile;
+        TIniFile *pIniFile;
+
+        if(nLanguage>0) strFile.sprintf("%s%s","C:\\","Caption_C77_ENG.ini");
+        else strFile.sprintf("%s%s","C:\\","Caption_C77.ini");
+
+        const char *pSection=pForm->Name.c_str();
+
+        pIniFile = new TIniFile(strFile);
+
+        TStringList *TempList = new TStringList;
+
+        pIniFile->ReadSection(pSection,TempList);
+
+        AnsiString strClass;
+        AnsiString strName;
+        AnsiString strValue;
+
+        for(int nIndex=0;nIndex<TempList->Count;nIndex++)
+        {
+                strName=TempList->Strings[nIndex];
+                strValue=pIniFile->ReadString(pSection,strName,"NA");
+
+                if(!pForm->FindComponent(strName)) continue;
+                strClass=pForm->FindComponent(strName)->ClassName();
+
+                if(strClass=="TLabel") ((TLabel *)pForm->FindComponent(strName))->Caption=strValue;
+                else if(strClass=="TToolButton") ((TToolButton *)pForm->FindComponent(strName))->Caption=strValue;
+                else if(strClass=="TSpeedButton") ((TSpeedButton *)pForm->FindComponent(strName))->Caption=strValue;
+                else if(strClass=="TBitBtn") ((TBitBtn *)pForm->FindComponent(strName))->Caption=strValue;
+                else if(strClass=="TGroupBox") ((TGroupBox *)pForm->FindComponent(strName))->Caption=strValue;
+                else if(strClass=="TCheckBox") ((TCheckBox *)pForm->FindComponent(strName))->Caption=strValue;
+                else if(strClass=="TStaticText") ((TStaticText *)pForm->FindComponent(strName))->Caption=strValue;
+                else if(strClass=="TButton") ((TButton *)pForm->FindComponent(strName))->Caption=strValue;
+                else if(strClass=="TTabSheet") ((TTabSheet *)pForm->FindComponent(strName))->Caption=strValue;
+                else if(strClass=="TPanel") ((TPanel *)pForm->FindComponent(strName))->Caption=strValue;
+                
+        }
+
+
+        delete TempList;
+        
+
+        delete pIniFile;
+}
+//---------------------------------------------------------------------------
+void __fastcall TfmMain::FormClose(TObject *Sender, TCloseAction &Action)
+{
+        g_bStopMainThread=true;
+        g_Grabber.StopLive(0);
+        g_Grabber.StopLive(1);
+
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TfmMain::paintMapPaint(TObject *Sender)
+{
+        CreateMapArray(paintMap->ClientRect, g_IniFile.m_nPackageX, g_IniFile.m_nPackageY,5,
+                                g_IniFile.m_nDeviceX,g_IniFile.m_nDeviceY);
+
+        paintMap->Canvas->Pen->Color=clLime;
+        paintMap->Canvas->Brush->Color=clGreen;
+        for(int nIndex=0;nIndex<m_vectRect.size();nIndex++)
+        {
+                if(m_nSubstrateMap[nIndex]==1) paintMap->Canvas->Brush->Color=clGreen; //OK
+                else if(m_nSubstrateMap[nIndex]==-1) paintMap->Canvas->Brush->Color=clRed;  //NG
+                else if(m_nSubstrateMap[nIndex]==0)paintMap->Canvas->Brush->Color=clGray;    //Empty
+
+              paintMap->Canvas->Rectangle(m_vectRect[nIndex]);
+              paintMap->Canvas->TextOutA(m_vectRect[nIndex].Left+3,m_vectRect[nIndex].top+3,FormatFloat("0",nIndex+1));
+              //PaintBox1->Canvas->TextRect(m_rectRectFront[nIndex],1,1,FormatFloat("0",nIndex));
+        }
+
+        TPoint points[3];
+
+        //Left Top
+        switch(g_IniFile.m_nSBTCorner)
+        {
+        case 0:
+                points[0] = TPoint(0,0);
+                points[1] = TPoint(30,0);
+                points[2] = TPoint(0,30);
+                break;
+        case 1:
+                points[0] = TPoint(paintMap->ClientRect.Right,0);
+                points[1] = TPoint(paintMap->ClientRect.Right-30,0);
+                points[2] = TPoint(paintMap->ClientRect.Right,30);
+                break;
+        case 2:
+                points[0] = TPoint(0,paintMap->ClientRect.Bottom);
+                points[1] = TPoint(30,paintMap->ClientRect.Bottom);
+                points[2] = TPoint(0,paintMap->ClientRect.Bottom-30);
+                break;
+        case 3:
+                points[0] = TPoint(paintMap->ClientRect.Right,paintMap->ClientRect.Bottom);
+                points[1] = TPoint(paintMap->ClientRect.Right-30,paintMap->ClientRect.Bottom);
+                points[2] = TPoint(paintMap->ClientRect.Right,paintMap->ClientRect.Bottom-30);
+                break;
+        }
+
+
+        paintMap->Canvas->Pen->Color=clLime;
+        paintMap->Canvas->Brush->Color=clYellow;
+        paintMap->Canvas->Polygon(points,2);
+
+}
+//---------------------------------------------------------------------------
+void __fastcall TfmMain::CreateMapArray(TRect &rect,int nPackageX,int nPackageY,int nDeviceGap,int nSectX,int nSectY)
+{
+        const int nGap=0;
+
+        if(nSectX<=0 || nPackageX<=0 || nSectY<=0 || nPackageY<=0) return;
+
+        //m_nLeftColCnt=nPackageX*nSectX;
+        //m_nLeftRowCnt=nPackageY*nSectY;
+        int nPitchX;
+        int nPitchY;
+
+        nPitchX=(rect.Width()-nDeviceGap*(nPackageX-1))/(nSectX*nPackageX);
+        nPitchY=(rect.Height()-nDeviceGap*(nPackageY-1))/(nSectY*nPackageY);
+
+
+        m_vectRect.clear();
+
+        for(int nY=0;nY<nSectY*nPackageY;nY++)
+        //for(int nX=0;nX<nSectX*nPackageX;nX++)
+        for(int nX=nSectX*nPackageX-1;nX>=0;nX--)
+        {
+               m_vectRect.push_back(TRect(rect.right-nPitchX*nX-nPitchX-nGap-(nX/nSectX)*nDeviceGap ,rect.top+nPitchY*nY+nGap+(nY/nSectY)*nDeviceGap,
+                        rect.right-nPitchX*nX-nGap-(nX/nSectX)*nDeviceGap,rect.top+nPitchY*nY+nPitchY-nGap+(nY/nSectY)*nDeviceGap));
+        }
+}
+//---------------------------------------------------------------------------
+void __fastcall TfmMain::ImagePaintBoxPaint(TObject *Sender)
+{
+        
+        theVision.DrawAll(ImagePaintBox->Canvas->Handle,g_IniFile.m_nImageWidth);
+        g_bOnRefresh=false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::BitBtn6Click(TObject *Sender)
+{
+        theVision.IncScaleSize();
+        RefreshImage();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::BitBtn3Click(TObject *Sender)
+{
+        theVision.DecScaleSize();
+        RefreshImage();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::BitBtn8Click(TObject *Sender)
+{
+
+        theVision.SetScaleSize(0.5,0.5);
+        RefreshImage();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::BitBtn5Click(TObject *Sender)
+{
+        theVision.SetScaleSize(1.0,1.0);
+        RefreshImage();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::Load1Click(TObject *Sender)
+{
+        int nTag=((TMenuItem *)Sender)->Tag;
+        OpenPictureDialog1->DefaultExt="bmp";
+        if(OpenPictureDialog1->Execute())
+        {
+                theVision.m_ImageTmpBW8.Load(OpenPictureDialog1->FileName.c_str());
+                theVision.m_ImageSizeX=theVision.m_ImageTmpBW8.GetWidth();
+                theVision.m_ImageSizeY=theVision.m_ImageTmpBW8.GetHeight();
+
+                if(nTag>0)
+                {
+                        theVision.MergeImage(nTag-1,g_IniFile.m_nImageWidth,g_IniFile.m_dImageAngle);
+                }
+        }
+
+        RefreshImage();        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::Save2Click(TObject *Sender)
+{
+        SavePictureDialog1->DefaultExt="bmp";
+        if(SavePictureDialog1->Execute())
+        {
+                theVision.m_ImageTmpBW8.Save(SavePictureDialog1->FileName.c_str());
+        }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::checkShowSearchROI0Click(TObject *Sender)
+{
+        TCheckBox *pCheck=(TCheckBox *)Sender;
+        
+        if(pCheck->Tag!=0)
+        {
+                /*
+                theVision.m_bShowMarkROI[0]=false;
+                theVision.m_bShowMarkROI[1]=false;
+                theVision.m_bShowMarkROI[2]=false;
+                */
+                theVision.m_bShowMarkROI[pCheck->Tag]=pCheck->Checked;
+
+
+                
+
+        }
+        else
+        {
+                theVision.m_bShowBlockROI[0]=false;
+                theVision.m_bShowBlockROI[1]=false;
+                theVision.m_bShowBlockROI[2]=false;
+                theVision.m_bShowBlockROI[3]=false;
+
+                theVision.m_bShowBlockROI[theVision.m_nCurrentRoiBlock]=pCheck->Checked;
+        }
+
+         if(pCheck->Tag!=0) checkShowSearchROI0->Checked=false;
+         if(pCheck->Tag!=1) checkShowSearchROI1->Checked=false;
+         if(pCheck->Tag!=2) checkShowSearchROI2->Checked=false;
+
+        RefreshImage();        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::checkShowPatternROI0Click(TObject *Sender)
+{
+        TCheckBox *pCheck=(TCheckBox *)Sender;
+        /*
+        theVision.m_bShowPatternROI[0]=false;
+        theVision.m_bShowPatternROI[1]=false;
+        theVision.m_bShowPatternROI[2]=false;
+        */
+        theVision.m_bShowPatternROI[pCheck->Tag]=pCheck->Checked;
+
+        if(pCheck->Tag!=0) checkShowPatternROI0->Checked=false;
+        if(pCheck->Tag!=1) checkShowPatternROI1->Checked=false;
+        if(pCheck->Tag!=2) checkShowPatternROI2->Checked=false;
+
+        RefreshImage();         
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::checkShowLayoutClick(TObject *Sender)
+{
+        theVision.m_bShowLayout=checkShowLayout->Checked;
+
+
+        RefreshImage();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::checkShowResult0Click(TObject *Sender)
+{
+        TCheckBox *pCheck=(TCheckBox *)Sender;
+        /*
+        theVision.m_bShowMatchResult[0]=false;
+        theVision.m_bShowMatchResult[1]=false;
+        theVision.m_bShowMatchResult[2]=false;
+        */
+        theVision.m_bShowMatchResult[pCheck->Tag]=pCheck->Checked;
+        
+        if(pCheck->Tag!=0) checkShowResult0->Checked=false;
+        if(pCheck->Tag!=1) checkShowResult1->Checked=false;
+        if(pCheck->Tag!=2) checkShowResult2->Checked=false;
+        RefreshImage();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::btnGrabClick(TObject *Sender)
+{
+        TSpeedButton *pBtn=(TSpeedButton *)Sender;
+
+        g_Grabber.Grab(pBtn->Tag);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::btnLiveClick(TObject *Sender)
+{
+        TSpeedButton *pBtn=(TSpeedButton *)Sender;
+
+        if(pBtn->Down) g_Grabber.StartLive(pBtn->Tag);
+        else g_Grabber.StopLive(pBtn->Tag);        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::BitBtn7Click(TObject *Sender)
+{
+        TBitBtn *pBtn=(TBitBtn *)Sender;
+        theVision.LearnPatMatch(theVision.m_roiMarkPattern[pBtn->Tag],theVision.m_markMatch[pBtn->Tag]);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::btnVisionProcessClick(TObject *Sender)
+{
+        DoVisionProcess(theVision.m_nCurrentRoiBlock);
+        RefreshImage();
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TfmMain::DoVisionProcess()
+{
+        int  nFounds=0;
+
+        theVision.m_markMatch[0].SetMaxPositions(g_IniFile.m_nDeviceX*g_IniFile.m_nDeviceY*g_IniFile.m_nPackageX*g_IniFile.m_nPackageY);
+
+        nFounds=theVision.FindPatMatch(theVision.m_roiMark[0],theVision.m_markMatch[0]);
+
+        if(nFounds<1)
+        {
+                //ShowMessage("找不到!!");
+                //int nMark=0;
+
+                //g_IniFile.m_bFindOKMark ? nMark=0:nMark=1;
+
+                //memset(m_nSubstrateMap,nMark,sizeof(__int16)*10000);
+
+                for(int nMap=0;nMap<theVision.m_vectRect.size();nMap++)
+                         g_IniFile.m_bFindOKMark ? m_nSubstrateMap[nMap]=0:m_nSubstrateMap[nMap]=1;
+        }
+        else
+        {
+                for(int nMap=0;nMap<theVision.m_vectRect.size();nMap++)
+                {
+                        m_nSubstrateMap[nMap]=0;
+                        for(int nIndex=0;nIndex<nFounds;nIndex++)
+                        {
+
+                                if(PtInRect(theVision.m_vectRect[nMap],TPoint(theVision.GetMatchPosX(nIndex),theVision.GetMatchPosY(nIndex))) )
+                                {
+                                       g_IniFile.m_bFindOKMark ? m_nSubstrateMap[nMap]=1:m_nSubstrateMap[nMap]=0; //Found
+                                       
+                                        break;
+                                }
+                                else g_IniFile.m_bFindOKMark ? m_nSubstrateMap[nMap]=0:m_nSubstrateMap[nMap]=1;
+                        }
+                }
+        }
+
+       //RefreshImage();
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TfmMain::DoVisionProcess(int nBkIndex)
+{
+        int  nFounds=0;
+
+        theVision.m_markMatch[0].SetMaxPositions(g_IniFile.m_nDeviceX*g_IniFile.m_nDeviceY*g_IniFile.m_nPackageX*g_IniFile.m_nPackageY);
+
+        nFounds=theVision.FindPatMatch(theVision.m_roiBlock[nBkIndex],theVision.m_markMatch[0]);
+
+        int nStartCol[4];
+        nStartCol[0]=0;
+        nStartCol[1]=nStartCol[0]+g_IniFile.m_nBlockColumn[0];
+        nStartCol[2]=nStartCol[1]+g_IniFile.m_nBlockColumn[1];
+        nStartCol[3]=nStartCol[2]+g_IniFile.m_nBlockColumn[2];
+
+        if(nFounds<1)
+        {
+                //ShowMessage("找不到!!");
+                //int nMark=0;
+
+                //g_IniFile.m_bFindOKMark ? nMark=0:nMark=1;
+
+                //memset(m_nSubstrateMap,nMark,sizeof(__int16)*10000);
+
+                for(int nMap=0;nMap<m_vectRect.size();nMap++)         //Full Substrate
+                {
+                        int nCol=nMap % (g_IniFile.m_nDeviceX*g_IniFile.m_nPackageX);
+
+                        if(nCol <nStartCol[nBkIndex+1] && nCol >=nStartCol[nBkIndex])
+                                g_IniFile.m_bFindOKMark ? m_nSubstrateMap[nMap]=0:m_nSubstrateMap[nMap]=1;
+                }
+        }
+        else
+        {
+                for(int nBkMap=0;nBkMap<theVision.m_vectRect.size();nBkMap++)      //One Block
+                {
+                        int nBkRow=nBkMap / g_IniFile.m_nBlockColumn[nBkIndex];
+                        int nBkCol=nBkMap % g_IniFile.m_nBlockColumn[nBkIndex];
+                        int nMap=nBkRow * g_IniFile.m_nDeviceX*g_IniFile.m_nPackageX+ nStartCol[nBkIndex]+nBkCol;
+
+                        m_nSubstrateMap[nMap]=0;
+                        for(int nIndex=0;nIndex<nFounds;nIndex++)
+                        {
+
+                                if(PtInRect(theVision.m_vectRect[nBkMap],TPoint(theVision.GetMatchPosX(theVision.m_markMatch[0],theVision.m_roiBlock[nBkIndex],nIndex),
+                                                                                theVision.GetMatchPosY(theVision.m_markMatch[0],theVision.m_roiBlock[nBkIndex],nIndex))) )
+                                {
+
+                                       g_IniFile.m_bFindOKMark ? m_nSubstrateMap[nMap]=1:m_nSubstrateMap[nMap]=0; //Found
+
+                                        break;
+                                }
+                                else g_IniFile.m_bFindOKMark ? m_nSubstrateMap[nMap]=0:m_nSubstrateMap[nMap]=1;
+                        }
+                }
+        }
+
+       //RefreshImage();
+}
+//---------------------------------------------------------------------------
+void __fastcall TfmMain::timerMessageTimer(TObject *Sender)
+{
+        static int nErrorCode=0;
+
+        timerMessage->Enabled=false;
+
+        if(tm1MSLogOut.timeDevEnd()>300000)
+        {
+                SetPrivilege(0);
+                tm1MSLogOut.timeDevStart();
+        }
+        //--Thread Log---
+        if(g_pMainThread->m_listLog.size()>0)
+        {
+                AnsiString strLog=g_pMainThread->m_listLog.front();
+                AddList(strLog);
+
+                g_pMainThread->m_listLog.pop_front();
+
+        }
+        //---Vision Log
+        if(theVision.m_listLog.size()>0)
+        {
+                AnsiString strLog=theVision.m_listLog.front();
+                AddList(strLog);
+
+                theVision.m_listLog.pop_front();
+
+        }
+         if(g_pMainThread->m_listVisionLog.size()>0)
+        {
+                AnsiString strLog=g_pMainThread->m_listVisionLog.front();
+                AddVisionLog(strLog);
+                AddList(strLog);
+                g_pMainThread->m_listVisionLog.pop_front();
+
+        }
+
+        //CIM Message
+        if(g_eqpXML.m_listCIMMsg.size()>0)
+        {
+                AnsiString strLog=g_eqpXML.m_listCIMMsg.front();
+                AddCIMList(strLog);
+                g_eqpXML.m_listCIMMsg.pop_front();
+        }
+
+        //---Error Code
+	if(g_IniFile.m_nErrorCode>0 && (nErrorCode!=g_IniFile.m_nErrorCode))
+	{
+		//if(m_pMessageDlg)
+		{
+			AnsiString strMsg=g_IniFile.GetErrorString("SYSTEM",g_IniFile.m_nErrorCode);
+                        AddList(strMsg);
+                        //Eng Message For CIM
+                        strMsg=g_IniFile.GetErrorString("SYSTEM",g_IniFile.m_nErrorCode,1);
+                        g_eqpXML.SendAlarmMessage(FormatFloat("0",g_IniFile.m_nErrorCode).c_str(),strMsg.c_str());
+
+		}                 
+
+	}
+
+
+
+        if(g_DIO.GetDO(DO::Buzzer)) listHistory->Color=clRed;
+        else listHistory->Color=clBlack;
+
+        //----Motion
+        if(!g_pMainThread->m_bIsAutoMode)
+        {
+
+        }
+
+        //---Refresh
+        if(g_pMainThread->m_bRefresh)
+        {
+
+                g_pMainThread->m_bRefresh=false;
+        }
+
+	nErrorCode=g_IniFile.m_nErrorCode;
+
+       
+
+        timerMessage->Enabled=true;
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TfmMain::AddList(AnsiString strMessage)
+{
+        listHistory->AddItem(TimeToStr(Time())+"-->"+strMessage,NULL);
+        listHistory->ItemIndex=listHistory->Count-1;
+
+
+        g_IniFile.AddLog(strMessage.c_str(),strMessage.Length());
+
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TfmMain::AddCIMList(AnsiString strMessage)
+{
+        listCIMLog->AddItem(TimeToStr(Time())+"-->"+strMessage,NULL);
+        listCIMLog->ItemIndex=listCIMLog->Count-1;
+
+
+        g_IniFile.AddLog(strMessage.c_str(),strMessage.Length());
+
+}
+//---------------------------------------------------------------------------
+void __fastcall TfmMain::AddVisionLog(AnsiString strLog)
+{
+        listVisionLog->AddItem(strLog,NULL);
+        listVisionLog->ItemIndex=listVisionLog->Count-1;
+}
+//---------------------------------------------------------------------------
+void __fastcall TfmMain::timerCommTimer(TObject *Sender)
+{
+        if(g_pMainThread->m_listTX.size()>0 )
+        {
+                bool bRet;
+                AnsiString strCommand=g_pMainThread->m_listTX.front();
+                g_pMainThread->m_listTX.pop_front();
+                AddList(strCommand);
+
+                AnsiString strCMD;
+                strCMD.sprintf("TRIG%c",0x0d);
+
+                if(strCommand=="VENDER_TRIG")
+                {
+                        //if(serverVenderID->Socket->Connected) serverVenderID->Socket->Connections[0]->SendText("TRIG");
+                        if(clientVenderID->Socket->Connected) clientVenderID->Socket->SendText(strCMD);
+                        else AddList("基板2D讀取器沒有連線"); 
+
+                        //g_pMainThread->m_listTX.pop_front();
+                }
+
+                if(strCommand=="LASER_READER_TRIG")
+                {
+                        //if(serverLaserID->Socket->Connected) serverLaserID->Socket->Connections[0]->SendText("TRIG");
+                        if(clientLaserID->Socket->Connected) clientLaserID->Socket->SendText(strCMD);
+                        else AddList("雷刻完2D讀取器沒有連線");
+
+                        //g_pMainThread->m_listTX.pop_front();
+                }
+
+                if(strCommand=="COVER_TRIG")
+                {
+                        //if(serverCoverID->Socket->Connected) serverCoverID->Socket->Connections[0]->SendText("TRIG");
+                        if(clientCoverID->Socket->Connected) clientCoverID->Socket->SendText(strCMD);
+                        else AddList("上蓋板2D讀取器沒有連線");
+
+                        //g_pMainThread->m_listTX.pop_front();
+                }
+
+                if(strCommand=="BOAT_TRIG")
+                {
+                        //if(serverBoatID->Socket->Connected) serverBoatID->Socket->Connections[0]->SendText("TRIG");
+                        if(clientBoatID->Socket->Connected) clientBoatID->Socket->SendText(strCMD);
+                        else AddList("下蓋板2D讀取器沒有連線");
+
+                        //g_pMainThread->m_listTX.pop_front();
+                }
+
+                if(strCommand=="PROCESS_MAP_FRONT")
+                {
+                        btnVisionProcessClick(btnVisionProcess);         //do vision process
+                        //g_pMainThread->m_listTX.pop_front();
+
+                        g_pMainThread->m_listVisionRX.push_back("PROCESS_MAP_DONE");
+                }
+
+                if(strCommand=="EXPORT_MAP_FRONT")
+                {
+                        //g_pMainThread->m_listTX.pop_front();
+                        //export
+                        ExportSPILMapFile(g_pMainThread->m_tmpProductInfo[1].m_strLotID);
+                        if(!g_IniFile.m_bUseLaserMark && g_IniFile.m_bUpLoadMapFile) UploadMapFile(g_pMainThread->m_tmpProductInfo[1].m_strLotID);
+
+                        g_pMainThread->m_listVisionRX.push_back("EXPORT_MAP_DONE");
+                }
+
+                if(strCommand=="PROCESS_MAP_REAR")
+                {
+                        btnVisionProcessClick(btnVisionProcess);         //do vision process
+                        //g_pMainThread->m_listTX.pop_front();
+
+                        g_pMainThread->m_listVisionRX.push_back("PROCESS_MAP_DONE");
+                }
+
+                if(strCommand=="EXPORT_MAP_REAR")
+                {
+                        //g_pMainThread->m_listTX.pop_front();
+                        //export
+                         ExportSPILMapFile(g_pMainThread->m_tmpProductInfo[0].m_strLotID);
+                        if(!g_IniFile.m_bUseLaserMark && g_IniFile.m_bUpLoadMapFile) UploadMapFile(g_pMainThread->m_tmpProductInfo[0].m_strLotID);
+
+                        g_pMainThread->m_listVisionRX.push_back("EXPORT_MAP_DONE");
+                }
+
+                if(strCommand=="OPEN_LASER_FRONT")
+                {
+                        bRet=g_Laser.OpenProgram(g_IniFile.m_nLaserProgramNo[1]);
+                        //bRet=true;
+                        if(bRet) g_pMainThread->m_listLaserRX.push_back("OPEN_LASER_OK");
+                        else g_pMainThread->m_listLaserRX.push_back("OPEN_LASER_NG");
+
+                        //g_pMainThread->m_listTX.pop_front();
+                }
+
+                if(strCommand=="OPEN_LASER_REAR")
+                {
+                        bRet=g_Laser.OpenProgram(g_IniFile.m_nLaserProgramNo[0]);
+                        //bRet=true;
+                        if(bRet) g_pMainThread->m_listLaserRX.push_back("OPEN_LASER_OK");
+                        else g_pMainThread->m_listLaserRX.push_back("OPEN_LASER_NG");
+
+                        //g_pMainThread->m_listTX.pop_front();
+                }
+
+                if(strCommand=="SET_LASER_OFFSET_FRONT")
+                {
+                        //Set Text
+                        bRet=g_Laser.SetText(g_IniFile.m_nLaserProgramNo[1],0,g_pMainThread->m_tmpProductInfo[1].m_strLotID.c_str());
+                        bRet=g_Laser.SetText(g_IniFile.m_nLaserProgramNo[1],2,g_pMainThread->m_tmpProductInfo[1].m_strLotID.c_str());     //For Second 2D Mark
+                        //Set Offset
+                        //bRet=g_Laser.SetAllTextPosOffset(g_IniFile.m_nLaserProgramNo[1],g_pMainThread->m_tmpProductInfo[1].m_nOffsetX,g_pMainThread->m_tmpProductInfo[1].m_nOffsetY);
+                        bRet=g_Laser.SetToolPosOffset(g_IniFile.m_nLaserProgramNo[1],g_pMainThread->m_tmpProductInfo[1].m_nOffsetX,g_pMainThread->m_tmpProductInfo[1].m_nOffsetY,0.0);
+                       // bRet=true;
+                        if(bRet) g_pMainThread->m_listLaserRX.push_back("SET_LASER_OFFSET_OK");
+                        else g_pMainThread->m_listLaserRX.push_back("SET_LASER_OFFSET_NG");
+
+                        //g_pMainThread->m_listTX.pop_front();
+                }
+
+                if(strCommand=="SET_LASER_OFFSET_REAR")
+                {
+                        //Set Text
+                        bRet=g_Laser.SetText(g_IniFile.m_nLaserProgramNo[0],0,g_pMainThread->m_tmpProductInfo[0].m_strLotID.c_str());
+                        bRet=g_Laser.SetText(g_IniFile.m_nLaserProgramNo[0],2,g_pMainThread->m_tmpProductInfo[0].m_strLotID.c_str());     //For Second 2D Mark
+                            //Set Offset
+                        //bRet=g_Laser.SetAllTextPosOffset(g_IniFile.m_nLaserProgramNo[0],g_pMainThread->m_tmpProductInfo[0].m_nOffsetX,g_pMainThread->m_tmpProductInfo[0].m_nOffsetY);
+                        bRet=g_Laser.SetToolPosOffset(g_IniFile.m_nLaserProgramNo[0],g_pMainThread->m_tmpProductInfo[0].m_nOffsetX,g_pMainThread->m_tmpProductInfo[0].m_nOffsetY,0.0);
+                        //bRet=true;
+                        if(bRet) g_pMainThread->m_listLaserRX.push_back("SET_LASER_OFFSET_OK");
+                        else g_pMainThread->m_listLaserRX.push_back("SET_LASER_OFFSET_NG");
+
+                        //g_pMainThread->m_listTX.pop_front();
+                }
+
+                if(strCommand=="FIRE_LASER_FRONT")
+                {
+
+                        //Fire
+                        bRet=g_Laser.FireLaser();
+                        //bRet=true;
+                        //::Sleep(1000);
+                        if(bRet) g_pMainThread->m_listLaserRX.push_back("FIRE_LASER_OK");
+                        else g_pMainThread->m_listLaserRX.push_back("FIRE_LASER_NG");
+
+                        //g_pMainThread->m_listTX.pop_front();
+
+                        if(g_IniFile.m_bUseMapCCD && g_IniFile.m_bUpLoadMapFile) UploadMapFile(g_pMainThread->m_tmpProductInfo[1].m_strLotID);
+                }
+
+                if(strCommand=="FIRE_LASER_REAR")
+                {
+
+                        //Fire
+                        bRet=g_Laser.FireLaser();
+                        //bRet=true;
+                        //::Sleep(1000);
+                        if(bRet) g_pMainThread->m_listLaserRX.push_back("FIRE_LASER_OK");
+                        else g_pMainThread->m_listLaserRX.push_back("FIRE_LASER_NG");
+
+                        //g_pMainThread->m_listTX.pop_front();
+
+                        if(g_IniFile.m_bUseMapCCD && g_IniFile.m_bUpLoadMapFile) UploadMapFile(g_pMainThread->m_tmpProductInfo[0].m_strLotID);
+                }
+
+                if(strCommand=="RESET_LASER_OFFSET_FRONT")
+                {
+                        //Set Offset
+                        //bRet=g_Laser.SetAllTextPosOffset(g_IniFile.m_nLaserProgramNo[1],-g_pMainThread->m_tmpProductInfo[1].m_nOffsetX,-g_pMainThread->m_tmpProductInfo[1].m_nOffsetY);
+                        bRet=g_Laser.SetToolPosOffset(g_IniFile.m_nLaserProgramNo[1],0.0,0.0,0.0);
+                       // bRet=true;
+                        if(bRet) g_pMainThread->m_listLaserRX.push_back("RESET_LASER_OFFSET_OK");
+                        else g_pMainThread->m_listLaserRX.push_back("RESET_LASER_OFFSET_NG");
+
+                        //g_pMainThread->m_listTX.pop_front();
+                }
+
+                if(strCommand=="RESET_LASER_OFFSET_REAR")
+                {
+                        //Set Offset
+                        //bRet=g_Laser.SetAllTextPosOffset(g_IniFile.m_nLaserProgramNo[0],-g_pMainThread->m_tmpProductInfo[0].m_nOffsetX,-g_pMainThread->m_tmpProductInfo[0].m_nOffsetY);
+                        bRet=g_Laser.SetToolPosOffset(g_IniFile.m_nLaserProgramNo[0],0.0,0.0,0.0);
+                        //bRet=true;
+                        if(bRet) g_pMainThread->m_listLaserRX.push_back("RESET_LASER_OFFSET_OK");
+                        else g_pMainThread->m_listLaserRX.push_back("RESET_LASER_OFFSET_NG");
+
+                        //g_pMainThread->m_listTX.pop_front();
+                }
+        }
+}
+//--------------------------------------------------------------------------- 
+void __fastcall TfmMain::serverVenderIDClientConnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AddList("基板2D 讀取器連線:"+Socket->RemoteAddress);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverVenderIDClientDisconnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AddList("基板2D 讀取器斷線!");
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverVenderIDClientRead(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AnsiString strMsg=Socket->ReceiveText();
+
+        AddList("基板2D 讀取器-->"+strMsg);
+
+        if(strMsg=="NO_READ") g_pMainThread->m_listVenderCodeReaderRX.push_back("VENDER_NOREAD");
+        else if(strMsg.Length()>8)
+        {
+
+                 //Send to EAP
+                g_eqpXML.m_strSubstrate2DCode=strMsg;
+                g_eqpXML.SendEventReport("11",strMsg.c_str());
+
+        }
+        else g_pMainThread->m_listVenderCodeReaderRX.push_back("VENDER_LENGHT_ERROR");
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverLaserIDClientConnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AddList("雷刻完2D 讀取器連線:"+Socket->RemoteAddress);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverLaserIDClientDisconnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AddList("雷刻完2D 讀取器斷線!");
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverLaserIDClientRead(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AnsiString strMsg=Socket->ReceiveText();
+
+        AddList("雷刻完2D 讀取器-->"+strMsg);
+
+        if(strMsg=="NO_READ") g_pMainThread->m_listLaserCodeReaderRX.push_back("LASER_READER_NOREAD");
+        else if(strMsg.Length()>8)
+        {
+                g_pMainThread->m_listLaserCodeReaderRX.push_back(strMsg);
+        }
+        else g_pMainThread->m_listLaserCodeReaderRX.push_back("LASER_READER_LENGHT_ERROR");
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverCoverIDClientConnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AddList("上蓋板2D 讀取器連線:"+Socket->RemoteAddress);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverCoverIDClientDisconnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AddList("上蓋板2D 讀取器斷線!");
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverCoverIDClientRead(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AnsiString strMsg=Socket->ReceiveText();
+
+        AddList("上蓋板2D 讀取器-->"+strMsg);
+
+        if(strMsg=="NO_READ") g_pMainThread->m_listCoverCodeReaderRX.push_back("COVER_READER_NOREAD");
+        else if(strMsg.Length()>3)
+        {
+                //Send to EAP
+                if(g_IniFile.m_bEAPCoverControl)
+                {
+                        AnsiString strData=g_eqpXML.doSendID(false,strMsg.c_str(),g_IniFile.m_strScheduleNo.c_str());
+                        Variant aa;
+                        aa = strData.c_str();
+                        MSMQMessage1->set_Body(aa);
+                        MSMQMessage1->Send(IMSMQQTX);
+
+                        g_IniFile.AddLog(strData.c_str(),strData.Length());
+                }
+                else g_pMainThread->m_listCoverCodeReaderRX.push_back("COVER_CONTROL_BYPASS");
+
+        }
+        else g_pMainThread->m_listCoverCodeReaderRX.push_back("COVER_READER_LENGHT_ERROR");
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverBoatIDClientConnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+         AddList("下蓋板2D 讀取器連線:"+Socket->RemoteAddress);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverBoatIDClientDisconnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AddList("下蓋板2D 讀取器斷線!");
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverBoatIDClientRead(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AnsiString strMsg=Socket->ReceiveText();
+
+        AddList("下蓋板2D 讀取器-->"+strMsg);
+
+        if(strMsg=="NO_READ") g_pMainThread->m_listBoatCodeReaderRX.push_back("BOAT_READER_NOREAD");
+        else if(strMsg.Length()>3)
+        {
+                //Send to EAP
+                if(g_IniFile.m_bEAPBoatControl)
+                {
+                        AnsiString strData=g_eqpXML.doSendID(true,strMsg.c_str(),g_IniFile.m_strScheduleNo.c_str());
+                        Variant aa;
+                        aa = strData.c_str();
+                        MSMQMessage1->set_Body(aa);
+                        MSMQMessage1->Send(IMSMQQTX);
+
+                        g_IniFile.AddLog(strData.c_str(),strData.Length());
+                }
+                else g_pMainThread->m_listCoverCodeReaderRX.push_back("BOAT_CONTROL_BYPASS");
+        }
+        else g_pMainThread->m_listBoatCodeReaderRX.push_back("BOAT_READER_LENGHT_ERROR");
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton8Click(TObject *Sender)
+{
+        C_GetTime tm1MS(EX_SCALE::TIME_1MS,false);
+
+        if(!g_MNet.GetDI(DI::Bogie_Exist))
+        {
+                ShowMessage("台車有無檢知off");
+                return;
+        }
+
+
+
+        TSpeedButton *pBtn=(TSpeedButton *)Sender;
+        pBtn->Enabled=false;
+
+        g_MNet.SetDO(DO::Bogie_LifterOn,true);
+        g_MNet.SetDO(DO::Bogie_LifterOff,false);
+        tm1MS.timeStart(5000);
+
+        while(1)
+        {
+                if(g_MNet.GetDI(DI::Bogie_LifterUp)) break;
+                if(tm1MS.timeUp())
+                {
+                        ShowMessage("台車頂昇汽缸上限off");
+                        break;
+                }
+                Application->ProcessMessages();
+        }
+
+        g_MNet.SetDO(DO::Bogie_Locker,true);
+
+        tm1MS.timeStart(5000);
+
+        while(1)
+        {
+                if(g_MNet.GetDI(DI::Bogie_LockOn)) break;
+                if(tm1MS.timeUp())
+                {
+                        ShowMessage("台車鎖定汽缸下限off");
+                        break;
+                }
+                Application->ProcessMessages();
+        }
+
+         pBtn->Enabled=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton1Click(TObject *Sender)
+{
+
+        if(!g_MNet.GetDI(DI::BoatFolkOut) || !g_DIO.GetDI(DI::BoatSeprateDown))
+        {
+                ShowMessage("Boat分離汽缸沒有縮回 X093 X095 Off");
+                return;
+        }
+
+        if(g_IniFile.m_nErrorCode>0)
+        {
+                ShowMessage("機台異常發生請先按[復歸]消除警報");
+                return;
+        }
+
+
+        TSpeedButton *pBtn=(TSpeedButton *)Sender;
+        pBtn->Enabled=false;
+
+        C_GetTime tm1MS(EX_SCALE::TIME_1MS,false);
+        g_MNet.AxisHome(Axis_Const::BLZ,false);
+        tm1MS.timeStart(50000);
+
+        while(1)
+        {
+                if(g_MNet.IsPosDone(Axis_Const::BLZ,0.0)) break;
+                if(tm1MS.timeUp()) break;
+                Application->ProcessMessages();
+        }
+
+        g_MNet.StopMove(Axis_Const::BLZ);
+
+        g_MNet.SetDO(DO::Bogie_LifterOn,false);
+        g_MNet.SetDO(DO::Bogie_LifterOff,true);
+        g_MNet.SetDO(DO::Bogie_Locker,false);
+
+        g_pMainThread->m_bBoatLifterReady=false;
+
+        pBtn->Enabled=true;
+        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton9Click(TObject *Sender)
+{
+        TSpeedButton *pBtn=(TSpeedButton *)Sender;
+
+        g_pMainThread->m_bStopLoad=pBtn->Down;
+        if(g_pMainThread->m_bStopLoad) g_pMainThread->m_bLoadLifterReady=false;
+}
+//---------------------------------------------------------------------------
+
+
+
+void __fastcall TfmMain::SpeedButton2Click(TObject *Sender)
+{
+        char *strCMD[]={"VENDER_TRIG","LASER_READER_TRIG","COVER_TRIG","BOAT_TRIG"};
+
+        TSpeedButton *pBtn=(TSpeedButton *)Sender;
+
+        g_pMainThread->m_listTX.push_back(strCMD[pBtn->Tag]);
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton12Click(TObject *Sender)
+{
+        TSpeedButton *pBtn=(TSpeedButton *)Sender;
+
+        switch(pBtn->Tag)
+        {
+                case 0:
+                        clientVenderID->Active=false;
+                        clientVenderID->Active=true;
+                        break;
+                case 1:
+                        clientLaserID->Active=false;
+                        clientLaserID->Active=true;
+                        break;
+                case 2:
+                        clientCoverID->Active=false;
+                        clientCoverID->Active=true;
+                        break;
+                case 3:
+                        clientBoatID->Active=false;
+                        clientBoatID->Active=true;
+                        break;
+        }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton19Click(TObject *Sender)
+{
+        g_pMainThread->m_nLaserCount=0;
+
+        g_Laser.SetText(g_IniFile.m_nLaserProgramNo[1],0,GetSchedule(g_pMainThread->m_nLaserCount).c_str());
+        g_Laser.SetText(g_IniFile.m_nLaserProgramNo[1],2,GetSchedule(g_pMainThread->m_nLaserCount).c_str());
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton20Click(TObject *Sender)
+{
+        g_pMainThread->m_nLaserCount=0;
+        
+        g_Laser.SetText(g_IniFile.m_nLaserProgramNo[0],0,GetSchedule(g_pMainThread->m_nLaserCount).c_str());
+        g_Laser.SetText(g_IniFile.m_nLaserProgramNo[0],2,GetSchedule(g_pMainThread->m_nLaserCount).c_str());
+}
+//---------------------------------------------------------------------------
+AnsiString __fastcall TfmMain::GetSchedule(int nIndex)
+{
+        //return g_SMSXML.m_strSerialID;     //PTI
+
+        //int nSubNo=g_pMainThread->m_nLaserCount / g_IniFile.m_nSubLotSize;
+        //int nSN=g_pMainThread->m_nLaserCount % g_IniFile.m_nSubLotSize;
+
+        //nIndex Start From 1
+
+        AnsiString strSchedule="INVALID";
+        try{
+        strSchedule.sprintf("%s%02d%s%02d",g_IniFile.m_strScheduleNo.SubString(1,9),
+                g_IniFile.m_strScheduleNo.SubString(10, g_IniFile.m_strScheduleNo.Length()-9 ).ToInt()+
+                ( (nIndex-1)/g_IniFile.m_nSubLotSize ),
+                g_IniFile.m_strSN,(nIndex-1) % g_IniFile.m_nSubLotSize +1);
+        }
+        catch(...)
+        {
+                strSchedule="INVALID";
+        }
+
+        return strSchedule;
+
+}
+//---------------------------------------------------------------------------
+void __fastcall TfmMain::SpeedButton21Click(TObject *Sender)
+{
+        g_Laser.FireLaser();
+              
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::TrackBar1Change(TObject *Sender)
+{
+        labelLED0->Caption=TrackBar1->Position;
+        //g_IniFile.m_nLEDDimmer[0]=TrackBar1->Position;
+        //g_LED.SetCurrent(0,0,TrackBar1->Position,0);
+        g_MNet.SetAO(0,TrackBar1->Position);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::TrackBar2Change(TObject *Sender)
+{
+        labelLED1->Caption=TrackBar2->Position;
+        g_IniFile.m_nLEDDimmer[1]=TrackBar2->Position;
+        g_LED.SetCurrent(1,0,TrackBar2->Position,0);
+}
+//---------------------------------------------------------------------------
+void __fastcall TfmMain::SetLEDDimmer()
+{
+
+        TrackBar1->Position=g_IniFile.m_nLEDDimmer[0];
+        TrackBar2->Position=g_IniFile.m_nLEDDimmer[1];
+}
+//---------------------------------------------------------------------------
+bool __fastcall TfmMain::AxisMoveCheck()
+{
+        //return true;    //debug
+
+        if(!g_pMainThread->m_bIsHomeDone)
+        {
+                ShowMessage("請先執行機台原點復歸");
+                return false;
+        }
+
+        if(!g_MNet.GetDI(DI::SS_SSuckerUp) || !g_MNet.GetDI(DI::SS_SpaSuckerUp))
+        {
+                ShowMessage("入料區吸盤沒有在上位");
+                return false;
+        }
+
+        if(!g_MNet.GetDI(DI::SC_SSuckerUp) || !g_MNet.GetDI(DI::SC_CSuckerUp))
+        {
+                ShowMessage("出料區吸盤沒有在上位");
+                return false;
+        }
+
+        if(g_MNet.GetFeedbackPos(Axis_Const::SCZ)>10.0)
+        {
+                ShowMessage("出料區吸盤Z 軸沒有在上位");
+                return false;
+        }
+
+        if(!g_MNet.GetDI(DI::LEDUp) )
+        {
+                ShowMessage("led光源沒有在上位");
+                return false;
+        }
+
+        return true;
+
+}
+//---------------------------------------------------------------------------
+void __fastcall TfmMain::SpeedButton16Click(TObject *Sender)
+{
+        if(!AxisMoveCheck()) return;       //debug
+
+        TSpeedButton *pBtn=(TSpeedButton *)Sender;
+        pBtn->Enabled=false;
+
+        int nTable=radioTable->ItemIndex;
+        int nAxis[2]={Axis_Const::RTX,Axis_Const::FTX};
+
+         C_GetTime tm1MS(EX_SCALE::TIME_1MS,false);
+        tm1MS.timeStart(10000);
+
+        g_MNet.AbsMove(nAxis[nTable],g_IniFile.m_dTableMapCCDPosX[nTable]-g_IniFile.m_dTableMapCCDPitch*pBtn->Tag);
+        g_MNet.AbsMove(Axis_Const::CCD,g_IniFile.m_dTableMapCCDPosY[nTable]);
+
+        while(1)
+        {
+                if( g_MNet.IsPosDone(nAxis[nTable],g_IniFile.m_dTableMapCCDPosX[nTable]-g_IniFile.m_dTableMapCCDPitch*pBtn->Tag)  &&
+                        g_MNet.IsPosDone(Axis_Const::CCD,g_IniFile.m_dTableMapCCDPosY[nTable])) break;
+                if(tm1MS.timeUp()) break;
+                Application->ProcessMessages();
+        }
+
+        theVision.m_nCurrentRoiBlock=pBtn->Tag;
+        theVision.m_bShowBlockROI[theVision.m_nCurrentRoiBlock]=checkShowSearchROI0->Checked;
+        RefreshImage();
+
+        pBtn->Enabled=true;
+}
+//---------------------------------------------------------------------------
+
+
+
+void __fastcall TfmMain::SpeedButton17Click(TObject *Sender)
+{
+        if(!AxisMoveCheck()) return;
+
+        TSpeedButton *pBtn=(TSpeedButton *)Sender;
+        pBtn->Enabled=false;
+
+        int nTable=radioTable->ItemIndex;
+
+        int nAxis[2]={Axis_Const::RTX,Axis_Const::FTX};
+
+        C_GetTime tm1MS(EX_SCALE::TIME_1MS,false);
+        tm1MS.timeStart(10000);
+
+        //int nCCDIndex=0;
+        //for(int nXX=0;nXX<10;nXX++)
+        for(int nIndex=0;nIndex<4;nIndex++)
+        {
+                g_MNet.AbsMove(nAxis[nTable],g_IniFile.m_dTableMapCCDPosX[nTable]-g_IniFile.m_dTableMapCCDPitch*nIndex);
+                g_MNet.AbsMove(Axis_Const::CCD,g_IniFile.m_dTableMapCCDPosY[nTable]);
+                tm1MS.timeStart(30000);
+                while(1)
+                {
+                        if( g_MNet.IsPosDone(nAxis[nTable],g_IniFile.m_dTableMapCCDPosX[nTable]-g_IniFile.m_dTableMapCCDPitch*nIndex)  &&
+                                g_MNet.IsPosDone(Axis_Const::CCD,g_IniFile.m_dTableMapCCDPosY[nTable])) break;
+                        if(tm1MS.timeUp()) break;
+                        Application->ProcessMessages();
+                }
+
+                theVision.m_nCurrentRoiBlock=nIndex;
+                ::Sleep(100);
+                g_Grabber.Grab(0);
+
+                tm1MS.timeStart(1000);
+
+                while(1)
+                {
+                         if(tm1MS.timeUp() || g_Grabber.m_bValidImage[0]) break;
+                         Application->ProcessMessages();
+                }
+
+                //theVision.MergeImage(nIndex,g_IniFile.m_nImageWidth,g_IniFile.m_dImageAngle);
+
+                DoVisionProcess(nIndex);
+                RefreshImage();
+        }
+
+        pBtn->Enabled=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton18Click(TObject *Sender)
+{
+        if(!AxisMoveCheck()) return;
+
+        TSpeedButton *pBtn=(TSpeedButton *)Sender;
+        pBtn->Enabled=false;
+
+        int nTable=radioTable->ItemIndex;
+
+         C_GetTime tm1MS(EX_SCALE::TIME_1MS,false);
+        tm1MS.timeStart(10000);
+
+        g_MNet.AbsMove(Axis_Const::FTX,g_IniFile.m_dTableMarkPosX[nTable]);
+        g_MNet.AbsMove(Axis_Const::CCD,g_IniFile.m_dTableMarkPosY[nTable]);
+
+        while(1)
+        {
+                if( g_MNet.IsPosDone(Axis_Const::FTX,g_IniFile.m_dTableMarkPosX[nTable])  &&
+                        g_MNet.IsPosDone(Axis_Const::CCD,g_IniFile.m_dTableMarkPosY[nTable])) break;
+                if(tm1MS.timeUp()) break;
+                Application->ProcessMessages();
+        }
+
+        pBtn->Enabled=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::BitBtn10Click(TObject *Sender)
+{
+        int  nFounds=0;
+
+        theVision.m_markMatch[1].SetMaxPositions(1);
+
+        nFounds=theVision.FindPatMatch(theVision.m_roiMark[1],theVision.m_markMatch[1]);
+
+        if(nFounds<1)
+        {
+                ShowMessage("找不到標記!!");
+
+        }
+
+        RefreshImage();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::BitBtn1Click(TObject *Sender)
+{
+        int  nFounds=0;
+
+        theVision.m_markMatch[2].SetMaxPositions(1);
+
+        nFounds=theVision.FindPatMatch(theVision.m_roiMark[2],theVision.m_markMatch[2]);
+
+        if(nFounds<1)
+        {
+                ShowMessage("找不到標記!!");
+
+        }
+        else
+        {
+                double dX=theVision.GetMatchPosX(theVision.m_markMatch[2],theVision.m_roiMark[2])-320.0;
+                double dY=theVision.GetMatchPosY(theVision.m_markMatch[2],theVision.m_roiMark[2])-240.0;
+                AddList("X="+FormatFloat("0.00 ",dX)+"Y="+FormatFloat("0.00",dY));
+
+        }
+
+        RefreshImage();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton22Click(TObject *Sender)
+{
+        if(!AxisMoveCheck()) return;
+
+        TSpeedButton *pBtn=(TSpeedButton *)Sender;
+        pBtn->Enabled=false;
+
+        int  nFounds=0;
+        double dX=0;
+        double dY=0;
+
+        theVision.m_markMatch[2].SetMaxPositions(1);
+
+        nFounds=theVision.FindPatMatch(theVision.m_roiMark[2],theVision.m_markMatch[2]);
+
+        if(nFounds<1)
+        {
+                ShowMessage("找不到標記!!");
+                pBtn->Enabled=true;
+                return;
+
+        }
+        else
+        {
+                dX=theVision.GetMatchPosX(theVision.m_markMatch[2],theVision.m_roiMark[2])-320.0;
+                dY=theVision.GetMatchPosY(theVision.m_markMatch[2],theVision.m_roiMark[2])-240.0;
+                AddList("X="+FormatFloat("0.00 ",dX)+"Y="+FormatFloat("0.00",dY));
+
+        }
+
+        RefreshImage();
+
+        int nTable=radioTable->ItemIndex;
+
+         C_GetTime tm1MS(EX_SCALE::TIME_1MS,false);
+        tm1MS.timeStart(10000);
+
+        g_MNet.AbsMove(Axis_Const::FTX,g_IniFile.m_dTableMarkPosX[nTable]-dX*g_IniFile.m_dFMCCDResolution[0]);
+        g_MNet.AbsMove(Axis_Const::CCD,g_IniFile.m_dTableMarkPosY[nTable]+dY*g_IniFile.m_dFMCCDResolution[1]);
+
+        while(1)
+        {
+                if( g_MNet.IsPosDone(Axis_Const::FTX,g_IniFile.m_dTableMarkPosX[nTable])  &&
+                        g_MNet.IsPosDone(Axis_Const::CCD,g_IniFile.m_dTableMarkPosY[nTable])) break;
+                if(tm1MS.timeUp()) break;
+                Application->ProcessMessages();
+        }
+
+        pBtn->Enabled=true;
+}
+//---------------------------------------------------------------------------
+
+
+
+void __fastcall TfmMain::SpeedButton23Click(TObject *Sender)
+{
+        //g_Laser.SetTextPos(0,0,110.110,-73.3);
+        g_Laser.SetAllTextPosOffset(0,10,10,0);       
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton6Click(TObject *Sender)
+{
+        C_GetTime tm1MS(EX_SCALE::TIME_1MS,false);
+        if(!AxisMoveCheck()) return;
+
+        TSpeedButton *pBtn=(TSpeedButton *)Sender;
+        pBtn->Enabled=false;
+
+        g_Motion.AbsMove(Axis_Const::SSY,g_IniFile.m_dSSPickerPutPos[1]);
+
+        g_MNet.SetDO(DO::SL_Start,true);
+        g_MNet.SetDO(DO::SL_Dir,true);
+        tm1MS.timeStart(10000);
+
+        while(1)
+        {
+                if(g_MNet.GetDI(DI::SL_Down)) break;
+                if(tm1MS.timeUp()) break;
+                Application->ProcessMessages();
+        }
+
+        g_MNet.SetDO(DO::SL_Start,false);
+
+        g_pMainThread->m_bLoadLifterReady=false;
+
+        pBtn->Enabled=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton7Click(TObject *Sender)
+{
+        C_GetTime tm1MS(EX_SCALE::TIME_1MS,false);
+
+        if(!AxisMoveCheck()) return;
+        g_MNet.SetDO(DO::CL_Align,false);
+        ::Sleep(200);
+        if(g_MNet.GetDI(DI::CL_AlignOn))
+        {
+                ShowMessage("蓋板靠邊汽缸沒有縮回");
+                return;
+        }
+
+
+
+        TSpeedButton *pBtn=(TSpeedButton *)Sender;
+        pBtn->Enabled=false;
+
+        g_Motion.AbsMove(Axis_Const::SCY,g_IniFile.m_dSCPickerPutCoverPosY);
+
+        g_MNet.SetDO(DO::CL_Start,true);
+        g_MNet.SetDO(DO::CL_Dir,false);
+        tm1MS.timeStart(30000);
+
+        while(1)
+        {
+                if(g_MNet.GetDI(DI::CL_Down)) break;
+                if(tm1MS.timeUp()) break;
+                Application->ProcessMessages();
+        }
+
+        g_MNet.SetDO(DO::CL_Start,false);
+
+        g_pMainThread->m_bCoverLifterReady=false;
+
+        pBtn->Enabled=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::clientSMSConnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AddList("clientSMS:"+Socket->RemoteAddress);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverSMSClientConnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AddList("serverSMS:"+Socket->RemoteAddress);        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverSMSClientDisconnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AddList("serverSMS Disconnected");        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::clientSMSDisconnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AddList("clientSMS Disconnected");         
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverSMSClientRead(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AnsiString strMsg=Socket->ReceiveText();
+
+        AddList("serverSMS<--"+strMsg);
+
+        g_SMSXML.m_listRX.push_back(strMsg);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::clientSMSRead(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        AnsiString strMsg=Socket->ReceiveText();
+
+        AddList("clientSMS<--"+strMsg);
+
+        g_SMSXML.m_listRX.push_back(strMsg);
+
+        clientSMS->Active=false;      
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton24Click(TObject *Sender)
+{
+        clientSMS->Active=false;
+        clientSMS->Active=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::timerSMSTimer(TObject *Sender)
+{
+        timerSMS->Enabled=false;
+
+        if(g_SMSXML.m_listRX.size()>0)
+        {
+                g_SMSXML.ProcessXML();
+        }
+
+        if(g_SMSXML.m_listClientTX.size()>0)
+        {
+                //clientSMS->Active=false;
+                clientSMS->Active=true;
+                if(clientSMS->Socket->Connected)
+                {
+                        AddList("clientSMS-->"+g_SMSXML.m_listClientTX.front());
+                        clientSMS->Socket->SendText(g_SMSXML.m_listClientTX.front());
+                        g_SMSXML.m_listClientTX.pop_front();
+                }
+
+        }
+
+        if(g_SMSXML.m_listServerTX.size()>0)
+        {
+                if(serverSMS->Socket->ActiveConnections>0)
+                {
+                        AddList("serverSMS-->"+g_SMSXML.m_listServerTX.front());
+                        serverSMS->Socket->Connections[0]->SendText(g_SMSXML.m_listServerTX.front());
+                        g_SMSXML.m_listServerTX.pop_front();
+                }
+
+
+        }
+
+        char *SMSStatus[]={"Off Line","On Line Local","On Line Remote"};
+
+        textSMSStatus->Caption=SMSStatus[g_SMSXML.m_nOnLineMode];
+        //textSMSStatus2->Caption=SMSStatus[g_SMSXML.m_nOnLineMode];
+        textSMSStatus2->Caption=SMSStatus[g_eqpXML.m_CIMStatus.ToInt() ];
+        labelSerialID->Caption= g_SMSXML.m_strSerialID;
+        labelLotEnd->Caption=g_SMSXML.m_strLotENDResult;
+
+        char *MAPFTPStatus[]={"Map FTP 斷線","Map FTP 連線"};
+        textMapFtpStatus->Caption=MAPFTPStatus[ftpMap->Connected];
+
+        textLaserCount->Caption=g_pMainThread->m_nStripCount; //g_pMainThread->m_nLaserCount;
+        textOKSummary->Caption=g_pMainThread->m_nOKSummary;
+        textNGSummary->Caption=g_pMainThread->m_nNGSummary;
+        labelSubstrateRemains->Caption=g_pMainThread->m_nSubstrateRemains;
+
+       m_strScheduleNo->Text=g_IniFile.m_strScheduleNo;
+       m_strSBTType->Text=g_IniFile.m_strSBTType;
+       m_strSBTSize->Text=g_IniFile.m_strSBTSize;
+
+       radioROIBlock->ItemIndex=theVision.m_nCurrentRoiBlock;
+
+
+        //EQP STATUS
+        if(g_MNet.GetDO(DO::RedLamp) && g_eqpXML.m_EqpStatus !='D')
+        {
+                g_eqpXML.m_EqpStatus='D';
+                g_eqpXML.SendEventReport("1");
+        }
+        if(g_MNet.GetDO(DO::GreenLamp) && g_eqpXML.m_EqpStatus !='R')
+        {
+                g_eqpXML.m_EqpStatus='R';
+                g_eqpXML.SendEventReport("1");
+        }
+        if(g_MNet.GetDO(DO::YellowLamp) && g_eqpXML.m_EqpStatus !='I')
+        {
+                g_eqpXML.m_EqpStatus='I';
+                g_eqpXML.SendEventReport("1");
+        }
+
+       timerSMS->Enabled=true;
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton25Click(TObject *Sender)
+{
+        g_SMSXML.ModeChange(true);
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TfmMain::clientSMSError(TObject *Sender,
+      TCustomWinSocket *Socket, TErrorEvent ErrorEvent, int &ErrorCode)
+{
+        g_SMSXML.m_listClientTX.clear();
+        AddList("[clientSMS Error]連線遠端電腦發生異常");
+        ErrorCode=0;
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TfmMain::serverSMSClientError(TObject *Sender,
+      TCustomWinSocket *Socket, TErrorEvent ErrorEvent, int &ErrorCode)
+{
+        AddList("serverSMS Error");
+        ErrorCode=0;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::clientVenderIDError(TObject *Sender,
+      TCustomWinSocket *Socket, TErrorEvent ErrorEvent, int &ErrorCode)
+{
+        AddList("[clientVenderID Error]連線基板2D讀取器發生異常");
+        ErrorCode=0;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::clientLaserIDError(TObject *Sender,
+      TCustomWinSocket *Socket, TErrorEvent ErrorEvent, int &ErrorCode)
+{
+        AddList("[clientLaserID Error]連線雷刻完2D讀取器發生異常");
+        ErrorCode=0;        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::clientCoverIDError(TObject *Sender,
+      TCustomWinSocket *Socket, TErrorEvent ErrorEvent, int &ErrorCode)
+{
+        AddList("[clientCoverID Error]連線上蓋2D讀取器發生異常");
+        ErrorCode=0;        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::clientBoatIDError(TObject *Sender,
+      TCustomWinSocket *Socket, TErrorEvent ErrorEvent, int &ErrorCode)
+{
+        AddList("[clientBoatID Error]連線Carrier 2D讀取器發生異常");
+        ErrorCode=0;        
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TfmMain::SpeedButton26Click(TObject *Sender)
+{
+        g_SMSXML.QueryID();        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton27Click(TObject *Sender)
+{
+        g_SMSXML.QueryIDEnd(g_pMainThread->m_nLaserCount);        
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TfmMain::SpeedButton28Click(TObject *Sender)
+{
+        g_SMSXML.ModeChange(false); 
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TfmMain::SpeedButton29Click(TObject *Sender)
+{
+        if(Application->MessageBoxA("確定要歸零嗎?","Confirm",MB_ICONQUESTION|MB_OKCANCEL)==IDCANCEL) return;
+
+        g_pMainThread->m_nLaserCount=0;
+        g_pMainThread->m_nOKSummary=0;
+        g_pMainThread->m_nNGSummary=0;
+        g_pMainThread->m_nStripCount=0;
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton30Click(TObject *Sender)
+{
+        TfrmUserID *pWnd=new TfrmUserID(this);
+
+        bool bRead=true;
+
+        DDX_String(bRead,g_IniFile.m_strScheduleNo,pWnd->m_strScheduleNo);
+        DDX_Int(bRead,g_IniFile.m_nSubLotSize,pWnd->m_nSubLotSize);
+        DDX_Int(bRead,g_IniFile.m_nScheduleQty,pWnd->m_nScheduleQty);
+        DDX_String(bRead,g_IniFile.m_strSBTType,pWnd->m_strSBTType);
+        DDX_String(bRead,g_IniFile.m_strSBTSize,pWnd->m_strSBTSize);
+        DDX_String(bRead,g_IniFile.m_strSN,pWnd->m_strSN);
+
+        if(pWnd->ShowModal()==mrOk)
+        {
+                bRead=false;
+
+                DDX_String(bRead,g_IniFile.m_strScheduleNo,pWnd->m_strScheduleNo);
+                DDX_Int(bRead,g_IniFile.m_nSubLotSize,pWnd->m_nSubLotSize);
+                DDX_Int(bRead,g_IniFile.m_nScheduleQty,pWnd->m_nScheduleQty);
+                DDX_String(bRead,g_IniFile.m_strSBTType,pWnd->m_strSBTType);
+                DDX_String(bRead,g_IniFile.m_strSBTSize,pWnd->m_strSBTSize);
+                DDX_String(bRead,g_IniFile.m_strSN,pWnd->m_strSN);
+
+                g_pMainThread->m_nLaserCount=pWnd->cmbTailNo->ItemIndex;
+                g_pMainThread->m_nOKSummary=0;
+                g_pMainThread->m_nNGSummary=0;
+                g_pMainThread->m_nStripCount=pWnd->cmbTailNo->ItemIndex;
+
+                if(GetSchedule(1)=="INVALID") ShowMessage("批號格式不正確 請重新輸入!!");
+                else
+                {
+                        AddList("初始雷刻批號:"+GetSchedule(g_pMainThread->m_nStripCount+1));
+
+                        //for user to confirm the Schedule Number
+                        bool bRet=false;
+                        bRet=g_Laser.OpenProgram(g_IniFile.m_nLaserProgramNo[1]);
+                        if(!bRet) ShowMessage("雷射開檔失敗");
+                        bRet=g_Laser.SetText(g_IniFile.m_nLaserProgramNo[1],0,GetSchedule(g_pMainThread->m_nStripCount+1).c_str());
+                        if(!bRet) ShowMessage("設定雷射批號1失敗");
+                        bRet=g_Laser.SetText(g_IniFile.m_nLaserProgramNo[1],2,GetSchedule(g_pMainThread->m_nStripCount+1).c_str());     //For Second 2D Mark
+                        if(!bRet) ShowMessage("設定雷射批號2失敗");
+                }
+
+        }
+
+
+
+
+
+        delete pWnd;
+                
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::Version1Click(TObject *Sender)
+{
+        for(int nIndex=0;nIndex<g_pMainThread->m_listThreadTrace.size();nIndex++)
+        {
+                AddList(g_pMainThread->m_listThreadTrace.front());
+                
+        }
+}
+//---------------------------------------------------------------------------
+bool __fastcall TfmMain::ExportMapFile()
+{
+        AnsiString strPath="C:\\MapData\\";
+        mkdir(strPath.c_str());
+
+        AnsiString strSubstrateID=g_SMSXML.m_strSerialID;
+        AnsiString strProductID=g_IniFile.m_strProductID;
+        AnsiString strFileName=strProductID+strSubstrateID+".xml";
+        int nRows=g_IniFile.m_nPackageY*g_IniFile.m_nDeviceY;
+        int nColumns=g_IniFile.m_nPackageX*g_IniFile.m_nDeviceX;
+
+        TiXmlDocument doc;
+        TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+        TiXmlElement *pMap=new TiXmlElement("Map");
+                pMap->SetAttribute("xmlns:semi","http://www.semi.org");
+                pMap->SetAttribute("SubstrateType","Strip");
+                pMap->SetAttribute("SubstrateID",strSubstrateID.c_str());
+                pMap->SetAttribute("FormatRevision","SEMI G85-0703");
+                pMap->SetAttribute("CarrierType","Cassette");
+                pMap->SetAttribute("FileName",strFileName.c_str());
+                pMap->SetAttribute("CreateDate",FormatDateTime("yyyymmddhhnnss",Now()).c_str());
+
+        TiXmlElement *pDevice=new TiXmlElement("Device");
+                pDevice->SetAttribute("ProductID",strProductID.c_str());
+                pDevice->SetAttribute("LotID",g_SMSXML.m_strLotNo.c_str());
+                pDevice->SetAttribute("OriginLocation",3);
+                pDevice->SetAttribute("Orientation",0);
+                pDevice->SetAttribute("Rows",nRows);
+                pDevice->SetAttribute("Columns",nColumns);
+                pDevice->SetAttribute("BinType","Decimal");
+                pDevice->SetAttribute("NullBin",0);
+                pDevice->SetAttribute("SubstrateSide","Both");
+                pDevice->SetAttribute("PackageType","UBGA");
+                pDevice->SetAttribute("MfgArea","StripTest");
+
+        //TiXmlComment *pComm=new  TiXmlComment("AtgBackLink: BoardName=txi6720ec LotNumber=1, RunNumber=38, SampleNumber=1");
+
+        TiXmlElement *pBin=new TiXmlElement("Bin");
+                pBin->SetAttribute("BinCode",1);
+                pBin->SetAttribute("BinCount",nRows*nColumns);
+                pBin->SetAttribute("BinQuality","Pass");
+
+        TiXmlElement *pData=new TiXmlElement("Data");
+                pData->SetAttribute("MapName","CellGrade");
+
+
+        //------------------
+        int nPassCount=0;
+        int nFailCount=0;
+        char bin[100][500]={0};
+
+        for(int nYY=0;nYY<nRows;nYY++)
+        for(int nXX=0;nXX<nColumns;nXX++)
+        {
+
+           if( m_nSubstrateMap[nYY*nColumns+nXX]==1)
+           {
+                nPassCount++;
+                strcat(&bin[nYY][0],"1 ");
+           }
+           else
+           {
+                nFailCount++;
+                strcat(&bin[nYY][0],"0 ");    //Null Bin
+           }
+        }
+
+        g_pMainThread->m_nOKCount=nPassCount;
+        g_pMainThread->m_nNGCount=nFailCount;
+
+        TiXmlElement *pRow;
+        for(int nIndex=0;nIndex<nRows;nIndex++)
+        {
+                pRow=new TiXmlElement("Row");
+                TiXmlText *pText=new TiXmlText(bin[nIndex]);          //Map Data Array
+                pText->SetCDATA(true);
+                pRow->LinkEndChild(pText);
+
+                //pBinCode->LinkEndChild();
+                pData->LinkEndChild(pRow);
+        }
+
+        //------------------
+
+        //pDevice->LinkEndChild(pComm);
+        pDevice->LinkEndChild(pBin);
+        pDevice->LinkEndChild(pData);
+
+        pMap->LinkEndChild(pDevice);
+
+
+        doc.LinkEndChild(decl);
+        doc.LinkEndChild(pMap);
+
+        strPath+=strFileName;
+        doc.SaveFile(strPath.c_str());
+
+        return true;
+}
+//---------------------------------------------------------------------------
+bool __fastcall TfmMain::ExportMapFileTmp(bool bFront)
+{
+        AnsiString strPath="C:\\MapData\\";
+        mkdir(strPath.c_str());
+
+        AnsiString strSubstrateID=g_SMSXML.m_strSerialID;
+        AnsiString strProductID=g_IniFile.m_strProductID;
+        AnsiString strFileName=strProductID+strSubstrateID+".xml";
+        int nRows=g_IniFile.m_nPackageY*g_IniFile.m_nDeviceY;
+        int nColumns=g_IniFile.m_nPackageX*g_IniFile.m_nDeviceX;
+
+        bFront ? strFileName="FrontMap.xml" : strFileName="RearMap.xml" ;
+
+        TiXmlDocument doc;
+        TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+        TiXmlElement *pMap=new TiXmlElement("Map");
+                pMap->SetAttribute("xmlns:semi","http://www.semi.org");
+                pMap->SetAttribute("SubstrateType","Strip");
+                pMap->SetAttribute("SubstrateID",strSubstrateID.c_str());
+                pMap->SetAttribute("FormatRevision","SEMI G85-0703");
+                pMap->SetAttribute("CarrierType","Cassette");
+                pMap->SetAttribute("FileName",strFileName.c_str());
+                pMap->SetAttribute("CreateDate",FormatDateTime("yyyymmddhhnnss",Now()).c_str());
+
+        TiXmlElement *pDevice=new TiXmlElement("Device");
+                pDevice->SetAttribute("ProductID",strProductID.c_str());
+                pDevice->SetAttribute("LotID",g_SMSXML.m_strLotNo.c_str());
+                pDevice->SetAttribute("OriginLocation",3);
+                pDevice->SetAttribute("Orientation",0);
+                pDevice->SetAttribute("Rows",nRows);
+                pDevice->SetAttribute("Columns",nColumns);
+                pDevice->SetAttribute("BinType","Decimal");
+                pDevice->SetAttribute("NullBin",0);
+                pDevice->SetAttribute("SubstrateSide","Both");
+                pDevice->SetAttribute("PackageType","UBGA");
+                pDevice->SetAttribute("MfgArea","StripTest");
+
+        //TiXmlComment *pComm=new  TiXmlComment("AtgBackLink: BoardName=txi6720ec LotNumber=1, RunNumber=38, SampleNumber=1");
+
+        TiXmlElement *pBin=new TiXmlElement("Bin");
+                pBin->SetAttribute("BinCode",1);
+                pBin->SetAttribute("BinCount",nRows*nColumns);
+                pBin->SetAttribute("BinQuality","Pass");
+
+        TiXmlElement *pData=new TiXmlElement("Data");
+                pData->SetAttribute("MapName","CellGrade");
+
+
+        //------------------
+        int nPassCount=0;
+        int nFailCount=0;
+        char bin[100][500]={0};
+
+        for(int nYY=0;nYY<nRows;nYY++)
+        for(int nXX=0;nXX<nColumns;nXX++)
+        {
+
+           if( m_nSubstrateMap[nYY*nColumns+nXX]==1)
+           {
+                nPassCount++;
+                strcat(&bin[nYY][0],"1 ");
+           }
+           else
+           {
+                nFailCount++;
+                strcat(&bin[nYY][0],"0 ");    //Null Bin
+           }
+        }
+
+        g_pMainThread->m_nOKCount=nPassCount;
+        g_pMainThread->m_nNGCount=nFailCount;
+
+        TiXmlElement *pRow;
+        for(int nIndex=0;nIndex<nRows;nIndex++)
+        {
+                pRow=new TiXmlElement("Row");
+                TiXmlText *pText=new TiXmlText(bin[nIndex]);          //Map Data Array
+                pText->SetCDATA(true);
+                pRow->LinkEndChild(pText);
+
+                //pBinCode->LinkEndChild();
+                pData->LinkEndChild(pRow);
+        }
+
+        //------------------
+
+        //pDevice->LinkEndChild(pComm);
+        pDevice->LinkEndChild(pBin);
+        pDevice->LinkEndChild(pData);
+
+        pMap->LinkEndChild(pDevice);
+
+
+        doc.LinkEndChild(decl);
+        doc.LinkEndChild(pMap);
+
+        strPath+=strFileName;
+        doc.SaveFile(strPath.c_str());
+
+        return true;
+}
+//---------------------------------------------------------------------------
+bool __fastcall TfmMain::RenameMapFile(bool bFront)
+{
+        AnsiString strFileNameTmp;
+
+        bFront ? strFileNameTmp="C:\\MapData\\FrontMap.xml" : strFileNameTmp="C:\\MapData\\RearMap.xml" ;
+
+        AnsiString strSubstrateID=g_SMSXML.m_strSerialID;
+        AnsiString strProductID=g_IniFile.m_strProductID;
+        AnsiString strFileName=strProductID+strSubstrateID+".xml";
+
+        TiXmlDocument doc;
+        if(!doc.LoadFile(strFileNameTmp.c_str())) return false;
+
+        TiXmlHandle docHandle( &doc );
+
+        TiXmlElement *pMap=docHandle.FirstChild("Map").Element();
+        pMap->SetAttribute("SubstrateID",strSubstrateID.c_str());
+        pMap->SetAttribute("FileName",strFileName.c_str());
+
+        strFileName="C:\\MapData\\"+strFileName;
+        doc.SaveFile(strFileName.c_str());
+
+        return true;
+}
+//---------------------------------------------------------
+bool __fastcall TfmMain::ExportSPILMapFile(AnsiString strSchedule)
+{
+        bool bRet=true;
+        try
+        {
+                FILE *file;
+                AnsiString strFileName;
+
+                strFileName.sprintf("%s%s","C:\\RawData\\",strSchedule);
+
+                strFileName+=".txt";
+                file=fopen(strFileName.c_str(), "w");
+
+                fprintf(file,"A [%s]\n",g_IniFile.m_strMachineID);
+                fprintf(file,"%s%d\n",strSchedule.SubString(1,9),strSchedule.SubString(10,2).ToInt());
+                fprintf(file,"%s\n",strSchedule.c_str());
+
+                int nRow=g_IniFile.m_nDeviceY*g_IniFile.m_nPackageY;
+                int nCol=g_IniFile.m_nDeviceX*g_IniFile.m_nPackageX;
+                fprintf(file,"%d,%d,%d\n",nRow*nCol,nRow,nCol);
+
+                int nPassCount=0;
+                int nFailCount=0;
+
+                for(int nIndex=0;nIndex<nRow*nCol;nIndex++)
+                {
+                        if(m_nSubstrateMap[nIndex]==1)
+                        {
+                                fprintf(file,"%c",'G');
+                                nPassCount++;
+                        }
+                        else
+                        {
+                                fprintf(file,"%c",'E');
+                                nFailCount++;
+                        }
+
+
+                        if(nIndex==(nRow*nCol-1)) fprintf(file,"%c",'\n');
+                        else if((nIndex % nCol)==(nCol-1)) fprintf(file,"%c",'~');
+                        else fprintf(file,"%c",',');
+
+                        //if((nIndex % nCol)<nCol)
+                }
+
+                g_pMainThread->m_nOKCount=nPassCount;
+                g_pMainThread->m_nNGCount=nFailCount;
+
+                //g_IniFile.AddLog(file->buffer,file->bsize,1);
+                fclose(file);
+        }
+        catch(...)
+        {
+                bRet=false;
+        }
+
+        return bRet;
+}
+//---------------------------------------------------------------------------
+bool __fastcall TfmMain::UploadMapFile(AnsiString strSchedule)
+{
+        AnsiString strA="C:\\RawData\\"+strSchedule+".txt";
+        AnsiString strB=g_IniFile.m_strMapDataPath+strSchedule+".txt";
+
+        BOOL bRet=MoveFile(strA.c_str(),strB.c_str());
+
+        AnsiString strMsg="[Move]"+strA+"-->"+strB;
+        if(bRet) strMsg+="[OK]";
+        else strMsg+="[NG]";
+
+        AddList(strMsg);
+
+        return true;
+}
+//---------------------------------------------------------------------------
+void __fastcall TfmMain::SpeedButton31Click(TObject *Sender)
+{
+        ExportMapFileTmp(true);
+        g_SMSXML.m_strSerialID="A123456789";
+        RenameMapFile(true);
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TfmMain::PageControl1Change(TObject *Sender)
+{
+        if(m_nUserLevel<=0 && PageControl1->TabIndex<3 ) PageControl1->ActivePage=tabInfo;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::btnClearVisionLogClick(TObject *Sender)
+{
+        listVisionLog->Clear();
+        g_pMainThread->m_listVisionLog.clear();
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton34Click(TObject *Sender)
+{
+/*
+        AnsiString strLog;
+        strLog="[A123456789]-->";
+        strLog+="OK:"+FormatFloat("0",100);
+        strLog+=" NG:"+FormatFloat("0",200);
+
+        g_pMainThread->m_listVisionLog.push_back(strLog);
+*/
+
+        for(int nIndex=1;nIndex<=23;nIndex++)
+        g_pMainThread->m_listVisionLog.push_back(GetSchedule(nIndex));
+
+        ExportSPILMapFile("AABBCCDD.01A02");
+        UploadMapFile("AABBCCDD.01A02");
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton35Click(TObject *Sender)
+{
+        ftpMap->Connect();        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::SpeedButton36Click(TObject *Sender)
+{
+
+        if(!ftpMap->Connected)
+        {
+                ShowMessage("FTP 沒有連線,請連線後重試");
+                return;
+        }
+        /*
+        ftpMap->ParseList=true;
+        ftpMap->List();
+
+        AnsiString strFoldName="test";
+        AnsiString strDirList;
+        bool bFoldExist=false;
+
+        int nDirCount = ftpMap->FTPDirectoryList->name->Count;
+        for (int i=0; i<nDirCount; i++)
+        {
+                strDirList = ftpMap->FTPDirectoryList->name->Strings[i];
+                if (strDirList == strFoldName)
+                {
+                       bFoldExist=true;
+                       break;
+                }
+
+        }
+
+        if(!bFoldExist) ftpMap->MakeDirectory("\\"+strFoldName);
+        */
+        ftpMap->MakeDirectory("\\IDPrinterStripMap\\test");
+        OpenDialog1->DefaultExt = "xml";
+        OpenDialog1->FileName = "*.xml";
+
+        AnsiString strName="\\IDPrinterStripMap\\Test\\"+FormatDateTime("yyyymmddhhnnss",Now())+".xml";
+
+        if(OpenDialog1->Execute())
+        {
+                ftpMap->Upload(OpenDialog1->FileName,"\\IDPrinterStripMap\\Test\\aaaa.xml");
+        }
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::ftpMapFailure(bool &Handled, TCmdType Trans_Type)
+{
+        Handled=true;
+
+        g_IniFile.m_nErrorCode=100;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::ftpMapConnect(TObject *Sender)
+{
+        AddList("MAP FTP Connected");        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::ftpMapConnectionFailed(TObject *Sender)
+{
+        AddList("MAP FTP Connection Failure!");        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::ftpMapDisconnect(TObject *Sender)
+{
+        AddList("MAP FTP Disconnect");        
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TfmMain::SpeedButton37Click(TObject *Sender)
+{
+        if(Application->MessageBoxA("即將關閉所有真空 及 打開夾爪 請注意掉落?","Confirm",MB_ICONQUESTION|MB_OKCANCEL)==IDCANCEL) return;
+
+         for(int nIndex=0;nIndex<96;nIndex++)
+         {
+                if((nIndex!=DO::Bogie_LifterOn) &&
+                        (nIndex!=DO::Bogie_Locker) )
+                g_DIO.SetDO(nIndex,false);
+         }
+         
+        g_MNet.SetDO(DO::SS_SVacOn,false);
+        g_MNet.SetDO(DO::SS_SVacOff,true);
+        g_MNet.SetDO(DO::SS_SpaVacOn,false);
+        g_MNet.SetDO(DO::SS_SpaVacOff,true);
+        g_MNet.SetDO(DO::SC_SSuckerVacOn,false);
+        g_MNet.SetDO(DO::SC_SSuckerVacOff,true);
+        g_MNet.SetDO(DO::SC_CSuckerVacOn,false);
+        g_MNet.SetDO(DO::SC_CSuckerVacOff,true);
+
+        g_MNet.SetDO(DO::BoatSuckerVacOn,false);
+        g_MNet.SetDO(DO::BoatSuckerVacOff,true);
+
+        g_MNet.SetDO(DO::BR2_Vac1,false);
+        g_MNet.SetDO(DO::BR2_Vac2,false);
+
+        //g_MNet.SetDO(DO::Bogie_LifterOn,true);
+        //g_MNet.SetDO(DO::Bogie_LifterOff,false);
+        //g_MNet.SetDO(DO::Bogie_Locker,true);
+
+
+        g_pMainThread->m_bNeedHome=true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverCIMClientConnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        g_eqpXML.StartComm(Socket);
+        g_eqpXML.m_bOnLine=true;
+        AddList("CIM Connected!!");
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverCIMClientDisconnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        g_eqpXML.EndComm();
+        g_eqpXML.m_bOnLine=false;
+        AddList("CIM Disconnected!!");        
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverCIMClientError(TObject *Sender,
+      TCustomWinSocket *Socket, TErrorEvent ErrorEvent, int &ErrorCode)
+{
+        ErrorCode=0;
+        AddList("CIM SocketEror");
+        Socket->Close();
+        g_eqpXML.EndComm();
+        g_eqpXML.m_bOnLine=false;       
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::serverCIMClientRead(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+        //AddList("CIM Read");
+        g_eqpXML.ProcessCIM();
+}
+//---------------------------------------------------------------------------
+
+bool TfmMain::StartProcess(bool bStart)
+{
+       if(bStart)
+       {
+                if(!g_pMainThread->m_bIsHomeDone ) return false;
+                g_pMainThread->SoftStart();
+       }
+       else
+       {
+                g_pMainThread->SoftStop();
+       }
+
+       return true;
+
+}
+//---------------------------------------------------------------------------
+bool TfmMain::OpenFilebyCIM(AnsiString strFileName)
+{
+        g_IniFile.m_strLastFileName=strFileName;
+        fmMain->Caption=strFileName;
+
+        g_IniFile.ProductFile(g_IniFile.m_strLastFileName.c_str(),true);
+        /*
+        fmMain->labelBodySize->Caption="產品尺寸:"+g_IniFile.m_strBodySize;
+        fmMain->labelScheduleNo->Caption="批 號:"+g_IniFile.m_strScheduleNo;
+
+        char drive[MAXDRIVE];
+        char dir[MAXDIR];
+        char file[MAXFILE];
+        char ext[MAXEXT];
+        int flags;
+
+        flags=fnsplit(g_IniFile.m_strLastFileName.c_str(),drive,dir,file,ext);
+        fmMain->labelFileName->Caption=(AnsiString)"檔案名稱:"+file;
+        */
+
+        theVision.LoadTool(g_IniFile.GetFileNameWithNewExt(strFileName.c_str(),"cev").c_str(),"Dummy");
+
+        fmMain->SetLEDDimmer();
+
+        g_SMSXML.m_strMachineID=g_IniFile.m_strSMSMachineID;
+        g_SMSXML.m_strUserID=g_IniFile.m_strSMSUserID;
+        g_SMSXML.m_strPartNo=g_IniFile.m_strSMSPartNo;
+        g_SMSXML.m_strLotNo=g_IniFile.m_strSMSLotNo;
+    
+
+        g_eqpXML.SendEventReport("2");
+
+    
+        return true;
+}
+//---------------------------------------------------------------------------
+bool TfmMain::CIMEventReportAck(AnsiString strSSID,AnsiString strAckCode)
+{
+        if(strAckCode=="0" && g_eqpXML.m_strSubstrate2DCode==strSSID)
+        {
+                g_pMainThread->m_listVenderCodeReaderRX.push_back("VENDER_PASS");
+
+        }
+        else if(strAckCode!="0" && g_eqpXML.m_strSubstrate2DCode==strSSID)
+        {
+                g_pMainThread->m_listVenderCodeReaderRX.push_back("VENDER_FAIL");
+        }
+
+        fmMain->AddCIMList("[CIMEventReportAck] Substrate ID:"+strSSID+",Ack:"+strAckCode);
+
+        //if(!g_pAutoRunThread->m_bIsSubstrate2DOk && g_eqpXML.m_strSubstrate2DCode==strSSID) g_eqpXML.SendAlarmMessage("5001","Substtrate 2D Code Judge Failed!!");
+
+}
+//---------------------------------------------------------------------------
+void __fastcall TfmMain::MSMQEvent1Arrived(TObject *Sender,
+      LPDISPATCH Queue, long Cursor)
+{
+        IMSMQQueue2Ptr IMSMQQ;
+        IMSMQMessage2Ptr IMSMQMsg;
+        Variant aa;
+
+        IMSMQQ= Queue ;
+
+        MSMQQueue1->ConnectTo(IMSMQQ);
+
+        IMSMQMsg = IMSMQQ->Receive();
+        MSMQMessage1->ConnectTo(IMSMQMsg);
+
+        aa = MSMQMessage1->get_Body();
+
+        AnsiString strData=aa;
+
+
+
+        g_IniFile.AddLog(strData.c_str(),strData.Length());
+
+        bool bIsCoverOk=g_eqpXML.doCheckID(strData.c_str());
+
+        if(bIsCoverOk) g_pMainThread->m_listCoverCodeReaderRX.push_back("COVER_CONTROL_PASS");
+        else g_pMainThread->m_listCoverCodeReaderRX.push_back("COVER_CONTROL_FAIL");
+
+
+        MSMQQueue2->ConnectTo(IMSMQQRX1);
+        MSMQQueue3->ConnectTo(IMSMQQRX2);
+        MSMQQueue2->EnableNotification(MSMQEvent1->GetDefaultInterface());
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfmMain::MSMQEvent2Arrived(TObject *Sender,
+      LPDISPATCH Queue, long Cursor)
+{
+        IMSMQQueue2Ptr IMSMQQ;
+        IMSMQMessage2Ptr IMSMQMsg;
+        Variant aa;
+
+        IMSMQQ= Queue ;
+        MSMQQueue2->ConnectTo(IMSMQQ);
+
+        IMSMQMsg = IMSMQQ->Receive();
+        MSMQMessage2->ConnectTo(IMSMQMsg);
+
+        aa = MSMQMessage2->get_Body();
+
+        AnsiString strData=aa;
+
+        g_IniFile.AddLog(strData.c_str(),strData.Length());
+
+        bool bIsBoatOk=g_eqpXML.doCheckID(strData.c_str());
+
+        if(bIsBoatOk) g_pMainThread->m_listBoatCodeReaderRX.push_back("BOAT_CONTROL_PASS");
+        else g_pMainThread->m_listBoatCodeReaderRX.push_back("BOAT_CONTROL_FAIL");
+
+        MSMQQueue2->ConnectTo(IMSMQQRX1);
+
+        MSMQQueue3->ConnectTo(IMSMQQRX2);
+        MSMQQueue3->EnableNotification(MSMQEvent2->GetDefaultInterface());
+}
+//---------------------------------------------------------------------------
+
+

@@ -1,0 +1,75 @@
+[SYSTEM]
+
+E0005=緊急停止被按下
+E0006=主氣壓源不足 
+E0007=安全門開啟 
+
+E0201=AXIS "LDY" 馬達Alarm
+E0202=AXIS "LDZ" 馬達Alarm
+E0203=AXIS "SPZ" 馬達Alarm
+E0204=AXIS "MGZ" 馬達Alarm
+E0205=AXIS "LLC" 馬達Alarm
+E0206=AXIS "LPX" 馬達Alarm
+E0207=AXIS "SPY" 馬達Alarm
+E0208=AXIS "CDX" 馬達Alarm
+E0209=AXIS "RLC" 馬達Alarm
+
+E0300=Loader Magazine 推桿沒有縮回 (X009 off)
+E0301=Loader Magazine 夾爪料盒有無檢知 (X024 on)
+E0302=Left Lane changer 流道進入檢知on(X026 on)
+E0303=Left Lane changer 流道基板到定位檢知 on(X027 on)
+E0304=Left Lane changer 流道離開檢知on(X028 on)
+E0305=Right Lane changer 流道進入檢知on(X032 on)
+E0306=Right Lane changer 流道基板到定位檢知 on(X033 on)
+E0307=Right Lane changer 流道離開檢知on(X034 on)
+E0308=Right Lane changer 推桿沒有縮回 (X039 off)
+E0309=前噴塗 流道進入檢知on(X042 on)
+E0310=前噴塗 流道基板到定位檢知 on(X043 on)
+E0311=前噴塗 流道離開檢知on(X044 on)
+E0312=後噴塗 流道進入檢知on(X047 on)
+E0313=後噴塗 流道基板到定位檢知 on(X048 on)
+E0314=後噴塗 流道離開檢知on(X049 on)
+E0315=NG回收料盒有無檢知on (X060 on)
+
+E0400=loader料盒方向異常檢知on (X013 on)
+E0401=loader料盒時間內沒有達定位 (X014 off)
+E0402=loader下層料盒已滿請移除 (X018 on)
+E0403=loader下層料盒時間內沒有到達定位 (X017 off)
+E0404=loader下層料盒時間內沒有脫離定位 (X017 on)
+E0405=loader 夾爪汽缸沒有在上位 (x022 off)
+E0406=loader Magazine 夾取失敗 夾爪汽缸下位on  (x023 on)
+E0407=loader Magazine 夾取異常 料盒有無檢知off (x024 off)
+E0408=loader 夾爪汽缸沒有在上位 (x022 off)
+E0409=左分配流道進入檢知 ON (X026 on)
+E0410=左分配流道離開檢知 ON (X028 on)
+E0411=入料推桿過壓檢知 on (X010 on)
+E0412=入料推桿沒有伸出 (X008 off)
+E0413=左分配流道 基板時間內沒有到定位 (X027 off)
+E0414=入料推桿沒有縮回 (X009 off)
+E0415=左分配流道阻擋汽缸上位 off (X029 off)
+
+E0500=噴塗區 前流道進入檢知 on(X042 on)
+E0501=噴塗區 後流道進入檢知 on(X047 on)
+E0502=噴塗區 前流道基板時間內沒有到定位 (X043 off)
+E0503=噴塗區 後流道基板時間內沒有到定位 (X048 off)
+
+E0600=Flux添加槽 Flux 不足 (X052 on)
+E0601=Flux筒 Flux 不足 (X056 on)
+
+E0700=前噴塗 流道離開檢知on(X044 on)
+E0701=後噴塗 流道離開檢知on(X049 on)
+E0702=Right Lane changer 流道進入檢知on(X032 on)
+E0703=Right Lane changer 流道離開檢知on(X034 on)
+E0704=Right Lane changer 推桿沒有縮回 (X039 off)
+E0705=Right Lane changer Stopper 沒有在上位 (X035 off)
+E0706=Right Lane changer 流道基板時間內沒有到定位(X033 off)
+E0707=Flux 有無檢查 CCD 無回應
+E0708=Right Lane changer 流道離開檢知時間內沒有on(X034 off)
+E0709=Right Lane changer 流道離開檢知時間內沒有off(X034 on)
+E0710=Right Lane changer 推桿沒有推到定位 (X038 off)
+E0711=Right Lane changer 推桿受阻 (X040 on)
+E0712=Right Lane changer 推桿沒有收回定位 (X039 off)
+
+E0999=請先復歸機台 
+E1000=機台初始中,請稍后 
+E1001=機台初始復歸 完成
