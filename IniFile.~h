@@ -54,7 +54,8 @@ public:
   double m_dCleanSprayPosZ;
   int m_nCleanSprayTimes;
   double m_dCleanSprayDistance;
-  double m_dSprayerWaterPressure;
+  double m_dSprayerCleanWaterPressure;
+  double m_dSprayerCleanAirPressure;
   int m_nFullCleanSprayTimes;
 
   double m_dScaleSprayPosX[2];

@@ -70,7 +70,8 @@ void __fastcall CIniFile::MachineFile(bool bRead)
   DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dCleanSprayPosZ",m_dCleanSprayPosZ,0.0);
   DDXFile_Int(bRead,pIniFile,Machine_Section,"m_nCleanSprayTimes",m_nCleanSprayTimes);
   DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dCleanSprayDistance",m_dCleanSprayDistance,0.0);
-  DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dSprayerWaterPressure",m_dSprayerWaterPressure,0.0);
+  DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dSprayerCleanWaterPressure",m_dSprayerCleanWaterPressure,0.0);
+  DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dSprayerCleanAirPressure",m_dSprayerCleanAirPressure,0.0);
   DDXFile_Int(bRead,pIniFile,Machine_Section,"m_nFullCleanSprayTimes",m_nFullCleanSprayTimes);
 
   DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dScaleSprayPosX0",m_dScaleSprayPosX[0],0.0);

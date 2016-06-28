@@ -1,8 +1,8 @@
 object frmMain: TfrmMain
-  Left = 79
-  Top = 407
+  Left = 71
+  Top = 0
   Width = 1455
-  Height = 820
+  Height = 773
   Caption = 'frmMain'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -21,54 +21,38 @@ object frmMain: TfrmMain
     Left = 940
     Top = 0
     Width = 10
-    Height = 666
+    Height = 619
     Cursor = crHSplit
     Align = alRight
   end
   object Splitter2: TSplitter
     Left = 0
-    Top = 666
+    Top = 619
     Width = 1447
     Height = 8
     Cursor = crVSplit
     Align = alBottom
   end
-  object ScrollBox1: TScrollBox
-    Left = 0
-    Top = 0
-    Width = 940
-    Height = 666
-    Align = alClient
-    TabOrder = 0
-    object ImagePaintBox: TPaintBox
-      Left = 0
-      Top = 0
-      Width = 681
-      Height = 513
-      OnMouseMove = ImagePaintBoxMouseMove
-      OnPaint = ImagePaintBoxPaint
-    end
-  end
   object Panel1: TPanel
     Left = 950
     Top = 0
     Width = 497
-    Height = 666
+    Height = 619
     Align = alRight
     Anchors = [akRight, akBottom]
     Caption = 'Panel1'
-    TabOrder = 1
+    TabOrder = 0
     DesignSize = (
       497
-      666)
+      619)
     object PageControl1: TPageControl
       Left = 1
       Top = 56
       Width = 495
-      Height = 984
-      ActivePage = TabSheet3
+      Height = 942
+      ActivePage = TabSheet2
       Anchors = [akLeft, akTop, akRight, akBottom]
-      TabIndex = 2
+      TabIndex = 1
       TabOrder = 0
       object TabSheet1: TTabSheet
         Caption = 'CCD'
@@ -519,6 +503,15 @@ object frmMain: TfrmMain
             OnClick = btnSet1Click
           end
         end
+        object btnOpenLog: TButton
+          Left = 32
+          Top = 488
+          Width = 153
+          Height = 49
+          Caption = #27298#35222'Log'
+          TabOrder = 3
+          OnClick = btnOpenLogClick
+        end
       end
       object TabSheet2: TTabSheet
         Caption = 'Function Test'
@@ -573,7 +566,7 @@ object frmMain: TfrmMain
           Top = 360
           Width = 161
           Height = 57
-          Caption = '(W) Weight Scale'#21205#20316#28204#35430
+          Caption = '(F) '#30095#36890#20301#32622#21205#20316#28204#35430
           OnClick = SpeedButton7Click
         end
         object SpeedButton8: TSpeedButton
@@ -725,83 +718,6 @@ object frmMain: TfrmMain
           ParentFont = False
           TabOrder = 1
           OnClick = m_bStopLoaderClick
-        end
-      end
-      object TabSheet3: TTabSheet
-        Caption = 'Step Reset'
-        ImageIndex = 2
-        object btnRearLaneReset: TSpeedButton
-          Tag = 1
-          Left = 224
-          Top = 200
-          Width = 105
-          Height = 57
-          Caption = #24460#22132#22615#27969#36947
-          OnClick = btnRearLaneResetClick
-        end
-        object btnFrnotLaneReset: TSpeedButton
-          Tag = 1
-          Left = 224
-          Top = 256
-          Width = 105
-          Height = 57
-          Caption = #21069#22132#22615#27969#36947
-          OnClick = btnFrnotLaneResetClick
-        end
-        object btnInLaneReset: TSpeedButton
-          Tag = 1
-          Left = 119
-          Top = 224
-          Width = 105
-          Height = 57
-          Caption = #20837#26009#27969#36947
-          OnClick = btnInLaneResetClick
-        end
-        object btnOutLaneReset: TSpeedButton
-          Tag = 1
-          Left = 329
-          Top = 224
-          Width = 105
-          Height = 57
-          Caption = #20986#26009#27969#36947
-          OnClick = btnOutLaneResetClick
-        end
-        object btnLoaderReset: TSpeedButton
-          Tag = 1
-          Left = 14
-          Top = 192
-          Width = 105
-          Height = 121
-          Caption = 'Loader'#24489#27512
-          OnClick = btnLoaderResetClick
-        end
-        object Shape03: TShape
-          Left = 367
-          Top = 208
-          Width = 28
-          Height = 28
-          Shape = stCircle
-        end
-        object Shape00: TShape
-          Left = 156
-          Top = 208
-          Width = 28
-          Height = 28
-          Shape = stCircle
-        end
-        object Shape01: TShape
-          Left = 262
-          Top = 245
-          Width = 28
-          Height = 28
-          Shape = stCircle
-        end
-        object Shape02: TShape
-          Left = 262
-          Top = 184
-          Width = 28
-          Height = 28
-          Shape = stCircle
         end
       end
     end
@@ -1240,7 +1156,7 @@ object frmMain: TfrmMain
   end
   object listHistory: TListBox
     Left = 0
-    Top = 674
+    Top = 627
     Width = 1447
     Height = 92
     Align = alBottom
@@ -1252,7 +1168,125 @@ object frmMain: TfrmMain
     Font.Style = []
     ItemHeight = 16
     ParentFont = False
+    TabOrder = 1
+  end
+  object Panel2: TPanel
+    Left = 0
+    Top = 0
+    Width = 940
+    Height = 619
+    Align = alClient
     TabOrder = 2
+    object Splitter3: TSplitter
+      Left = 1
+      Top = 436
+      Width = 938
+      Height = 10
+      Cursor = crVSplit
+      Align = alBottom
+    end
+    object ScrollBox1: TScrollBox
+      Left = 1
+      Top = 1
+      Width = 938
+      Height = 435
+      Align = alClient
+      TabOrder = 0
+      object ImagePaintBox: TPaintBox
+        Left = 0
+        Top = 0
+        Width = 681
+        Height = 513
+        OnMouseMove = ImagePaintBoxMouseMove
+        OnPaint = ImagePaintBoxPaint
+      end
+    end
+    object PageControl2: TPageControl
+      Left = 1
+      Top = 446
+      Width = 938
+      Height = 172
+      ActivePage = TabSheet4
+      Align = alBottom
+      TabIndex = 0
+      TabOrder = 1
+      object TabSheet4: TTabSheet
+        Caption = 'Step Reset'
+        object btnRearLaneReset: TSpeedButton
+          Tag = 1
+          Left = 432
+          Top = 24
+          Width = 105
+          Height = 57
+          Caption = #24460#22132#22615#27969#36947
+          OnClick = btnRearLaneResetClick
+        end
+        object btnFrnotLaneReset: TSpeedButton
+          Tag = 1
+          Left = 432
+          Top = 80
+          Width = 105
+          Height = 57
+          Caption = #21069#22132#22615#27969#36947
+          OnClick = btnFrnotLaneResetClick
+        end
+        object btnInLaneReset: TSpeedButton
+          Tag = 1
+          Left = 287
+          Top = 48
+          Width = 105
+          Height = 57
+          Caption = #20837#26009#27969#36947
+          OnClick = btnInLaneResetClick
+        end
+        object btnOutLaneReset: TSpeedButton
+          Tag = 1
+          Left = 585
+          Top = 48
+          Width = 105
+          Height = 57
+          Caption = #20986#26009#27969#36947
+          OnClick = btnOutLaneResetClick
+        end
+        object btnLoaderReset: TSpeedButton
+          Tag = 1
+          Left = 142
+          Top = 16
+          Width = 105
+          Height = 121
+          Caption = 'Loader'#24489#27512
+          OnClick = btnLoaderResetClick
+        end
+        object Shape03: TShape
+          Left = 623
+          Top = 32
+          Width = 28
+          Height = 28
+          Shape = stCircle
+        end
+        object Shape00: TShape
+          Left = 324
+          Top = 32
+          Width = 28
+          Height = 28
+          Shape = stCircle
+        end
+        object Shape01: TShape
+          Left = 470
+          Top = 69
+          Width = 28
+          Height = 28
+          Shape = stCircle
+        end
+        object Shape02: TShape
+          Left = 470
+          Top = 8
+          Width = 28
+          Height = 28
+          Shape = stCircle
+        end
+      end
+    end
   end
   object MainMenu1: TMainMenu
     Left = 192

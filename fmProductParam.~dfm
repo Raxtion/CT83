@@ -1,6 +1,6 @@
 object frmProductParam: TfrmProductParam
-  Left = 514
-  Top = 149
+  Left = 583
+  Top = 42
   BorderStyle = bsDialog
   Caption = 'frmProductParam'
   ClientHeight = 666
@@ -38,9 +38,9 @@ object frmProductParam: TfrmProductParam
     Top = 0
     Width = 923
     Height = 601
-    ActivePage = TabSheet1
+    ActivePage = TabSheet3
     Align = alTop
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 2
     object TabSheet1: TTabSheet
       Caption = #20301#32622#35373#23450
@@ -525,7 +525,7 @@ object frmProductParam: TfrmProductParam
           Top = 74
           Width = 108
           Height = 21
-          Hint = 'm_dLeftLaneChangerSprayPos0'
+          Hint = 'm_dLeftLaneChangerSprayPos1'
           Alignment = taRightJustify
           AutoSize = False
           BevelInner = bvSpace
@@ -866,7 +866,6 @@ object frmProductParam: TfrmProductParam
           Top = 252
           Width = 108
           Height = 21
-          Hint = 'm_dSprayDistance'
           Alignment = taRightJustify
           AutoSize = False
           BevelInner = bvSpace
@@ -906,7 +905,7 @@ object frmProductParam: TfrmProductParam
           Top = 220
           Width = 108
           Height = 21
-          Hint = 'm_dSprayDistance'
+          Hint = 'm_dSprayPitch'
           Alignment = taRightJustify
           AutoSize = False
           BevelInner = bvSpace
@@ -942,11 +941,12 @@ object frmProductParam: TfrmProductParam
           TabOrder = 23
         end
         object StaticText51: TStaticText
+          Tag = 6
           Left = 13
           Top = 28
           Width = 108
           Height = 21
-          Hint = 'm_dSprayDistance'
+          Hint = 'm_dSprayReadyPos'
           Alignment = taRightJustify
           AutoSize = False
           BevelInner = bvSpace
@@ -957,6 +957,7 @@ object frmProductParam: TfrmProductParam
           Color = clSkyBlue
           ParentColor = False
           TabOrder = 24
+          OnClick = StaticText5Click
         end
         object m_dSprayReadyPos: TEdit
           Left = 131
@@ -1002,7 +1003,7 @@ object frmProductParam: TfrmProductParam
           Top = 50
           Width = 108
           Height = 21
-          Hint = 'm_dRightLaneChangerSprayPos0'
+          Hint = 'm_dRightLaneChangerSprayPos1'
           Alignment = taRightJustify
           AutoSize = False
           BevelInner = bvSpace
@@ -1021,7 +1022,7 @@ object frmProductParam: TfrmProductParam
           Top = 26
           Width = 108
           Height = 21
-          Hint = 'm_dRightLaneChangerSprayPos1'
+          Hint = 'm_dRightLaneChangerSprayPos0'
           Alignment = taRightJustify
           AutoSize = False
           BevelInner = bvSpace
@@ -1165,12 +1166,10 @@ object frmProductParam: TfrmProductParam
           TabOrder = 11
         end
         object StaticText53: TStaticText
-          Tag = 8
           Left = 13
           Top = 298
           Width = 108
           Height = 21
-          Hint = 'm_dCCDCheckPosY'
           Alignment = taRightJustify
           AutoSize = False
           BevelInner = bvSpace
@@ -1656,12 +1655,10 @@ object frmProductParam: TfrmProductParam
           TabOrder = 5
         end
         object StaticText96: TStaticText
-          Tag = 11
           Left = 13
           Top = 76
           Width = 108
           Height = 21
-          Hint = 'm_dSprayLaneAlarmY1'
           Alignment = taRightJustify
           AutoSize = False
           BevelInner = bvSpace
@@ -1698,12 +1695,10 @@ object frmProductParam: TfrmProductParam
           TabOrder = 8
         end
         object StaticText98: TStaticText
-          Tag = 11
           Left = 13
           Top = 100
           Width = 108
           Height = 21
-          Hint = 'm_dSprayLaneAlarmY1'
           Alignment = taRightJustify
           AutoSize = False
           BevelInner = bvSpace
@@ -1821,6 +1816,589 @@ object frmProductParam: TfrmProductParam
           TickStyle = tsAuto
           Visible = False
           OnChange = m_nLEDDimmer1Change
+        end
+      end
+    end
+    object TabSheet3: TTabSheet
+      Caption = 'Clean Sprayer Lane'
+      ImageIndex = 2
+      object GroupBox8: TGroupBox
+        Left = 16
+        Top = 9
+        Width = 321
+        Height = 496
+        Caption = 'Clean Sprayer Lane'
+        TabOrder = 0
+        object StaticText69: TStaticText
+          Tag = 7
+          Left = 13
+          Top = 36
+          Width = 108
+          Height = 21
+          Hint = 'm_dCleanSprayPosX0'
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #28165#28500#20301#32622' (X1)'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 0
+          OnClick = StaticText5Click
+        end
+        object m_dCleanSprayPosX0: TEdit
+          Left = 131
+          Top = 36
+          Width = 65
+          Height = 24
+          TabOrder = 1
+          Text = 'editAcc1'
+        end
+        object StaticText70: TStaticText
+          Left = 200
+          Top = 37
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = 'mm'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 2
+        end
+        object StaticText71: TStaticText
+          Tag = 11
+          Left = 13
+          Top = 60
+          Width = 108
+          Height = 21
+          Hint = 'm_dCleanSprayPosY0'
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #28165#28500#20301#32622' (Y1)'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 3
+          OnClick = StaticText5Click
+        end
+        object m_dCleanSprayPosY0: TEdit
+          Left = 131
+          Top = 60
+          Width = 65
+          Height = 24
+          TabOrder = 4
+          Text = 'editAcc1'
+        end
+        object StaticText72: TStaticText
+          Left = 200
+          Top = 61
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = 'mm'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 5
+        end
+        object StaticText75: TStaticText
+          Left = 13
+          Top = 268
+          Width = 108
+          Height = 21
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = 'X '#28165#28500#27425#25976
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 6
+        end
+        object m_nCleanSprayTimes: TEdit
+          Left = 131
+          Top = 268
+          Width = 65
+          Height = 24
+          TabOrder = 7
+          Text = 'editAcc1'
+        end
+        object StaticText76: TStaticText
+          Left = 200
+          Top = 269
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #27425
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 8
+        end
+        object StaticText77: TStaticText
+          Tag = 7
+          Left = 13
+          Top = 84
+          Width = 108
+          Height = 21
+          Hint = 'm_dCleanSprayPosX1'
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #28165#28500#20301#32622' (X2)'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 9
+          OnClick = StaticText5Click
+        end
+        object m_dCleanSprayPosX1: TEdit
+          Left = 131
+          Top = 84
+          Width = 65
+          Height = 24
+          TabOrder = 10
+          Text = 'editAcc1'
+        end
+        object StaticText78: TStaticText
+          Left = 200
+          Top = 85
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = 'mm'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 11
+        end
+        object StaticText79: TStaticText
+          Tag = 11
+          Left = 13
+          Top = 108
+          Width = 108
+          Height = 21
+          Hint = 'm_dCleanSprayPosY1'
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #28165#28500#20301#32622' (Y2)'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 12
+          OnClick = StaticText5Click
+        end
+        object m_dCleanSprayPosY1: TEdit
+          Left = 131
+          Top = 108
+          Width = 65
+          Height = 24
+          TabOrder = 13
+          Text = 'editAcc1'
+        end
+        object StaticText80: TStaticText
+          Left = 200
+          Top = 109
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = 'mm'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 14
+        end
+        object StaticText81: TStaticText
+          Tag = 7
+          Left = 13
+          Top = 132
+          Width = 108
+          Height = 21
+          Hint = 'm_dCleanSprayPosX2'
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #28165#28500#20301#32622' (X3)'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 15
+          OnClick = StaticText5Click
+        end
+        object m_dCleanSprayPosX2: TEdit
+          Left = 131
+          Top = 132
+          Width = 65
+          Height = 24
+          TabOrder = 16
+          Text = 'editAcc1'
+        end
+        object StaticText82: TStaticText
+          Left = 200
+          Top = 133
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = 'mm'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 17
+        end
+        object StaticText83: TStaticText
+          Tag = 11
+          Left = 13
+          Top = 156
+          Width = 108
+          Height = 21
+          Hint = 'm_dCleanSprayPosY2'
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #28165#28500#20301#32622' (Y3)'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 18
+          OnClick = StaticText5Click
+        end
+        object m_dCleanSprayPosY2: TEdit
+          Left = 131
+          Top = 156
+          Width = 65
+          Height = 24
+          TabOrder = 19
+          Text = 'editAcc1'
+        end
+        object StaticText86: TStaticText
+          Left = 200
+          Top = 157
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = 'mm'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 20
+        end
+        object StaticText87: TStaticText
+          Tag = 7
+          Left = 13
+          Top = 180
+          Width = 108
+          Height = 21
+          Hint = 'm_dCleanSprayPosX3'
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #28165#28500#20301#32622' (X4)'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 21
+          OnClick = StaticText5Click
+        end
+        object m_dCleanSprayPosX3: TEdit
+          Left = 131
+          Top = 180
+          Width = 65
+          Height = 24
+          TabOrder = 22
+          Text = 'editAcc1'
+        end
+        object StaticText88: TStaticText
+          Left = 200
+          Top = 181
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = 'mm'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 23
+        end
+        object StaticText89: TStaticText
+          Tag = 11
+          Left = 13
+          Top = 204
+          Width = 108
+          Height = 21
+          Hint = 'm_dCleanSprayPosY3'
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #28165#28500#20301#32622' (Y4)'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 24
+          OnClick = StaticText5Click
+        end
+        object m_dCleanSprayPosY3: TEdit
+          Left = 131
+          Top = 204
+          Width = 65
+          Height = 24
+          TabOrder = 25
+          Text = 'editAcc1'
+        end
+        object StaticText90: TStaticText
+          Left = 200
+          Top = 205
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = 'mm'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 26
+        end
+        object StaticText91: TStaticText
+          Left = 13
+          Top = 324
+          Width = 108
+          Height = 21
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #28165#28500#36317#38626'(X)'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 27
+        end
+        object m_dCleanSprayDistance: TEdit
+          Left = 131
+          Top = 324
+          Width = 65
+          Height = 24
+          TabOrder = 28
+          Text = 'editAcc1'
+        end
+        object StaticText92: TStaticText
+          Left = 200
+          Top = 325
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = 'mm'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 29
+        end
+        object StaticText93: TStaticText
+          Tag = 6
+          Left = 13
+          Top = 236
+          Width = 108
+          Height = 21
+          Hint = 'm_dCleanSprayPosZ'
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #28165#28500#20301#32622' (Z)'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 30
+          OnClick = StaticText5Click
+        end
+        object m_dCleanSprayPosZ: TEdit
+          Left = 131
+          Top = 236
+          Width = 65
+          Height = 24
+          TabOrder = 31
+          Text = 'editAcc1'
+        end
+        object StaticText94: TStaticText
+          Left = 200
+          Top = 237
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = 'mm'
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 32
+        end
+        object StaticText95: TStaticText
+          Left = 13
+          Top = 356
+          Width = 108
+          Height = 21
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #27700#28165#27927'Air'#21152#22739
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 33
+        end
+        object m_dSprayerCleanWaterPressure: TEdit
+          Left = 131
+          Top = 356
+          Width = 65
+          Height = 24
+          TabOrder = 34
+          Text = 'editAcc1'
+        end
+        object StaticText100: TStaticText
+          Left = 200
+          Top = 357
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 35
+        end
+        object StaticText103: TStaticText
+          Left = 13
+          Top = 292
+          Width = 108
+          Height = 21
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #20840#37096' '#28165#28500#27425#25976
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 36
+        end
+        object m_nFullCleanSprayTimes: TEdit
+          Left = 131
+          Top = 292
+          Width = 65
+          Height = 24
+          TabOrder = 37
+          Text = 'editAcc1'
+        end
+        object StaticText105: TStaticText
+          Left = 200
+          Top = 293
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #27425
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 38
+        end
+        object StaticText101: TStaticText
+          Left = 13
+          Top = 380
+          Width = 108
+          Height = 21
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = 'Air'#28165#27927'Air'#21152#22739
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 39
+        end
+        object m_dSprayerCleanAirPressure: TEdit
+          Left = 131
+          Top = 380
+          Width = 65
+          Height = 24
+          TabOrder = 40
+          Text = 'editAcc1'
+        end
+        object StaticText102: TStaticText
+          Left = 200
+          Top = 381
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 41
         end
       end
     end

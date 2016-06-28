@@ -519,30 +519,13 @@ void __fastcall TfrmMain::Machine1Click(TObject *Sender)
 	DDX_Float(bRead, g_IniFile.m_dConveyerPos[4], pMachineDlg->m_dConveyerPos4);
 	DDX_Float(bRead, g_IniFile.m_dNGMagPos, pMachineDlg->m_dNGMagPos);
 
-	DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[0], pMachineDlg->m_dCleanSprayPosX0);
-	DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[0], pMachineDlg->m_dCleanSprayPosY0);
-    DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[1], pMachineDlg->m_dCleanSprayPosX1);
-	DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[1], pMachineDlg->m_dCleanSprayPosY1);
-    DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[2], pMachineDlg->m_dCleanSprayPosX2);
-	DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[2], pMachineDlg->m_dCleanSprayPosY2);
-    DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[3], pMachineDlg->m_dCleanSprayPosX3);
-	DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[3], pMachineDlg->m_dCleanSprayPosY3);
-    DDX_Float(bRead, g_IniFile.m_dCleanSprayPosZ, pMachineDlg->m_dCleanSprayPosZ);
-	DDX_Int(bRead, g_IniFile.m_nCleanSprayTimes, pMachineDlg->m_nCleanSprayTimes);
-    DDX_Float(bRead, g_IniFile.m_dCleanSprayDistance, pMachineDlg->m_dCleanSprayDistance);
-    DDX_Float(bRead, g_IniFile.m_dSprayerCleanWaterPressure, pMachineDlg->m_dSprayerCleanWaterPressure);
-    DDX_Float(bRead, g_IniFile.m_dSprayerCleanAirPressure, pMachineDlg->m_dSprayerCleanAirPressure);
-    DDX_Int(bRead, g_IniFile.m_nFullCleanSprayTimes, pMachineDlg->m_nFullCleanSprayTimes);
-
 	DDX_Float(bRead, g_IniFile.m_dScaleSprayPosX[0], pMachineDlg->m_dScaleSprayPosX0);
 	DDX_Float(bRead, g_IniFile.m_dScaleSprayPosY[0], pMachineDlg->m_dScaleSprayPosY0);
 	DDX_Float(bRead, g_IniFile.m_dScaleSprayPosZ[0], pMachineDlg->m_dScaleSprayPosZ0);
     DDX_Float(bRead, g_IniFile.m_dScaleSprayPosX[1], pMachineDlg->m_dScaleSprayPosX1);
 	DDX_Float(bRead, g_IniFile.m_dScaleSprayPosY[1], pMachineDlg->m_dScaleSprayPosY1);
 	DDX_Float(bRead, g_IniFile.m_dScaleSprayPosZ[1], pMachineDlg->m_dScaleSprayPosZ1);
-	DDX_Int(bRead, g_IniFile.m_nScaleSprayTime[0], pMachineDlg->m_nScaleSprayTime0);
     DDX_Int(bRead, g_IniFile.m_nScaleSprayTime[1], pMachineDlg->m_nScaleSprayTime1);
-    DDX_Int(bRead, g_IniFile.m_nScaleSprayTimes[0], pMachineDlg->m_nScaleSprayTimes0);
     DDX_Int(bRead, g_IniFile.m_nScaleSprayTimes[1], pMachineDlg->m_nScaleSprayTimes1);
     DDX_Float(bRead, g_IniFile.m_dScaleSprayDelayTime, pMachineDlg->m_dScaleSprayDelayTime);
 
@@ -654,30 +637,13 @@ void __fastcall TfrmMain::Machine1Click(TObject *Sender)
 		        DDX_Float(bRead, g_IniFile.m_dConveyerPos[4], pMachineDlg->m_dConveyerPos4);
 		        DDX_Float(bRead, g_IniFile.m_dNGMagPos, pMachineDlg->m_dNGMagPos);
 
-		        DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[0], pMachineDlg->m_dCleanSprayPosX0);
-                DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[0], pMachineDlg->m_dCleanSprayPosY0);
-                DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[1], pMachineDlg->m_dCleanSprayPosX1);
-	            DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[1], pMachineDlg->m_dCleanSprayPosY1);
-                DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[2], pMachineDlg->m_dCleanSprayPosX2);
-	            DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[2], pMachineDlg->m_dCleanSprayPosY2);
-                DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[3], pMachineDlg->m_dCleanSprayPosX3);
-	            DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[3], pMachineDlg->m_dCleanSprayPosY3);
-                DDX_Float(bRead, g_IniFile.m_dCleanSprayPosZ, pMachineDlg->m_dCleanSprayPosZ);
-	            DDX_Int(bRead, g_IniFile.m_nCleanSprayTimes, pMachineDlg->m_nCleanSprayTimes);
-                DDX_Float(bRead, g_IniFile.m_dCleanSprayDistance, pMachineDlg->m_dCleanSprayDistance);
-                DDX_Float(bRead, g_IniFile.m_dSprayerCleanWaterPressure, pMachineDlg->m_dSprayerCleanWaterPressure);
-                DDX_Float(bRead, g_IniFile.m_dSprayerCleanAirPressure, pMachineDlg->m_dSprayerCleanAirPressure);
-                DDX_Int(bRead, g_IniFile.m_nFullCleanSprayTimes, pMachineDlg->m_nFullCleanSprayTimes);
-
 		        DDX_Float(bRead, g_IniFile.m_dScaleSprayPosX[0], pMachineDlg->m_dScaleSprayPosX0);
 	            DDX_Float(bRead, g_IniFile.m_dScaleSprayPosY[0], pMachineDlg->m_dScaleSprayPosY0);
 	            DDX_Float(bRead, g_IniFile.m_dScaleSprayPosZ[0], pMachineDlg->m_dScaleSprayPosZ0);
                 DDX_Float(bRead, g_IniFile.m_dScaleSprayPosX[1], pMachineDlg->m_dScaleSprayPosX1);
 	            DDX_Float(bRead, g_IniFile.m_dScaleSprayPosY[1], pMachineDlg->m_dScaleSprayPosY1);
 	            DDX_Float(bRead, g_IniFile.m_dScaleSprayPosZ[1], pMachineDlg->m_dScaleSprayPosZ1);
-                DDX_Int(bRead, g_IniFile.m_nScaleSprayTime[0], pMachineDlg->m_nScaleSprayTime0);
                 DDX_Int(bRead, g_IniFile.m_nScaleSprayTime[1], pMachineDlg->m_nScaleSprayTime1);
-                DDX_Int(bRead, g_IniFile.m_nScaleSprayTimes[0], pMachineDlg->m_nScaleSprayTimes0);
                 DDX_Int(bRead, g_IniFile.m_nScaleSprayTimes[1], pMachineDlg->m_nScaleSprayTimes1);
                 DDX_Float(bRead, g_IniFile.m_dScaleSprayDelayTime, pMachineDlg->m_dScaleSprayDelayTime);
 
@@ -778,6 +744,21 @@ void __fastcall TfrmMain::Product1Click(TObject *Sender)
     DDX_Float(bRead, g_IniFile.m_dWeightScaleAlarmUp, pWnd->m_dWeightScaleAlarmUp);
     DDX_Float(bRead, g_IniFile.m_dWeightScaleAlarmDown, pWnd->m_dWeightScaleAlarmDown);
 
+    DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[0], pWnd->m_dCleanSprayPosX0);
+	DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[0], pWnd->m_dCleanSprayPosY0);
+    DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[1], pWnd->m_dCleanSprayPosX1);
+	DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[1], pWnd->m_dCleanSprayPosY1);
+    DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[2], pWnd->m_dCleanSprayPosX2);
+	DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[2], pWnd->m_dCleanSprayPosY2);
+    DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[3], pWnd->m_dCleanSprayPosX3);
+	DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[3], pWnd->m_dCleanSprayPosY3);
+    DDX_Float(bRead, g_IniFile.m_dCleanSprayPosZ, pWnd->m_dCleanSprayPosZ);
+	DDX_Int(bRead, g_IniFile.m_nCleanSprayTimes, pWnd->m_nCleanSprayTimes);
+    DDX_Float(bRead, g_IniFile.m_dCleanSprayDistance, pWnd->m_dCleanSprayDistance);
+    DDX_Float(bRead, g_IniFile.m_dSprayerCleanWaterPressure, pWnd->m_dSprayerCleanWaterPressure);
+    DDX_Float(bRead, g_IniFile.m_dSprayerCleanAirPressure, pWnd->m_dSprayerCleanAirPressure);
+    DDX_Int(bRead, g_IniFile.m_nFullCleanSprayTimes, pWnd->m_nFullCleanSprayTimes);
+
     if (!g_IniFile.m_bIsMagazineUpFirst)
     {
         pWnd->m_dMagazinePushPosZ->Enabled = true;
@@ -866,6 +847,21 @@ void __fastcall TfrmMain::Product1Click(TObject *Sender)
                 DDX_Int(bRead, g_IniFile.m_nScaleSprayTimes[0], pWnd->m_nScaleSprayTimes0);
                 DDX_Float(bRead, g_IniFile.m_dWeightScaleAlarmUp, pWnd->m_dWeightScaleAlarmUp);
                 DDX_Float(bRead, g_IniFile.m_dWeightScaleAlarmDown, pWnd->m_dWeightScaleAlarmDown);
+
+                DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[0], pWnd->m_dCleanSprayPosX0);
+                DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[0], pWnd->m_dCleanSprayPosY0);
+                DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[1], pWnd->m_dCleanSprayPosX1);
+	            DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[1], pWnd->m_dCleanSprayPosY1);
+                DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[2], pWnd->m_dCleanSprayPosX2);
+	            DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[2], pWnd->m_dCleanSprayPosY2);
+                DDX_Float(bRead, g_IniFile.m_dCleanSprayPosX[3], pWnd->m_dCleanSprayPosX3);
+	            DDX_Float(bRead, g_IniFile.m_dCleanSprayPosY[3], pWnd->m_dCleanSprayPosY3);
+                DDX_Float(bRead, g_IniFile.m_dCleanSprayPosZ, pWnd->m_dCleanSprayPosZ);
+	            DDX_Int(bRead, g_IniFile.m_nCleanSprayTimes, pWnd->m_nCleanSprayTimes);
+                DDX_Float(bRead, g_IniFile.m_dCleanSprayDistance, pWnd->m_dCleanSprayDistance);
+                DDX_Float(bRead, g_IniFile.m_dSprayerCleanWaterPressure, pWnd->m_dSprayerCleanWaterPressure);
+                DDX_Float(bRead, g_IniFile.m_dSprayerCleanAirPressure, pWnd->m_dSprayerCleanAirPressure);
+                DDX_Int(bRead, g_IniFile.m_nFullCleanSprayTimes, pWnd->m_nFullCleanSprayTimes);
 
 		        //Set Pressure
 		        g_Motion.SetAO(0, g_IniFile.m_dFluxTankAirPressure);
@@ -1145,6 +1141,12 @@ void __fastcall TfrmMain::SpeedButton2Click(TObject *Sender)
 	g_Scale.SetZero();
 }
 //---------------------------------------------------------------------------
+void __fastcall TfrmMain::btnOpenLogClick(TObject *Sender)
+{
+    AnsiString strCMD = "C:\\C83 Log\\" + FormatDateTime("yyyy_mm_dd",Now()) + ".txt";
+    ShellExecute(this->Handle, "open", "notepad", strCMD.c_str(), NULL, SW_SHOW);
+}
+//---------------------------------------------------------------------------
 void __fastcall TfrmMain::TrackBar2Change(TObject *Sender)
 {
 	g_Motion.SetAO(0, TrackBar2->Position);
@@ -1390,22 +1392,22 @@ void __fastcall TfrmMain::SpeedButton7Click(TObject *Sender)
     }
 
 	pBtn->Enabled = false;
-	g_pMainThread->m_listLog.push_back("開始(W) Weight Scale動作測試");
+	g_pMainThread->m_listLog.push_back("開始(F) 疏通位置動作測試");
 
 	g_pMainThread->m_bIsSprayerLock = true;
-	g_pMainThread->m_bStartWaterScaleSpray = true;
+	g_pMainThread->m_bStartDredgeScaleSpray = true;
 	g_pMainThread->nThreadIndex[14] = 0;
 
 	tm1MS.timeStart(120000);
 	while (1)
 	{
-		if (!g_pMainThread->m_bStartWaterScaleSpray) break;
+		if (!g_pMainThread->m_bStartDredgeScaleSpray) break;
 		Application->ProcessMessages();
 		if (tm1MS.timeUp()) break;
 	}
 
     g_pMainThread->m_bIsSprayerLock = false;
-	g_pMainThread->m_listLog.push_back("(W) Weight Scale動作測試結束");
+	g_pMainThread->m_listLog.push_back("(F) 疏通位置動作測試結束");
 	pBtn->Enabled = true;
 }
 //---------------------------------------------------------------------------
@@ -1477,11 +1479,15 @@ void __fastcall TfrmMain::SpeedButton9Click(TObject *Sender)
     g_pMainThread->m_bStartFillFlux = true;
     g_pMainThread->nThreadIndex[18] = 0;
 
+    g_pMainThread->m_bIsSprayerLock = true;
+
 	while (1)
 	{
 		if (!g_pMainThread->m_bStartFillFlux) break;
 		Application->ProcessMessages();
 	}
+
+    g_pMainThread->m_bIsSprayerLock = false;
 
 	g_pMainThread->m_listLog.push_back("補Flux測試結束");
 	pBtn->Enabled = true;
@@ -1491,6 +1497,7 @@ void __fastcall TfrmMain::SpeedButton10Click(TObject *Sender)
 {
     static C_GetTime tm1MS(EX_SCALE::TIME_1MS, false);
 
+    g_pMainThread->m_bIsSprayerLock = false;
     g_pMainThread->m_bStartFillFlux = false;
     g_pMainThread->nThreadIndex[18] = 0;
     g_pMainThread->m_listLog.push_back("終止 補Flux測試");
@@ -1587,6 +1594,8 @@ void __fastcall TfrmMain::btnOutLaneResetClick(TObject *Sender)
 //---------------------------------------------------------------------------
 
 #pragma endregion
+
+
 
 
 

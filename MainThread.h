@@ -57,10 +57,10 @@ public:
         bool m_bStartSBTSpray;
         bool m_bSBTSprayDone;
         bool m_bStartCleanSpray;
-        bool m_bStartCleanSprayAir;
+        bool m_bStartCleanSprayAir;         
         bool m_bCleanSprayDone;
 		bool m_bStartFluxScaleSpray;
-        bool m_bStartWaterScaleSpray;
+        bool m_bStartDredgeScaleSpray;
         bool m_bScaleSprayDone;
         
         bool m_bStartReLoadClamper;

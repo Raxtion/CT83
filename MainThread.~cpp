@@ -1189,12 +1189,12 @@ void __fastcall CMainThread::doSprayerLane(int &nThreadIndex, bool bFront)
 	case 0:
 		if (bFront)
 		{
-			if (m_bIsNeedPreMoveSprayer && CheckXYZAtSprayReadyPos(bFront)) nThreadIndex = nTagReadyWait;
-			else
-            {
-                m_bIsNeedPreMoveSprayer = false;
-                nThreadIndex++;
-            }
+			if (m_bIsNeedPreMoveSprayer && !CheckXYZAtSprayReadyPos(bFront))
+			{
+				m_bIsNeedPreMoveSprayer = false;
+				nThreadIndex++;
+			}
+			else nThreadIndex = nTagReadyWait;
 		}
 		else
 		{
@@ -1223,7 +1223,7 @@ void __fastcall CMainThread::doSprayerLane(int &nThreadIndex, bool bFront)
 		break;
     case 4:
         if (g_Motion.IsPosDone(Axis_Const::SPZ, g_IniFile.m_dSprayReadyPos))
-		{
+		{	
 			nThreadIndex++;
 		}
 		break;
@@ -1324,7 +1324,7 @@ void __fastcall CMainThread::doSprayerLane(int &nThreadIndex, bool bFront)
 		}
 		break;
 	case 14:
-		if (true) //(g_Motion.IsLastPosDone(Axis_Const::SPZ))               //I don't know where is it Last Pos, It is Dame.
+		if (true) //(g_Motion.IsLastPosDone(Axis_Const::SPZ))               //I don't know where is it Last Pos, It is Damn.
 		{
 			g_Motion.AbsMove(Axis_Const::SPX, g_IniFile.m_dStartSprayPosX[bFront]);
 			g_Motion.AbsMove(Axis_Const::SPY, g_IniFile.m_dStartSprayPosY[bFront]);
@@ -2542,6 +2542,7 @@ void __fastcall CMainThread::doReLoadClamper(int &nThreadIndex)
 	}
 }
 #pragma endregion
+
 
 
 

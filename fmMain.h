@@ -36,7 +36,6 @@ __published:	// IDE-managed Components
         TMenuItem *Login1;
         TMenuItem *Exit1;
         TMenuItem *Version1;
-        TScrollBox *ScrollBox1;
         TSplitter *Splitter1;
         TPanel *Panel1;
         TListBox *listHistory;
@@ -58,7 +57,6 @@ __published:	// IDE-managed Components
         TOpenDialog *OpenDialog1;
         TSavePictureDialog *SavePictureDialog1;
         TOpenPictureDialog *OpenPictureDialog1;
-        TPaintBox *ImagePaintBox;
         TTimer *timerMessage;
         TLabel *Label1;
         TGroupBox *GroupBox2;
@@ -84,12 +82,6 @@ __published:	// IDE-managed Components
     TSpeedButton *SpeedButton8;
     TSpeedButton *SpeedButton9;
     TSpeedButton *SpeedButton10;
-    TTabSheet *TabSheet3;
-    TSpeedButton *btnRearLaneReset;
-    TSpeedButton *btnFrnotLaneReset;
-    TSpeedButton *btnInLaneReset;
-    TSpeedButton *btnOutLaneReset;
-    TSpeedButton *btnLoaderReset;
     TCheckBox *m_bStopLoader;
     TBitBtn *BitBtn12;
     TBitBtn *BitBtn13;
@@ -100,15 +92,27 @@ __published:	// IDE-managed Components
     TButton *btnSet1;
     TButton *btnSet2;
     TTimer *timerAutoCleanSprayLane;
-    TShape *Shape03;
-    TShape *Shape00;
-    TShape *Shape01;
-    TShape *Shape02;
     TGroupBox *GroupBox4;
     TLabel *Label7;
     TEdit *m_dMarkScore0;
     TButton *Button1;
     TButton *Button2;
+    TButton *btnOpenLog;
+    TPanel *Panel2;
+    TScrollBox *ScrollBox1;
+    TPaintBox *ImagePaintBox;
+    TSplitter *Splitter3;
+    TPageControl *PageControl2;
+    TTabSheet *TabSheet4;
+    TSpeedButton *btnRearLaneReset;
+    TSpeedButton *btnFrnotLaneReset;
+    TSpeedButton *btnInLaneReset;
+    TSpeedButton *btnOutLaneReset;
+    TSpeedButton *btnLoaderReset;
+    TShape *Shape03;
+    TShape *Shape00;
+    TShape *Shape01;
+    TShape *Shape02;
         void __fastcall DIDO1Click(TObject *Sender);
         void __fastcall Motor1Click(TObject *Sender);
         void __fastcall Exit1Click(TObject *Sender);
@@ -159,6 +163,7 @@ __published:	// IDE-managed Components
     void __fastcall BitBtn15Click(TObject *Sender);
     void __fastcall btnSet1Click(TObject *Sender);
     void __fastcall timerAutoCleanSprayLaneTimer(TObject *Sender);
+    void __fastcall btnOpenLogClick(TObject *Sender);
 private:	// User declarations
         int m_nUserLevel; //0:OP 1:Engineer 2:adm
         C_GetTime tm1MSLogOut;
