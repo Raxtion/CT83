@@ -146,7 +146,7 @@ void __fastcall CMainThread::Execute()
             m_bIsSprayerWeightAlarm = false;
 
             //Release Lock
-            m_bIsSprayerLock = false;
+            //m_bIsSprayerLock = false;
 
             //PreMove
             m_bIsNeedPreMoveSprayer = false;
@@ -281,7 +281,8 @@ void __fastcall CMainThread::Execute()
 
 		//Either Auto or Manual
 		if (m_bStartFillFlux && bHomeDone) doFillFlux(nThreadIndex[18]);
-		if (m_bStartSBTSpray && bHomeDone) doSBTSpray(nThreadIndex[17]);
+		if (m_bStartSBTSprayF && bHomeDone) doSBTSpray(nThreadIndex[17], true);
+		if (m_bStartSBTSprayR && bHomeDone) doSBTSpray(nThreadIndex[12], false);
 		if (m_bStartCleanSpray && bHomeDone) doCleanSpray(nThreadIndex[16], true);
         if (m_bStartCleanSprayAir && bHomeDone) doCleanSpray(nThreadIndex[15], false);
 		if (m_bStartDredgeScaleSpray && bHomeDone) doScaleSpray(nThreadIndex[14], true);
@@ -437,8 +438,10 @@ bool __fastcall CMainThread::InitialMachine(int &nThreadIndex)
 		n_bLaneSprayReady[0] = false;
 		n_bLaneSprayReady[1] = false;
 
-		m_bStartSBTSpray = false;
-		m_bSBTSprayDone = false;
+		m_bStartSBTSprayF = false;
+		m_bStartSBTSprayR = false;
+		m_bSBTSprayDoneF = false;
+		m_bSBTSprayDoneR = false;
 		m_bStartCleanSpray = false;
         m_bStartCleanSprayAir = false;
 		m_bCleanSprayDone = false;
@@ -1016,6 +1019,7 @@ void __fastcall CMainThread::doLeftLaneChanger(int &nThreadIndex)
 		else if (g_Motion.GetDI(DI::LeftLaneChangerOut)) g_IniFile.m_nErrorCode = 410;
 		else if (g_Motion.GetDI(DI::FrontLaneSprayIn)) g_IniFile.m_nErrorCode = 500;
 		else if (g_Motion.GetDI(DI::RearLaneSprayIn)) g_IniFile.m_nErrorCode = 501;
+        else
 		{
 			//g_Motion.AbsMove(Axis_Const::LLC, g_IniFile.m_dLeftLaneChangerMgzPos);
 			nThreadIndex++;
@@ -1029,7 +1033,7 @@ void __fastcall CMainThread::doLeftLaneChanger(int &nThreadIndex)
 		else nThreadIndex++;
 		break;
 	case 2:
-		g_Motion.AbsMove(Axis_Const::LLC, g_IniFile.m_dLeftLaneChangerMgzPos);
+        g_Motion.AbsMove(Axis_Const::LLC, g_IniFile.m_dLeftLaneChangerMgzPos);
 		nThreadIndex++;
 		break;
 	case 3:
@@ -1189,8 +1193,9 @@ void __fastcall CMainThread::doSprayerLane(int &nThreadIndex, bool bFront)
 	case 0:
 		if (bFront)
 		{
-			if (m_bIsNeedPreMoveSprayer && !CheckXYZAtSprayReadyPos(bFront))
+			if (m_bIsNeedPreMoveSprayer && !CheckXYZAtSprayReadyPos(bFront) && !m_bIsSprayerLock)
 			{
+                m_bIsSprayerLock = true;
 				m_bIsNeedPreMoveSprayer = false;
 				nThreadIndex++;
 			}
@@ -1198,7 +1203,13 @@ void __fastcall CMainThread::doSprayerLane(int &nThreadIndex, bool bFront)
 		}
 		else
 		{
-			nThreadIndex = nTagReadyWait;
+			if (m_bIsNeedPreMoveSprayer && !CheckXYZAtSprayReadyPos(bFront) && !m_bIsSprayerLock)
+			{
+                m_bIsSprayerLock = true;
+				m_bIsNeedPreMoveSprayer = false;
+				nThreadIndex++;
+			}
+			else nThreadIndex = nTagReadyWait;
 		}
 		break;
 	case 1:
@@ -1224,6 +1235,7 @@ void __fastcall CMainThread::doSprayerLane(int &nThreadIndex, bool bFront)
     case 4:
         if (g_Motion.IsPosDone(Axis_Const::SPZ, g_IniFile.m_dSprayReadyPos))
 		{	
+            m_bIsSprayerLock = false;
 			nThreadIndex++;
 		}
 		break;
@@ -1271,12 +1283,26 @@ void __fastcall CMainThread::doSprayerLane(int &nThreadIndex, bool bFront)
 		{
 			g_Motion.SetDO(DO::LeftLaneChangerMotor, true);
 			g_Motion.SetDO(oLaneSprayMotor, true);
-			p_tm1MS->timeStart(10000);
+
 			nThreadIndex++;
 		}
 		else if (p_tm1MS->timeUp()) g_IniFile.m_nErrorCode = 415;
 		break;
-	case 10:
+    case 10:
+        if (g_Motion.GetDI(iLaneSprayIn))
+        {
+            p_tm1MS->timeStart(10000);
+            nThreadIndex++;
+        }
+        else nThreadIndex--;
+        break;
+	case 11:
+        if (!g_Motion.GetDI(iLaneSprayIn))
+        {
+            //For UPH Let Left LaneChaange go back first.
+			m_bLeftLaneChangerReady = false;
+			m_bIsLeftLaneChangerLock = false;
+        }
 		if (!g_Motion.GetDI(iLaneSprayIn) && g_Motion.GetDI(iLaneSprayInp))
 		{
 			p_tm1MS->timeStart(300);
@@ -1290,8 +1316,8 @@ void __fastcall CMainThread::doSprayerLane(int &nThreadIndex, bool bFront)
         }
 		else if (p_tm1MS->timeUp()) bFront ? g_IniFile.m_nErrorCode = 502 : g_IniFile.m_nErrorCode = 503;
 		break;
-	case 11:
-	case nTagReadyWork:nThreadIndex = 11;
+	case 12:
+	case nTagReadyWork:nThreadIndex = 12;
 		if (p_tm1MS->timeUp())
 		{
 			//ShowNow
@@ -1306,16 +1332,18 @@ void __fastcall CMainThread::doSprayerLane(int &nThreadIndex, bool bFront)
 			nThreadIndex++;
 		}
 		break;
-	case 12:
+	case 13:
 		if (p_tm1MS->timeUp())
 		{
+            //Move to Top for UPH
 			m_bLeftLaneChangerReady = false;
 			m_bIsLeftLaneChangerLock = false;
+
 			if (!g_IniFile.m_bUseSprayer) nThreadIndex++;
 			else nThreadIndex = nTagReadyOut;
 		}
 		break;
-	case 13:
+	case 14:
 		if (!m_bIsSprayerLock)
 		{
 			m_bIsSprayerLock = true;
@@ -1323,7 +1351,7 @@ void __fastcall CMainThread::doSprayerLane(int &nThreadIndex, bool bFront)
 			nThreadIndex++;
 		}
 		break;
-	case 14:
+	case 15:
 		if (true) //(g_Motion.IsLastPosDone(Axis_Const::SPZ))               //I don't know where is it Last Pos, It is Damn.
 		{
 			g_Motion.AbsMove(Axis_Const::SPX, g_IniFile.m_dStartSprayPosX[bFront]);
@@ -1331,29 +1359,45 @@ void __fastcall CMainThread::doSprayerLane(int &nThreadIndex, bool bFront)
 			nThreadIndex++;
 		}
 		break;
-	case 15:
+	case 16:
 		if (g_Motion.IsPosDone(Axis_Const::SPX, g_IniFile.m_dStartSprayPosX[bFront])
             && g_Motion.IsPosDone(Axis_Const::SPY, g_IniFile.m_dStartSprayPosY[bFront]))
 		{
-			m_bStartSBTSpray = true;
-			m_bSBTSprayDone = false;
+			if (bFront)
+			{
+				m_bSBTSprayDoneF = false;
+				m_bStartSBTSprayF = true;
+			}
+			else
+			{
+				m_bSBTSprayDoneR = false;
+				m_bStartSBTSprayR = true;
+			}
 			nThreadIndex++;
 		}
 		break;
-	case 16:
-		if (m_bSBTSprayDone) 
+	case 17:
+		if ((bFront && m_bSBTSprayDoneF) || (!bFront && m_bSBTSprayDoneR))
 		{
 			m_bIsSprayerLock = false;
 			nThreadIndex++;
 		}
-		else if (!m_bStartSBTSpray)
+		else if ((bFront && !m_bStartSBTSprayF) || (!bFront && !m_bStartSBTSprayR))
 		{
-			m_bStartSBTSpray = true;          //restart  again
-			CMainThread::nThreadIndex[17] = 0;
+			if (bFront)
+			{
+				m_bStartSBTSprayF = true;          //restart  again
+				CMainThread::nThreadIndex[17] = 0;
+			}
+			else
+			{
+				m_bStartSBTSprayR = true;          //restart  again
+				CMainThread::nThreadIndex[12] = 0;
+			}
 		}
 		break;
-	case 17:
-	case nTagReadyOut:nThreadIndex = 17;
+	case 18:
+	case nTagReadyOut:nThreadIndex = 18;
 		n_bLaneSprayReady[bFront] = true;
         if (g_IniFile.m_nRailOption == 0)
         {
@@ -1367,7 +1411,7 @@ void __fastcall CMainThread::doSprayerLane(int &nThreadIndex, bool bFront)
         }
 		nThreadIndex++;
 		break;
-	case 18:
+	case 19:
 		if (!n_bLaneSprayReady[bFront])
 		{
 			//ShowNow
@@ -1522,7 +1566,9 @@ void __fastcall CMainThread::doCCDBufferLane(int &nThreadIndex)
 			else
 			{
 				m_listLog.push_back("Flux ("+IntToStr(nCCDCheckPosIndex)+")有無檢查-->NG");
-				bCCDCheckResult = false;
+                //20160704 bypass NGMgz If the NGMag be off line
+                bCCDCheckResult = false;
+                //bCCDCheckResult = true;
 			}
 			nThreadIndex++;
 		}
@@ -1576,7 +1622,7 @@ void __fastcall CMainThread::doCCDBufferLane(int &nThreadIndex)
         if (g_Motion.IsLastPosDone(Axis_Const::RLC))
 		{
 			g_Motion.SetDO(DO::OutConveyerMotor, true);
-			g_Motion.SetDO(DO::RightLaneChangerStopper, false);     //Stoper down 
+			g_Motion.SetDO(DO::RightLaneChangerStopper, false);     //Stoper down
 			tm1MS.timeStart(3000);
 			nThreadIndex++;
 		}
@@ -1753,11 +1799,12 @@ void __fastcall CMainThread::doFillFlux(int &nThreadIndex)
 	switch (nThreadIndex)
 	{
 	case 0:
-		if (g_Motion.GetDI(DI::FluxBoxLevel))   //Alarm and not Stop
+		if (!g_Motion.GetDI(DI::FluxBoxLevel))   //Alarm and not Stop
 		{
 			g_IniFile.m_nErrorCode = 1002;
 			nThreadIndex++;
 		}
+        else nThreadIndex++;
 		break;
 	case 1:
 		//Protect Manual Control Error. >.< If Auto, be not happened
@@ -1789,11 +1836,14 @@ void __fastcall CMainThread::doFillFlux(int &nThreadIndex)
         if (tm1MS.timeUp())
         {
             g_Motion.SetDO(DO::FluxTankFluxIn, true);
+            tm1MS.timeStart(g_IniFile.m_nAutoFillTime * 1000);
             nThreadIndex++;
         }
+        break;
 	case 4:
 		//Protect Manual Control Error. >.< If Auto, be not happened
-		if (!g_Motion.GetDI(DI::FluxTankLevelMid) || !g_Motion.GetDI(DI::FluxTankLevelUp))
+		//if (!g_Motion.GetDI(DI::FluxTankLevelMid) || !g_Motion.GetDI(DI::FluxTankLevelUp))
+        if (tm1MS.timeUp())
 		{
             g_Motion.SetDO(DO::FluxTankFluxIn, false);
             g_Motion.SetDO(DO::FluxTankVacuumIn, false);
@@ -1808,13 +1858,16 @@ void __fastcall CMainThread::doFillFlux(int &nThreadIndex)
 	}
 }
 //---------------------------------------------------------------------------
-void __fastcall CMainThread::doSBTSpray(int &nThreadIndex)
+void __fastcall CMainThread::doSBTSpray(int &nThreadIndex, bool bFront)
 {
 	static C_GetTime tm1MS(EX_SCALE::TIME_1MS, false);
 
-	static double dTempLocX = 0.0;
-	static double dTempLocY = 0.0;
+	static double dTempLocFX = 0.0;
+    static double dTempLocRX = 0.0;
+	static double dTempLocFY = 0.0;
+    static double dTempLocRY = 0.0;
 	static int nMoveIndex = 0;
+    static bool bCountTiime = false;
 
 	const int nStartDredge = 1000;
 	const int nStartWork = 2000;
@@ -1824,22 +1877,26 @@ void __fastcall CMainThread::doSBTSpray(int &nThreadIndex)
 	switch (nThreadIndex)
 	{
 	case 0:
-        /*
-		if (g_Motion.GetDI(DI::FluxBoxLevel))
+		if (!g_Motion.GetDI(DI::FluxBoxLevel))
 		{
 			g_IniFile.m_nErrorCode = 600;
-			m_bStartSBTSpray = false;
-            m_bSBTSprayDone = true;
+			if (bFront) m_bStartSBTSprayF = false;
+            else m_bStartSBTSprayR = false;
+            if (bFront) m_bSBTSprayDoneF = false;
+            else m_bSBTSprayDoneR = false;
 		    nThreadIndex = 0;
 		}
-        */
 		//detect Tank Level here
 		if (m_bIsSprayerLock && !g_Motion.GetDI(DI::FluxTankLevelDown))
 		{
 			m_listLog.push_back("警告! 高壓Flux桶不足 系統啟動自動補Fulx");
 			m_bStartFillFlux = true;
 			CMainThread::nThreadIndex[18] = 0;
-			tm1MS.timeStart(1200000);
+			if (!bCountTiime)
+            {
+                tm1MS.timeStart(600000);
+                bCountTiime = true;
+            }
 			nThreadIndex++;
 		}
 		else nThreadIndex = nStartWork;
@@ -1847,6 +1904,7 @@ void __fastcall CMainThread::doSBTSpray(int &nThreadIndex)
 	case 1:
 		if (m_bStartFillFlux == false && g_Motion.GetDI(DI::FluxTankLevelDown))
 		{
+            bCountTiime = false;
 			tm1MS.timeStart(300);
 			nThreadIndex++;
 		}
@@ -1856,12 +1914,21 @@ void __fastcall CMainThread::doSBTSpray(int &nThreadIndex)
 		}
 		else if (tm1MS.timeUp())
 		{
-			m_listLog.push_back("嚴重警告! 自動補Fulx超過20分鐘, 系統停機. 請確認底下Flux存量");
+			m_listLog.push_back("嚴重警告! 自動補Fulx超過10分鐘, 系統停機. 請確認底下Flux存量");
 			g_IniFile.m_nErrorCode = 51;
-			m_bStartSBTSpray = false;
-			m_bSBTSprayDone = false;
+			if (bFront)
+			{
+				m_bStartSBTSprayF = false;
+				m_bSBTSprayDoneF = false;
+			}
+			else
+			{
+				m_bStartSBTSprayR = false;
+				m_bSBTSprayDoneR = false;
+			}
 
 			m_bStartFillFlux = false;
+            bCountTiime = false;
 			nThreadIndex = 0;
 		}
 		break;
@@ -1869,10 +1936,19 @@ void __fastcall CMainThread::doSBTSpray(int &nThreadIndex)
 	case nStartDredge:nThreadIndex = 2;
 		if (tm1MS.timeUp())
 		{
-			dTempLocX = g_Motion.GetFeedbackPos(Axis_Const::SPX);
-			dTempLocY = g_Motion.GetFeedbackPos(Axis_Const::SPY);
+            if (bFront)
+            {
+			    dTempLocFX = g_Motion.GetFeedbackPos(Axis_Const::SPX);
+			    dTempLocFY = g_Motion.GetFeedbackPos(Axis_Const::SPY);
+            }
+            else
+            {
+                dTempLocRX = g_Motion.GetFeedbackPos(Axis_Const::SPX);
+			    dTempLocRY = g_Motion.GetFeedbackPos(Axis_Const::SPY);
+            }
 
 			m_bStartDredgeScaleSpray = true;
+            m_bScaleSprayDone = false;
 			CMainThread::nThreadIndex[14] = 0;
 			nThreadIndex++;
 		}
@@ -1887,17 +1963,32 @@ void __fastcall CMainThread::doSBTSpray(int &nThreadIndex)
 	case 4:
 		if (g_Motion.IsPosDone(Axis_Const::SPZ, 0.0))
 		{
-			g_Motion.AbsMove(Axis_Const::SPX, dTempLocX);
-			g_Motion.AbsMove(Axis_Const::SPY, dTempLocY);
+            if (bFront)
+            {
+			    g_Motion.AbsMove(Axis_Const::SPX, dTempLocFX);
+			    g_Motion.AbsMove(Axis_Const::SPY, dTempLocFY);
+            }
+            else
+            {
+                g_Motion.AbsMove(Axis_Const::SPX, dTempLocRX);
+			    g_Motion.AbsMove(Axis_Const::SPY, dTempLocRY);
+            }
 			nThreadIndex++;
 		}
 		break;
 	case 5:
-		if (g_Motion.IsPosDone(Axis_Const::SPX, dTempLocX)
-			&& g_Motion.IsPosDone(Axis_Const::SPY, dTempLocY))
+		if (bFront && g_Motion.IsPosDone(Axis_Const::SPX, dTempLocFX)
+			&& g_Motion.IsPosDone(Axis_Const::SPY, dTempLocFY))
 		{
-			dTempLocX = 0.0;
-			dTempLocY = 0.0;
+			dTempLocFX = 0.0;
+			dTempLocFY = 0.0;
+			nThreadIndex++;
+		}
+        if (!bFront && g_Motion.IsPosDone(Axis_Const::SPX, dTempLocRX)
+			&& g_Motion.IsPosDone(Axis_Const::SPY, dTempLocRY))
+		{
+			dTempLocRX = 0.0;
+			dTempLocRY = 0.0;
 			nThreadIndex++;
 		}
 		break;
@@ -1908,7 +1999,7 @@ void __fastcall CMainThread::doSBTSpray(int &nThreadIndex)
 			g_Motion.SetDO(DO::FluxTankFluxIn, false);
 			g_Motion.SetDO(DO::FluxTankVacuumIn, false);
 			g_Motion.SetDO(DO::FluxTankVacOn, false);
-			tm1MS.timeStart(100);
+			tm1MS.timeStart(10);
             m_bIsSprayerAlarm = false;
 			nThreadIndex++;
 		}
@@ -1925,19 +2016,28 @@ void __fastcall CMainThread::doSBTSpray(int &nThreadIndex)
 		//if(g_Motion.GetAI(0)>0 && g_Motion.GetAI(0)<4095)       //temp pressure value          //debug
 		if (true)
 		{
-			tm1MS.timeStart(500);
+			tm1MS.timeStart(10);
 			nThreadIndex++;
 		}
 		else if (tm1MS.timeUp())
 		{
 			g_IniFile.m_nErrorCode = 602;
-			m_bStartSBTSpray = false;
+			if (bFront)
+			{
+				m_bStartSBTSprayF = false;
+				m_bSBTSprayDoneF = false;
+			}
+			else
+			{
+				m_bStartSBTSprayR = false;
+				m_bSBTSprayDoneR = false;
+			}
 		}
 		break;
 	case 9:
 		if (tm1MS.timeUp())
 		{
-			tm1MS.timeStart(300);                      //delay Start
+			tm1MS.timeStart(100);                      //delay Start
 			nThreadIndex++;
 		}
 		break;
@@ -1956,7 +2056,7 @@ void __fastcall CMainThread::doSBTSpray(int &nThreadIndex)
 			g_Motion.SetDO(DO::SprayerAirOn, true);
 			g_Motion.SetDO(DO::SprayerWaterOn, false);
 
-			tm1MS.timeStart(1000);
+			tm1MS.timeStart(500);
 			nThreadIndex++;
 		}
 		break;
@@ -2045,8 +2145,16 @@ void __fastcall CMainThread::doSBTSpray(int &nThreadIndex)
 		break;
 	default:
         if (m_bIsSprayerAlarm) g_IniFile.m_nErrorCode = 504;
-		m_bStartSBTSpray = false;
-		m_bSBTSprayDone = true;
+		if (bFront)
+		{
+			m_bStartSBTSprayF = false;
+			m_bSBTSprayDoneF = true;
+		}
+		else
+		{
+			m_bStartSBTSprayR = false;
+			m_bSBTSprayDoneR = true;
+		}
         m_bIsSprayerLock = false;
 		nThreadIndex = 0;
 		break;
@@ -2139,14 +2247,14 @@ void __fastcall CMainThread::doCleanSpray(int &nThreadIndex, bool bWater)
         }
 		break;
 	case 6:
-		if (g_Motion.IsLastPosDone(Axis_Const::SPX))
+		if (g_Motion.IsMotionDone(Axis_Const::SPX))
 		{
 			g_Motion.RelMove(Axis_Const::SPX, -g_IniFile.m_dCleanSprayDistance);
 			nThreadIndex++;
 		}
 		break;
 	case 7:
-		if (g_Motion.IsLastPosDone(Axis_Const::SPX))
+		if (g_Motion.IsMotionDone(Axis_Const::SPX))
 		{
 			if (nMoveIndexX + 1 < g_IniFile.m_nCleanSprayTimes)
             {
@@ -2194,7 +2302,7 @@ void __fastcall CMainThread::doCleanSpray(int &nThreadIndex, bool bWater)
 		if (bWater) m_bStartCleanSpray = false;
         else m_bStartCleanSprayAir = false;
 		m_bCleanSprayDone = true;
-        m_bIsSprayerLock = false;
+        //m_bIsSprayerLock = false;                        // not off by self, off by doSprayerLane
 		nThreadIndex = 0;
 		break;
 	}
@@ -2213,16 +2321,13 @@ void __fastcall CMainThread::doScaleSpray(int &nThreadIndex, bool bDredge)
 	switch (nThreadIndex)
 	{
 	case 0:
-        /*
-		if (g_Motion.GetDI(DI::FluxBoxLevel))
+		if (!bDredge && !g_Motion.GetDI(DI::FluxBoxLevel))
 		{
 			g_IniFile.m_nErrorCode = 600;
-            if (!bDredge) m_bStartFluxScaleSpray = false;
-			else m_bStartDredgeScaleSpray = false;
+            m_bStartFluxScaleSpray = false;
             m_bScaleSprayDone = false;
             nThreadIndex = 0;
 		}
-        */ 
 		//detect Tank Level here
 		if (m_bIsSprayerLock && !g_Motion.GetDI(DI::FluxTankLevelDown))
 		{
@@ -2259,7 +2364,7 @@ void __fastcall CMainThread::doScaleSpray(int &nThreadIndex, bool bDredge)
 	case nTagStartWork:nThreadIndex = 2;
 		if (m_bIsSprayerLock)
 		{
-            if (g_Motion.GetDI(DI::FluxBoxLevel)) m_listLog.push_back("警告! 底下Flux桶量不足");
+            if (!g_Motion.GetDI(DI::FluxBoxLevel)) m_listLog.push_back("警告! 底下Flux桶量不足");
 			g_Motion.AbsMove(Axis_Const::SPZ, 0.0);
 			m_listScaleWeight.clear();
             m_bIsSprayerWeightAlarm = false;
@@ -2305,7 +2410,7 @@ void __fastcall CMainThread::doScaleSpray(int &nThreadIndex, bool bDredge)
 		break;
 	case 7:
         /* //Not detect Level here. Just at Top.
-		if (g_Motion.GetDI(DI::FluxBoxLevel))
+		if (!g_Motion.GetDI(DI::FluxBoxLevel))
 		{
 			g_IniFile.m_nErrorCode = 600;
             if (!bDredge) m_bStartFluxScaleSpray = false;
@@ -2324,7 +2429,7 @@ void __fastcall CMainThread::doScaleSpray(int &nThreadIndex, bool bDredge)
         */
 		if (true)
 		{
-            if (g_Motion.GetDI(DI::FluxBoxLevel)) m_listLog.push_back("警告! 底下Flux桶量不足");
+            if (!g_Motion.GetDI(DI::FluxBoxLevel)) m_listLog.push_back("警告! 底下Flux桶量不足");
 
 			g_Motion.SetDO(DO::FluxTankFluxIn, false);
 			g_Motion.SetDO(DO::FluxTankVacuumIn, false);
@@ -2441,7 +2546,7 @@ void __fastcall CMainThread::doScaleSpray(int &nThreadIndex, bool bDredge)
 		if (!bDredge) m_bStartFluxScaleSpray = false;
 		else m_bStartDredgeScaleSpray = false;
 		m_bScaleSprayDone = true;
-        m_bIsSprayerLock = false;
+        //m_bIsSprayerLock = false;               // not off by self, off by doSprayerLane
 		nThreadIndex = 0;
 		break;
 	}
@@ -2637,4 +2742,7 @@ void __fastcall CMainThread::doReLoadClamper(int &nThreadIndex)
 	}
 }
 #pragma endregion
+
+
+
 

@@ -52,12 +52,7 @@ void __fastcall CIniFile::MachineFile(bool bRead)
   DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dMgzPitch",m_dMgzPitch,0.0);
   DDXFile_Int(bRead,pIniFile,Machine_Section,"m_nMgzSize",m_nMgzSize);
 
-  DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dConveyerPos0",m_dConveyerPos[0],0.0);
-  DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dConveyerPos1",m_dConveyerPos[1],0.0);
-  DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dConveyerPos2",m_dConveyerPos[2],0.0);
-  DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dConveyerPos3",m_dConveyerPos[3],0.0);
-  DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dConveyerPos4",m_dConveyerPos[4],0.0);
-  DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dNGMagPos",m_dNGMagPos,0.0);
+
 
   DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dScaleSprayPosX0",m_dScaleSprayPosX[0],0.0);
   DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dScaleSprayPosY0",m_dScaleSprayPosY[0],0.0);
@@ -176,6 +171,16 @@ void __fastcall CIniFile::ProductFile(char *strFileName,bool bRead)
   DDXFile_Float(bRead,pIniFile,Product_Section,"m_dSprayerCleanWaterPressure",m_dSprayerCleanWaterPressure,0.0);
   DDXFile_Float(bRead,pIniFile,Product_Section,"m_dSprayerCleanAirPressure",m_dSprayerCleanAirPressure,0.0);
   DDXFile_Int(bRead,pIniFile,Product_Section,"m_nFullCleanSprayTimes",m_nFullCleanSprayTimes);
+
+  DDXFile_Float(bRead,pIniFile,Product_Section,"m_dConveyerPos0",m_dConveyerPos[0],0.0);
+  DDXFile_Float(bRead,pIniFile,Product_Section,"m_dConveyerPos1",m_dConveyerPos[1],0.0);
+  DDXFile_Float(bRead,pIniFile,Product_Section,"m_dConveyerPos2",m_dConveyerPos[2],0.0);
+  DDXFile_Float(bRead,pIniFile,Product_Section,"m_dConveyerPos3",m_dConveyerPos[3],0.0);
+  DDXFile_Float(bRead,pIniFile,Product_Section,"m_dConveyerPos4",m_dConveyerPos[4],0.0);
+  DDXFile_Float(bRead,pIniFile,Product_Section,"m_dNGMagPos",m_dNGMagPos,0.0);
+
+  DDXFile_Int(bRead,pIniFile,Product_Section,"m_nAutoFillTime",m_nAutoFillTime);
+
   delete pIniFile;
 }
 //---------------------------------------------------------------------------

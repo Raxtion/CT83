@@ -1,8 +1,8 @@
 object frmMachineParam: TfrmMachineParam
-  Left = 387
-  Top = 64
+  Left = 270
+  Top = 156
   Width = 951
-  Height = 709
+  Height = 677
   Caption = 'frmMachineParam'
   Color = 13430215
   Font.Charset = DEFAULT_CHARSET
@@ -16,7 +16,7 @@ object frmMachineParam: TfrmMachineParam
   TextHeight = 16
   object BitBtn1: TBitBtn
     Left = 256
-    Top = 624
+    Top = 576
     Width = 121
     Height = 41
     TabOrder = 0
@@ -24,7 +24,7 @@ object frmMachineParam: TfrmMachineParam
   end
   object BitBtn2: TBitBtn
     Left = 576
-    Top = 624
+    Top = 576
     Width = 129
     Height = 41
     Caption = 'Exit'
@@ -654,7 +654,7 @@ object frmMachineParam: TfrmMachineParam
   end
   object m_bForceEject: TCheckBox
     Left = 728
-    Top = 632
+    Top = 584
     Width = 97
     Height = 17
     Caption = #24375#21046#25490#20986
@@ -840,273 +840,13 @@ object frmMachineParam: TfrmMachineParam
       OnClick = m_bIsMgzUpFirsClick
     end
   end
-  object GroupBox3: TGroupBox
-    Left = 328
-    Top = 336
-    Width = 289
-    Height = 185
-    Caption = #25490#20986#20998#37197#27969#36947
-    TabOrder = 5
-    object StaticText22: TStaticText
-      Tag = 12
-      Left = 13
-      Top = 26
-      Width = 108
-      Height = 21
-      Hint = 'm_dConveyerPos0'
-      Alignment = taRightJustify
-      AutoSize = False
-      BevelInner = bvSpace
-      BevelKind = bkSoft
-      BevelOuter = bvNone
-      BorderStyle = sbsSingle
-      Caption = #25490#20986#20301#32622' (1)'
-      Color = clSkyBlue
-      ParentColor = False
-      TabOrder = 0
-      OnClick = StaticText5Click
-    end
-    object m_dConveyerPos0: TEdit
-      Left = 131
-      Top = 26
-      Width = 65
-      Height = 24
-      TabOrder = 1
-      Text = 'editAcc1'
-    end
-    object StaticText24: TStaticText
-      Left = 200
-      Top = 27
-      Width = 65
-      Height = 22
-      AutoSize = False
-      BevelInner = bvSpace
-      BevelKind = bkSoft
-      BevelOuter = bvNone
-      BorderStyle = sbsSingle
-      Caption = 'mm'
-      Color = clSkyBlue
-      ParentColor = False
-      TabOrder = 2
-    end
-    object StaticText25: TStaticText
-      Tag = 12
-      Left = 13
-      Top = 50
-      Width = 108
-      Height = 21
-      Hint = 'm_dConveyerPos1'
-      Alignment = taRightJustify
-      AutoSize = False
-      BevelInner = bvSpace
-      BevelKind = bkSoft
-      BevelOuter = bvNone
-      BorderStyle = sbsSingle
-      Caption = #25490#20986#20301#32622' (2)'
-      Color = clSkyBlue
-      ParentColor = False
-      TabOrder = 3
-      OnClick = StaticText5Click
-    end
-    object m_dConveyerPos1: TEdit
-      Left = 131
-      Top = 50
-      Width = 65
-      Height = 24
-      TabOrder = 4
-      Text = 'editAcc1'
-    end
-    object StaticText26: TStaticText
-      Left = 200
-      Top = 51
-      Width = 65
-      Height = 22
-      AutoSize = False
-      BevelInner = bvSpace
-      BevelKind = bkSoft
-      BevelOuter = bvNone
-      BorderStyle = sbsSingle
-      Caption = 'mm'
-      Color = clSkyBlue
-      ParentColor = False
-      TabOrder = 5
-    end
-    object StaticText27: TStaticText
-      Tag = 12
-      Left = 13
-      Top = 74
-      Width = 108
-      Height = 21
-      Hint = 'm_dConveyerPos2'
-      Alignment = taRightJustify
-      AutoSize = False
-      BevelInner = bvSpace
-      BevelKind = bkSoft
-      BevelOuter = bvNone
-      BorderStyle = sbsSingle
-      Caption = #25490#20986#20301#32622' (3)'
-      Color = clSkyBlue
-      ParentColor = False
-      TabOrder = 6
-      OnClick = StaticText5Click
-    end
-    object m_dConveyerPos2: TEdit
-      Left = 131
-      Top = 74
-      Width = 65
-      Height = 24
-      TabOrder = 7
-      Text = 'editAcc1'
-    end
-    object StaticText28: TStaticText
-      Left = 200
-      Top = 75
-      Width = 65
-      Height = 22
-      AutoSize = False
-      BevelInner = bvSpace
-      BevelKind = bkSoft
-      BevelOuter = bvNone
-      BorderStyle = sbsSingle
-      Caption = 'mm'
-      Color = clSkyBlue
-      ParentColor = False
-      TabOrder = 8
-    end
-    object StaticText29: TStaticText
-      Tag = 12
-      Left = 13
-      Top = 98
-      Width = 108
-      Height = 21
-      Hint = 'm_dConveyerPos3'
-      Alignment = taRightJustify
-      AutoSize = False
-      BevelInner = bvSpace
-      BevelKind = bkSoft
-      BevelOuter = bvNone
-      BorderStyle = sbsSingle
-      Caption = #25490#20986#20301#32622' (4)'
-      Color = clSkyBlue
-      ParentColor = False
-      TabOrder = 9
-      OnClick = StaticText5Click
-    end
-    object m_dConveyerPos3: TEdit
-      Left = 131
-      Top = 98
-      Width = 65
-      Height = 24
-      TabOrder = 10
-      Text = 'editAcc1'
-    end
-    object StaticText30: TStaticText
-      Left = 200
-      Top = 99
-      Width = 65
-      Height = 22
-      AutoSize = False
-      BevelInner = bvSpace
-      BevelKind = bkSoft
-      BevelOuter = bvNone
-      BorderStyle = sbsSingle
-      Caption = 'mm'
-      Color = clSkyBlue
-      ParentColor = False
-      TabOrder = 11
-    end
-    object StaticText31: TStaticText
-      Tag = 12
-      Left = 13
-      Top = 122
-      Width = 108
-      Height = 21
-      Hint = 'm_dConveyerPos4'
-      Alignment = taRightJustify
-      AutoSize = False
-      BevelInner = bvSpace
-      BevelKind = bkSoft
-      BevelOuter = bvNone
-      BorderStyle = sbsSingle
-      Caption = #25490#20986#20301#32622' (5)'
-      Color = clSkyBlue
-      ParentColor = False
-      TabOrder = 12
-      OnClick = StaticText5Click
-    end
-    object m_dConveyerPos4: TEdit
-      Left = 131
-      Top = 122
-      Width = 65
-      Height = 24
-      TabOrder = 13
-      Text = 'editAcc1'
-    end
-    object StaticText32: TStaticText
-      Left = 200
-      Top = 123
-      Width = 65
-      Height = 22
-      AutoSize = False
-      BevelInner = bvSpace
-      BevelKind = bkSoft
-      BevelOuter = bvNone
-      BorderStyle = sbsSingle
-      Caption = 'mm'
-      Color = clSkyBlue
-      ParentColor = False
-      TabOrder = 14
-    end
-    object StaticText33: TStaticText
-      Tag = 12
-      Left = 13
-      Top = 146
-      Width = 108
-      Height = 21
-      Hint = 'm_dNGMagPos'
-      Alignment = taRightJustify
-      AutoSize = False
-      BevelInner = bvSpace
-      BevelKind = bkSoft
-      BevelOuter = bvNone
-      BorderStyle = sbsSingle
-      Caption = 'Mgz. '#20301#32622
-      Color = clSkyBlue
-      ParentColor = False
-      TabOrder = 15
-      OnClick = StaticText5Click
-    end
-    object m_dNGMagPos: TEdit
-      Left = 131
-      Top = 146
-      Width = 65
-      Height = 24
-      TabOrder = 16
-      Text = 'editAcc1'
-    end
-    object StaticText34: TStaticText
-      Left = 200
-      Top = 147
-      Width = 65
-      Height = 22
-      AutoSize = False
-      BevelInner = bvSpace
-      BevelKind = bkSoft
-      BevelOuter = bvNone
-      BorderStyle = sbsSingle
-      Caption = 'mm'
-      Color = clSkyBlue
-      ParentColor = False
-      TabOrder = 17
-    end
-  end
   object GroupBox5: TGroupBox
     Left = 24
     Top = 336
     Width = 289
     Height = 129
     Caption = 'Weight Scale'
-    TabOrder = 6
+    TabOrder = 5
     object StaticText44: TStaticText
       Tag = 7
       Left = 13
@@ -1279,7 +1019,7 @@ object frmMachineParam: TfrmMachineParam
     Width = 289
     Height = 185
     Caption = 'Limitation'
-    TabOrder = 7
+    TabOrder = 6
     object StaticText56: TStaticText
       Left = 13
       Top = 26
@@ -1531,12 +1271,12 @@ object frmMachineParam: TfrmMachineParam
     end
   end
   object GroupBox7: TGroupBox
-    Left = 24
-    Top = 464
+    Left = 328
+    Top = 336
     Width = 289
-    Height = 153
+    Height = 185
     Caption = 'Clean Sprayer'
-    TabOrder = 8
+    TabOrder = 7
     object StaticText76: TStaticText
       Tag = 7
       Left = 13
@@ -1743,8 +1483,8 @@ object frmMachineParam: TfrmMachineParam
     end
   end
   object m_nRailOption: TRadioGroup
-    Left = 328
-    Top = 528
+    Left = 24
+    Top = 472
     Width = 289
     Height = 49
     Caption = 'Rail Option'
@@ -1753,15 +1493,15 @@ object frmMachineParam: TfrmMachineParam
       'All'
       'Front'
       'Rear')
-    TabOrder = 9
+    TabOrder = 8
   end
   object m_bUsePreAutoWeightScale: TCheckBox
     Left = 24
-    Top = 624
+    Top = 576
     Width = 209
     Height = 17
     Caption = #27599#27425#21855#21205#20808#22519#34892#22132#37327#28204#35430
-    TabOrder = 10
+    TabOrder = 9
   end
   object GroupBox8: TGroupBox
     Left = 24
@@ -1769,7 +1509,7 @@ object frmMachineParam: TfrmMachineParam
     Width = 897
     Height = 61
     Caption = #33258#21205#28165#27927#27969#36947' (24H: 00:00)'
-    TabOrder = 11
+    TabOrder = 10
     object m_strAutoCleanSprayLaneDateTime0: TEdit
       Left = 139
       Top = 23

@@ -64,6 +64,7 @@ public:
   int m_nScaleSprayTime[2];
   int m_nScaleSprayTimes[2];
   double m_dScaleSprayDelayTime;
+  int m_nAutoFillTime;
   //double m_dScale
 
   double m_dLDYUnLoadClamperAlarm;

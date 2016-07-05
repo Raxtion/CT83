@@ -27,6 +27,7 @@ private:
         bool m_bSoftStop;
         bool m_bSoftReset;
         bool m_bSoftInit;
+
 protected:
         void __fastcall Execute();
 public:
@@ -54,8 +55,10 @@ public:
         bool n_bLaneSprayReady[2];              //1: Front 0:Reard
 
 		bool m_bStartFillFlux;
-        bool m_bStartSBTSpray;
-        bool m_bSBTSprayDone;
+        bool m_bStartSBTSprayF;
+		bool m_bStartSBTSprayR;
+        bool m_bSBTSprayDoneF;
+        bool m_bSBTSprayDoneR;
         bool m_bStartCleanSpray;
         bool m_bStartCleanSprayAir;         
         bool m_bCleanSprayDone;
@@ -99,7 +102,7 @@ public:
 
         //Either Auto or Manual Mode
         void __fastcall doFillFlux(int &nThreadIndex);					//m_bIsSprayerLock
-        void __fastcall doSBTSpray(int &nThreadIndex);					//m_bIsSprayerLock
+        void __fastcall doSBTSpray(int &nThreadIndex, bool bFront);		//m_bIsSprayerLock
         void __fastcall doCleanSpray(int &nThreadIndex, bool bWater);   //m_bIsSprayerLock
         void __fastcall doScaleSpray(int &nThreadIndex, bool bWater);	//m_bIsSprayerLock
 
@@ -126,6 +129,7 @@ public:
 };
 //---------------------------------------------------------------------------
 #endif
+
 
 
 
