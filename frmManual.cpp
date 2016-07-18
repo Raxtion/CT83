@@ -681,7 +681,7 @@ void __fastcall TfmManual::btnStartWaterClick(TObject *Sender)
     TSpeedButton *pBtn=(TSpeedButton *)Sender;
 
     g_Motion.SetDO(DO::SprayerAirOn, !g_MNet.GetDO(DO::SprayerAirOn));
-    g_Motion.SetDO(DO::SprayerWaterOn, !g_MNet.GetDO(DO::SprayerWaterOn));
+    g_Motion.SetDO(DO::CleanerWaterOn, !g_MNet.GetDO(DO::CleanerWaterOn));
 }
 //---------------------------------------------------------------------------
 

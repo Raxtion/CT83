@@ -249,7 +249,7 @@ void __fastcall TfmManual::btnLLCGoClick(TObject *Sender)
     dPos[4]=g_IniFile.m_dConveyerPos[2];
     dPos[5]=g_IniFile.m_dConveyerPos[3];
     dPos[6]=g_IniFile.m_dConveyerPos[4];
-    dPos[6]=g_IniFile.m_dNGMagPos;
+    dPos[7]=g_IniFile.m_dNGMagPos;
 
     if (!g_Motion.GetDI(DI::RightPusherBwd))
     {

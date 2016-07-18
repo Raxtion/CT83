@@ -36,7 +36,7 @@ void __fastcall CIniFile::MachineFile(bool bRead)
   DDXFile_Int(bRead,pIniFile,System_Section,"Priviledge",m_nPriviledge);
   DDXFile_String(bRead,pIniFile,System_Section,"ARTPassword",m_strARTPassword,"CLARE");
   DDXFile_String(bRead,pIniFile,System_Section,"ENGPassword",m_strENGPassword,"123");
-  DDXFile_String(bRead,pIniFile,System_Section,"LastFileName",m_strLastFileName,"C:\\Product Data\\Default.ini");
+  DDXFile_String(bRead,pIniFile,System_Section,"LastFileName",m_strLastFileName,"C:\\Product_Data\\Default.ini");
 
   //Machine
   for(int nIndex=0;nIndex<MAX_AXIS;nIndex++)
@@ -82,6 +82,7 @@ void __fastcall CIniFile::MachineFile(bool bRead)
   DDXFile_Bool(bRead,pIniFile,Machine_Section,"m_bUseAutoCleanSprayLane",m_bUseAutoCleanSprayLane,false);
   DDXFile_Bool(bRead,pIniFile,Machine_Section,"m_bIsMgzUpFirst",m_bIsMgzUpFirst,false);
   DDXFile_Bool(bRead,pIniFile,Machine_Section,"m_bStopLoader",m_bStopLoader,false);
+  DDXFile_Bool(bRead,pIniFile,Machine_Section,"m_bIsUseCIM",m_bIsUseCIM,true);
 
   DDXFile_Int(bRead,pIniFile,Machine_Section,"m_nRailOption",m_nRailOption);
   delete pIniFile;
@@ -180,6 +181,9 @@ void __fastcall CIniFile::ProductFile(char *strFileName,bool bRead)
   DDXFile_Float(bRead,pIniFile,Product_Section,"m_dNGMagPos",m_dNGMagPos,0.0);
 
   DDXFile_Int(bRead,pIniFile,Product_Section,"m_nAutoFillTime",m_nAutoFillTime);
+  DDXFile_Float(bRead,pIniFile,Product_Section,"m_dSpraryDelayTimeB",m_dSpraryDelayTimeB,0.2);
+  DDXFile_Float(bRead,pIniFile,Product_Section,"m_dSpraryDelayTimeA",m_dSpraryDelayTimeA,0.0);
+  DDXFile_Float(bRead,pIniFile,Product_Section,"m_dSuccBackDelayTime",m_dSuccBackDelayTime,1.0);
 
   delete pIniFile;
 }

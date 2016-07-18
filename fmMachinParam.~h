@@ -145,8 +145,10 @@ __published:	// IDE-managed Components
     TEdit *m_strAutoCleanSprayLaneDateTime1;
     TEdit *m_strAutoCleanSprayLaneDateTime2;
     TCheckBox *m_bUseAutoCleanSprayLane;
+    TCheckBox *m_bIsUseCIM;
         void __fastcall StaticText5Click(TObject *Sender);
     void __fastcall m_bIsMgzUpFirsClick(TObject *Sender);
+    void __fastcall m_bIsUseCIMClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
         __fastcall TfrmMachineParam(TComponent* Owner);

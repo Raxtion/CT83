@@ -57,7 +57,11 @@ void DDXFile_String(bool bRead,TIniFile *pIniFile,AnsiString strSection,
 
 void FindFileName(char *strSource,char *strDest);
 
-
-
+TStringList* SplitString(AnsiString Original, AnsiString Delim);
+void ReplaceString(AnsiString *Original, AnsiString OldStr, AnsiString NewStr);
+//DirExplore(path) To find all files in path. Files are in <liststrFileName>. Directorys are in <liststrForderName>
+//std::list<AnsiString> g_liststrForderName;
+//std::list<AnsiString> g_liststrFileName;
+void DirExplore(AnsiString path,std::list<AnsiString> &g_liststrForderName,std::list<AnsiString> &g_liststrFileName);
 
 #endif

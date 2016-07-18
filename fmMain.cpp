@@ -24,6 +24,8 @@
 #include "C_GetTime.h"
 #include "PCIM114GL.H"
 #include "NHB300.h"
+#include "ZEBEXSerial.h"
+#include "EQPXML.h"
 
 extern CPylonCCD *g_pCCD;
 extern CEVision theVision;
@@ -34,6 +36,8 @@ extern bool g_bStopMainThread;
 extern PCIM114GL g_MNet;
 extern CNHB300 g_Scale;
 extern TfmManual *fmManual;
+extern CZEBEXSerial g_1DScanner;
+extern CEQPXML g_eqpXML;
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -52,7 +56,7 @@ void __fastcall TfrmMain::FormCreate(TObject *Sender)
 {
 	g_pMainThread = new CMainThread(false);
 
-    if (!FileExists("C:\\Product Data\\")) _mkdir("C:\\Product Data\\");
+    if (!FileExists("C:\\Product_Data\\")) _mkdir("C:\\Product_Data\\");
 
 	g_IniFile.MachineFile(true);
 	g_IniFile.ProductFile(g_IniFile.m_strLastFileName.c_str(), true);
@@ -79,6 +83,24 @@ void __fastcall TfrmMain::FormCreate(TObject *Sender)
 
 	theVision.LoadTool(g_IniFile.GetFileNameWithNewExt(Caption.c_str(), "cev").c_str(), "Dummy");
 
+    //g_eqpXML initial
+    g_eqpXML.m_bOnLine = true;
+    g_eqpXML.StartProcess = frmMain->StartProcess;
+    g_eqpXML.OpenFile = frmMain->OpenFilebyCIM;
+    g_eqpXML.m_EqpStatus = 'I';
+
+    // IniFile boot CIM 
+    if (g_IniFile.m_bIsUseCIM == true)
+    {
+        ServerCIM->Active = true;
+        AddList("CIM Start!");
+    }
+    else
+    {
+        ServerCIM->Active = false;
+        AddList("CIM Stop!");
+        g_eqpXML.m_CIMStatus = "0";
+    }
 
     //Product Parameter setting
     TrackBar2->Position = g_IniFile.m_dFluxTankAirPressure;
@@ -231,6 +253,80 @@ void __fastcall TfrmMain::AddList(AnsiString strMessage)
 
 }
 //---------------------------------------------------------------------------
+bool TfrmMain::StartProcess(bool bStart)
+{
+	if(bStart)
+	{
+		g_pMainThread->m_bIsStartProcessbyCIM = true;
+        g_pMainThread->m_listLog.push_back("收到CIM回應 START，機台開始啟動...");
+	}
+	else
+	{
+		g_pMainThread->m_bIsStopProcessbyCIM = true;
+        g_pMainThread->m_listLog.push_back("收到CIM回應 STOP，機台禁止啟動...");
+	}
+	return true;
+}
+//---------------------------------------------------------------------------
+bool TfrmMain::OpenFilebyCIM(AnsiString strFileName)
+{
+    if (FileExists(strFileName))
+    {
+        g_IniFile.MachineFile(true);
+		g_IniFile.ProductFile(strFileName.c_str(), true);
+
+        g_IniFile.m_strLastFileName = strFileName;
+        frmMain->Caption = g_IniFile.m_strLastFileName;
+
+		//Set Pressure
+		g_Motion.SetAO(0, g_IniFile.m_dFluxTankAirPressure);
+		g_Motion.SetAO(1, g_IniFile.m_dSprayerAirPressure);
+
+		theVision.LoadTool(g_IniFile.GetFileNameWithNewExt(frmMain->Caption.c_str(), "cev").c_str(), "Dummy");
+	    return true;
+    }
+    else return false;
+}
+//---------------------------------------------------------------------------
+#pragma endregion
+
+#pragma region Socket
+void __fastcall TfrmMain::ServerCIMClientConnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+    g_eqpXML.StartComm(Socket);
+    AddList("CIM Connected!!");
+    Shape3->Visible = true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfrmMain::ServerCIMClientDisconnect(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+    g_eqpXML.EndComm();
+    AddList("CIM Disconnected!!");
+    Shape3->Visible = false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfrmMain::ServerCIMClientError(TObject *Sender,
+      TCustomWinSocket *Socket, TErrorEvent ErrorEvent, int &ErrorCode)
+{
+    AddList("CIM SocketEror");
+    Socket->Close();
+    Shape3->Brush->Color = clRed;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfrmMain::ServerCIMClientRead(TObject *Sender,
+      TCustomWinSocket *Socket)
+{
+    //AddList("CIM Read");
+    //g_pMainThread->m_ActionLog.push_back(g_pMainThread->AddTimeString("[ServerCIM]CIM Read"));
+    Shape3->Brush->Color = clYellow;
+    g_eqpXML.ProcessCIMstr();
+}
+//---------------------------------------------------------------------------
 #pragma endregion
 
 #pragma region MainTimer
@@ -339,7 +435,6 @@ void __fastcall TfrmMain::timerMessageTimer(TObject *Sender)
 
 	}
 
-
 	//---Error Code
 	if (g_IniFile.m_nErrorCode>0 && (nErrorCode != g_IniFile.m_nErrorCode))
 	{
@@ -351,7 +446,6 @@ void __fastcall TfrmMain::timerMessageTimer(TObject *Sender)
 		}
 	}
 
-
 	if (g_Motion.GetDO(DO::Buzzer)) listHistory->Color = clRed;
 	else listHistory->Color = clBlack;
 
@@ -361,9 +455,39 @@ void __fastcall TfrmMain::timerMessageTimer(TObject *Sender)
 
 	}
 
-
 	nErrorCode = g_IniFile.m_nErrorCode;
 
+    //--Idle Run Down---
+    if (ServerCIM->Active == true && g_pMainThread->m_bIsHomeDone == true)
+    {
+        if (g_IniFile.m_nErrorCode > 0 && g_IniFile.m_nErrorCode < 1000 && g_eqpXML.m_EqpStatus !='D')
+        {
+            g_eqpXML.m_EqpStatus='D';
+            g_eqpXML.SendEventReport("1");
+        }
+        else if (g_DIO.ReadDOBit(DO::StartBtnLamp) && g_eqpXML.m_EqpStatus !='R')
+        {
+            g_eqpXML.m_EqpStatus='R';
+            g_eqpXML.SendEventReport("1");
+        }
+        else if (g_IniFile.m_nErrorCode == 0 && g_eqpXML.m_EqpStatus !='I' && !g_DIO.ReadDOBit(DO::StartBtnLamp))
+        {
+            g_eqpXML.m_EqpStatus='I';
+            g_eqpXML.SendEventReport("1");
+        }
+    }
+
+    //---Renew CIM signal
+    Shape3->Brush->Color = clLime;
+
+    //---Query Mag 1D Reader
+    AnsiString strtemp = "Error!";
+    //if (g_1DScanner.m_bInitOK) strtemp = g_1DScanner.GetData();
+    if (strtemp != "Error!")
+    {
+        AddList(strtemp);
+        g_eqpXML.m_strMagzin1DCode = strtemp;
+    }
 
 	timerMessage->Enabled = true;
 }
@@ -420,11 +544,11 @@ void __fastcall TfrmMain::Open1Click(TObject *Sender)
 
 	if (OpenDialog1->Execute())
 	{
-		g_IniFile.m_strLastFileName = OpenDialog1->FileName;
-		Caption = g_IniFile.m_strLastFileName;
+		g_IniFile.MachineFile(true);
+		g_IniFile.ProductFile(OpenDialog1->FileName.c_str(), true);
 
-		//g_IniFile.MachineFile(true);
-		g_IniFile.ProductFile(Caption.c_str(), true);
+        g_IniFile.m_strLastFileName = OpenDialog1->FileName;
+		Caption = g_IniFile.m_strLastFileName;
 
 		//Set Pressure
 		g_Motion.SetAO(0, g_IniFile.m_dFluxTankAirPressure);
@@ -452,21 +576,22 @@ void __fastcall TfrmMain::Save1Click(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmMain::Saveas1Click(TObject *Sender)
 {
-	AnsiString InputString = InputBox("請輸入將要另存檔案名稱", "檔案名稱", "Default");
+	SaveDialog1->DefaultExt = "ini";
+	if (SaveDialog1->Execute())
+	{
 
-	if (Application->MessageBox("確定要存檔嗎?", "Look", MB_OKCANCEL) != IDOK) return;
+		if (!FileExists("C:\\Product_Data\\")) _mkdir("C:\\Product_Data\\");
+		g_IniFile.m_strLastFileName = SaveDialog1->FileName;
+		Caption = SaveDialog1->FileName;
+		g_IniFile.MachineFile(false);
+		g_IniFile.ProductFile(SaveDialog1->FileName.c_str(), false);
 
+		theVision.SaveTool(g_IniFile.GetFileNameWithNewExt(Caption.c_str(), "cev").c_str(), "Dummy");
 
-	MkDir("C:\\Product Data\\" + InputString + "\\");
-
-	AnsiString strPathName = "C:\\Product Data\\" + InputString + "\\" + InputString + ".ini";
-	g_IniFile.m_strLastFileName = strPathName;
-	Caption = strPathName;
-
-	g_IniFile.ProductFile(g_IniFile.m_strLastFileName.c_str(), false);
-	g_IniFile.MachineFile(false);
-
-	theVision.SaveTool(g_IniFile.GetFileNameWithNewExt(Caption.c_str(), "cev").c_str(), "Dummy");
+		//if (g_IniFile.m_nLanguageMode>0) ShowMessage("Save Done");
+		//else ShowMessage("存檔完畢");
+		ShowMessage("存檔完畢");
+	}
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmMain::Load1Click(TObject *Sender)
@@ -537,6 +662,7 @@ void __fastcall TfrmMain::Machine1Click(TObject *Sender)
     DDX_Check(bRead, g_IniFile.m_bUsePreAutoWeightScale, pMachineDlg->m_bUsePreAutoWeightScale);
     DDX_Check(bRead, g_IniFile.m_bUseAutoCleanSprayLane, pMachineDlg->m_bUseAutoCleanSprayLane);
     DDX_Check(bRead, g_IniFile.m_bIsMgzUpFirst, pMachineDlg->m_bIsMgzUpFirst);
+    DDX_Check(bRead, g_IniFile.m_bIsUseCIM, pMachineDlg->m_bIsUseCIM);
 
     DDX_Radio(bRead, g_IniFile.m_nRailOption, pMachineDlg->m_nRailOption);
 
@@ -648,6 +774,7 @@ void __fastcall TfrmMain::Machine1Click(TObject *Sender)
                 DDX_Check(bRead, g_IniFile.m_bUsePreAutoWeightScale, pMachineDlg->m_bUsePreAutoWeightScale);
                 DDX_Check(bRead, g_IniFile.m_bUseAutoCleanSprayLane, pMachineDlg->m_bUseAutoCleanSprayLane);
                 DDX_Check(bRead, g_IniFile.m_bIsMgzUpFirst, pMachineDlg->m_bIsMgzUpFirst);
+                DDX_Check(bRead, g_IniFile.m_bIsUseCIM, pMachineDlg->m_bIsUseCIM);
 
                 DDX_Radio(bRead, g_IniFile.m_nRailOption, pMachineDlg->m_nRailOption);
 
@@ -753,6 +880,9 @@ void __fastcall TfrmMain::Product1Click(TObject *Sender)
 	DDX_Float(bRead, g_IniFile.m_dNGMagPos, pWnd->m_dNGMagPos);
 
     DDX_Int(bRead, g_IniFile.m_nAutoFillTime, pWnd->m_nAutoFillTime);
+    DDX_Float(bRead, g_IniFile.m_dSpraryDelayTimeB, pWnd->m_dSpraryDelayTimeB);
+    DDX_Float(bRead, g_IniFile.m_dSpraryDelayTimeA, pWnd->m_dSpraryDelayTimeA);
+    DDX_Float(bRead, g_IniFile.m_dSuccBackDelayTime, pWnd->m_dSuccBackDelayTime);
 
     if (!g_IniFile.m_bIsMagazineUpFirst)
     {
@@ -866,7 +996,10 @@ void __fastcall TfrmMain::Product1Click(TObject *Sender)
 		        DDX_Float(bRead, g_IniFile.m_dNGMagPos, pWnd->m_dNGMagPos);
 
                 DDX_Int(bRead, g_IniFile.m_nAutoFillTime, pWnd->m_nAutoFillTime);
-
+                DDX_Float(bRead, g_IniFile.m_dSpraryDelayTimeB, pWnd->m_dSpraryDelayTimeB);
+                DDX_Float(bRead, g_IniFile.m_dSpraryDelayTimeA, pWnd->m_dSpraryDelayTimeA);
+                DDX_Float(bRead, g_IniFile.m_dSuccBackDelayTime, pWnd->m_dSuccBackDelayTime);
+                
 		        //Set Pressure
 		        g_Motion.SetAO(0, g_IniFile.m_dFluxTankAirPressure);
 		        g_Motion.SetAO(1, g_IniFile.m_dSprayerAirPressure);
@@ -1241,7 +1374,7 @@ void __fastcall TfrmMain::SpeedButton1Click(TObject *Sender)
     tm1MS.timeStart(120000);
 	while (1)
 	{
-		if (!g_pMainThread->m_bStartSBTSprayF || !g_pMainThread->m_bStartSBTSprayR) break;
+		if (((pBtn->Tag == true) && !g_pMainThread->m_bStartSBTSprayF) || ((pBtn->Tag == false) && !g_pMainThread->m_bStartSBTSprayR)) break;
 		Application->ProcessMessages();
         if (tm1MS.timeUp()) break;
 	}
@@ -1512,6 +1645,23 @@ void __fastcall TfrmMain::SpeedButton10Click(TObject *Sender)
     g_Motion.SetDO(DO::FluxTankVacOn, false);
 }
 //---------------------------------------------------------------------------
+void __fastcall TfrmMain::SpeedButton16Click(TObject *Sender)
+{
+    static C_GetTime tm1MS(EX_SCALE::TIME_1MS, false);
+
+    g_pMainThread->m_bIsSprayerLock = false;
+    g_pMainThread->m_bStartCleanSpray = false;
+    g_pMainThread->m_bStartCleanSprayAir = false;
+    g_pMainThread->nThreadIndex[15] = 0;
+    g_pMainThread->nThreadIndex[16] = 0;
+    g_pMainThread->m_listLog.push_back("終止 清洗測試");
+
+    g_Motion.SetDO(DO::FrontLaneSprayMotor, false);
+    g_Motion.SetDO(DO::RearLaneSprayMotor, false);
+    g_Motion.SetDO(DO::CleanerWaterOn, false);
+    g_Motion.SetDO(DO::CleanerWaterAirSwitch, false);
+}
+//---------------------------------------------------------------------------
 void __fastcall TfrmMain::btnLoaderResetClick(TObject *Sender)
 {
     static C_GetTime tm1MS(EX_SCALE::TIME_1MS, false);
@@ -1597,8 +1747,37 @@ void __fastcall TfrmMain::btnOutLaneResetClick(TObject *Sender)
     ShowMessage("完成");
 }
 //---------------------------------------------------------------------------
+void __fastcall TfrmMain::SpeedButton11Click(TObject *Sender)
+{
+    g_1DScanner.Disable();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TfrmMain::SpeedButton12Click(TObject *Sender)
+{
+    g_1DScanner.Enable();
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::SpeedButton13Click(TObject *Sender)
+{
+    g_1DScanner.Sleep();
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::SpeedButton14Click(TObject *Sender)
+{
+    g_1DScanner.Wakeup();
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::SpeedButton15Click(TObject *Sender)
+{
+    g_1DScanner.Initial();
+}
+//---------------------------------------------------------------------------
 
 #pragma endregion
+
+
+
 
 
 

@@ -1,8 +1,8 @@
 object frmMain: TfrmMain
-  Left = 58
-  Top = 717
-  Width = 1507
-  Height = 828
+  Left = 65
+  Top = 40
+  Width = 1479
+  Height = 818
   Caption = 'frmMain'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,44 +18,99 @@ object frmMain: TfrmMain
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter1: TSplitter
-    Left = 992
+    Left = 964
     Top = 0
     Width = 10
-    Height = 647
+    Height = 637
     Cursor = crHSplit
     Align = alRight
   end
   object Splitter2: TSplitter
     Left = 0
-    Top = 647
-    Width = 1499
+    Top = 637
+    Width = 1471
     Height = 8
     Cursor = crVSplit
     Align = alBottom
   end
   object Panel1: TPanel
-    Left = 1002
+    Left = 974
     Top = 0
     Width = 497
-    Height = 647
+    Height = 637
     Align = alRight
     Anchors = [akRight, akBottom]
     Caption = 'Panel1'
     TabOrder = 0
     DesignSize = (
       497
-      647)
+      637)
     object PageControl1: TPageControl
       Left = 1
       Top = 56
       Width = 495
-      Height = 1117
+      Height = 1252
       ActivePage = TabSheet2
       Anchors = [akLeft, akTop, akRight, akBottom]
       TabIndex = 1
       TabOrder = 0
       object TabSheet1: TTabSheet
         Caption = 'CCD'
+        object SpeedButton11: TSpeedButton
+          Left = 346
+          Top = 32
+          Width = 65
+          Height = 25
+          Caption = 'Disable'
+          Visible = False
+          OnClick = SpeedButton11Click
+        end
+        object SpeedButton12: TSpeedButton
+          Left = 346
+          Top = 64
+          Width = 65
+          Height = 25
+          Caption = 'Enable'
+          Visible = False
+          OnClick = SpeedButton12Click
+        end
+        object SpeedButton13: TSpeedButton
+          Left = 346
+          Top = 96
+          Width = 65
+          Height = 25
+          Caption = 'Sleep'
+          Visible = False
+          OnClick = SpeedButton13Click
+        end
+        object SpeedButton14: TSpeedButton
+          Left = 346
+          Top = 128
+          Width = 65
+          Height = 25
+          Caption = 'Wakeup'
+          Visible = False
+          OnClick = SpeedButton14Click
+        end
+        object SpeedButton15: TSpeedButton
+          Left = 346
+          Top = 160
+          Width = 65
+          Height = 25
+          Caption = 'Initial'
+          Visible = False
+          OnClick = SpeedButton15Click
+        end
+        object Shape3: TShape
+          Left = 467
+          Top = 7
+          Width = 17
+          Height = 17
+          Brush.Color = clLime
+          Pen.Color = clMedGray
+          Shape = stCircle
+          Visible = False
+        end
         object GroupBox1: TGroupBox
           Left = 16
           Top = 16
@@ -566,12 +621,12 @@ object frmMain: TfrmMain
           Top = 360
           Width = 161
           Height = 57
-          Caption = '(F) '#30095#36890#20301#32622#21205#20316#28204#35430
+          Caption = '(F) '#22132#22615#20301#32622#21205#20316#28204#35430
           OnClick = SpeedButton7Click
         end
         object SpeedButton8: TSpeedButton
           Tag = 1
-          Left = 32
+          Left = 224
           Top = 432
           Width = 161
           Height = 57
@@ -595,6 +650,15 @@ object frmMain: TfrmMain
           Height = 57
           Caption = #32066#27490' '#35036'Flux'#21205#20316#28204#35430
           OnClick = SpeedButton10Click
+        end
+        object SpeedButton16: TSpeedButton
+          Tag = 1
+          Left = 32
+          Top = 431
+          Width = 161
+          Height = 57
+          Caption = #32066#27490' '#28165#27927#21205#20316#28204#35430
+          OnClick = SpeedButton16Click
         end
         object GroupBox3: TGroupBox
           Left = 32
@@ -1156,8 +1220,8 @@ object frmMain: TfrmMain
   end
   object listHistory: TListBox
     Left = 0
-    Top = 655
-    Width = 1499
+    Top = 645
+    Width = 1471
     Height = 119
     Align = alBottom
     Color = clBlack
@@ -1173,14 +1237,14 @@ object frmMain: TfrmMain
   object Panel2: TPanel
     Left = 0
     Top = 0
-    Width = 992
-    Height = 647
+    Width = 964
+    Height = 637
     Align = alClient
     TabOrder = 2
     object Splitter3: TSplitter
       Left = 1
-      Top = 468
-      Width = 990
+      Top = 458
+      Width = 962
       Height = 10
       Cursor = crVSplit
       Align = alBottom
@@ -1188,8 +1252,8 @@ object frmMain: TfrmMain
     object ScrollBox1: TScrollBox
       Left = 1
       Top = 1
-      Width = 990
-      Height = 467
+      Width = 962
+      Height = 457
       Align = alClient
       TabOrder = 0
       object ImagePaintBox: TPaintBox
@@ -1203,8 +1267,8 @@ object frmMain: TfrmMain
     end
     object PageControl2: TPageControl
       Left = 1
-      Top = 478
-      Width = 990
+      Top = 468
+      Width = 962
       Height = 168
       ActivePage = TabSheet4
       Align = alBottom
@@ -1379,7 +1443,6 @@ object frmMain: TfrmMain
     Top = 64
   end
   object timerMessage: TTimer
-    Interval = 100
     OnTimer = timerMessageTimer
     Left = 32
     Top = 104
@@ -1395,6 +1458,17 @@ object frmMain: TfrmMain
     Interval = 60000
     OnTimer = timerAutoCleanSprayLaneTimer
     Left = 152
+    Top = 104
+  end
+  object ServerCIM: TServerSocket
+    Active = False
+    Port = 6000
+    ServerType = stNonBlocking
+    OnClientConnect = ServerCIMClientConnect
+    OnClientDisconnect = ServerCIMClientDisconnect
+    OnClientRead = ServerCIMClientRead
+    OnClientError = ServerCIMClientError
+    Left = 192
     Top = 104
   end
 end

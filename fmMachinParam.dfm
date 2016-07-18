@@ -1275,7 +1275,7 @@ object frmMachineParam: TfrmMachineParam
     Top = 336
     Width = 289
     Height = 185
-    Caption = 'Clean Sprayer'
+    Caption = 'Flux '#22132#22615#20301#32622
     TabOrder = 7
     object StaticText76: TStaticText
       Tag = 7
@@ -1590,5 +1590,14 @@ object frmMachineParam: TfrmMachineParam
       Caption = #20351#29992#33258#21205#28165#27927#27969#36947
       TabOrder = 6
     end
+  end
+  object m_bIsUseCIM: TCheckBox
+    Left = 24
+    Top = 600
+    Width = 97
+    Height = 17
+    Caption = #21855#29992'CIM'
+    TabOrder = 11
+    OnClick = m_bIsUseCIMClick
   end
 end

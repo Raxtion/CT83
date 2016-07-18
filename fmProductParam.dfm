@@ -1,6 +1,6 @@
 object frmProductParam: TfrmProductParam
-  Left = 277
-  Top = 126
+  Left = 194
+  Top = 123
   BorderStyle = bsDialog
   Caption = 'frmProductParam'
   ClientHeight = 640
@@ -1257,6 +1257,134 @@ object frmProductParam: TfrmProductParam
           Color = clSkyBlue
           ParentColor = False
           TabOrder = 2
+        end
+      end
+      object GroupBox12: TGroupBox
+        Left = 600
+        Top = 16
+        Width = 281
+        Height = 113
+        Caption = #22132#22615#24310#36978#31186#25976
+        TabOrder = 4
+        object StaticText119: TStaticText
+          Left = 13
+          Top = 28
+          Width = 108
+          Height = 21
+          Hint = 'm_dSprayDistance'
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #22132#21069' '#24310#36978#26178#38291
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 0
+        end
+        object m_dSpraryDelayTimeB: TEdit
+          Left = 128
+          Top = 26
+          Width = 65
+          Height = 24
+          TabOrder = 1
+          Text = 'editAcc1'
+        end
+        object StaticText120: TStaticText
+          Left = 200
+          Top = 26
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #31186
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 2
+        end
+        object StaticText121: TStaticText
+          Left = 13
+          Top = 52
+          Width = 108
+          Height = 21
+          Hint = 'm_dSprayDistance'
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #22132#24460' '#24310#36978#26178#38291
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 3
+        end
+        object m_dSpraryDelayTimeA: TEdit
+          Left = 128
+          Top = 50
+          Width = 65
+          Height = 24
+          TabOrder = 4
+          Text = 'editAcc1'
+        end
+        object StaticText122: TStaticText
+          Left = 200
+          Top = 50
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #31186
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 5
+        end
+        object StaticText123: TStaticText
+          Left = 13
+          Top = 76
+          Width = 108
+          Height = 21
+          Hint = 'm_dSprayDistance'
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #20498#21560' '#24310#36978#26178#38291
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 6
+        end
+        object m_dSuccBackDelayTime: TEdit
+          Left = 128
+          Top = 74
+          Width = 65
+          Height = 24
+          TabOrder = 7
+          Text = 'editAcc1'
+        end
+        object StaticText124: TStaticText
+          Left = 200
+          Top = 74
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #31186
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 8
         end
       end
     end

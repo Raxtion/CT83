@@ -14,6 +14,7 @@
 #include <Dialogs.hpp>
 #include <ExtDlgs.hpp>
 #include "C_GetTime.h"
+#include <ScktComp.hpp>
 //---------------------------------------------------------------------------
 class TfrmMain : public TForm
 {
@@ -113,6 +114,14 @@ __published:	// IDE-managed Components
     TShape *Shape00;
     TShape *Shape01;
     TShape *Shape02;
+    TSpeedButton *SpeedButton11;
+    TSpeedButton *SpeedButton12;
+    TSpeedButton *SpeedButton13;
+    TSpeedButton *SpeedButton14;
+    TSpeedButton *SpeedButton15;
+    TServerSocket *ServerCIM;
+    TShape *Shape3;
+    TSpeedButton *SpeedButton16;
         void __fastcall DIDO1Click(TObject *Sender);
         void __fastcall Motor1Click(TObject *Sender);
         void __fastcall Exit1Click(TObject *Sender);
@@ -164,6 +173,21 @@ __published:	// IDE-managed Components
     void __fastcall btnSet1Click(TObject *Sender);
     void __fastcall timerAutoCleanSprayLaneTimer(TObject *Sender);
     void __fastcall btnOpenLogClick(TObject *Sender);
+    void __fastcall SpeedButton11Click(TObject *Sender);
+    void __fastcall SpeedButton12Click(TObject *Sender);
+    void __fastcall SpeedButton13Click(TObject *Sender);
+    void __fastcall SpeedButton14Click(TObject *Sender);
+    void __fastcall SpeedButton15Click(TObject *Sender);
+    void __fastcall ServerCIMClientConnect(TObject *Sender,
+          TCustomWinSocket *Socket);
+    void __fastcall ServerCIMClientDisconnect(TObject *Sender,
+          TCustomWinSocket *Socket);
+    void __fastcall ServerCIMClientError(TObject *Sender,
+          TCustomWinSocket *Socket, TErrorEvent ErrorEvent,
+          int &ErrorCode);
+    void __fastcall ServerCIMClientRead(TObject *Sender,
+          TCustomWinSocket *Socket);
+    void __fastcall SpeedButton16Click(TObject *Sender);
 private:	// User declarations
         int m_nUserLevel; //0:OP 1:Engineer 2:adm
         C_GetTime tm1MSLogOut;
@@ -171,12 +195,14 @@ private:	// User declarations
 public:		// User declarations
         __fastcall TfrmMain(TComponent* Owner);
 
-         static void OnGrabComplete(int nIndex,bool bResult);
-         void __fastcall RefreshImage();
-         void __fastcall SetPrivilege(int nLevel);
-         void __fastcall ReadCaptionFile(TForm *pForm,int nLanguage=0);       //0:Chinese
-         void __fastcall AddList(AnsiString strMessage);
-         void __fastcall SetLEDDimmer();
+        static void OnGrabComplete(int nIndex,bool bResult);
+        static bool StartProcess(bool bStart);
+        static bool OpenFilebyCIM(AnsiString strFileName);
+        void __fastcall RefreshImage();
+        void __fastcall SetPrivilege(int nLevel);
+        void __fastcall ReadCaptionFile(TForm *pForm,int nLanguage=0);       //0:Chinese
+        void __fastcall AddList(AnsiString strMessage);
+        void __fastcall SetLEDDimmer();
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TfrmMain *frmMain;

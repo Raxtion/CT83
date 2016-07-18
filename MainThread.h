@@ -40,6 +40,9 @@ public:
 
         bool m_bIsHomeDone;
         bool m_bIsAutoMode;
+        bool m_bIsStartProcessbyDIO;            //Record for Strat Process by DI::StartBtn
+        bool m_bIsStartProcessbyCIM;            //Record for Strat Process by CIM in CMainThread::Execute() not by DI::StartBtn
+        bool m_bIsStopProcessbyCIM;             //Record for Stop Process by CIM in CMainThread::Execute() not by DI::StopBtn
         bool m_bNeedHome;
         bool m_bIsSprayerAlarm;
         bool m_bIsSprayerWeightAlarm;
@@ -74,6 +77,11 @@ public:
         bool m_bIsLeftLaneChangerLock;
         bool m_bIsSprayerLock;
 
+        //IO Again
+        bool m_bStartAgain;
+        bool m_bStopAgain;
+        bool m_bResetAgain;
+        bool m_bInitalAgain;
 
         //Counter;
         int m_nStripCount;

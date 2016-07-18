@@ -3,8 +3,13 @@
 #include <vcl.h>
 #pragma hdrstop
 
+#include "fmMain.h"
 #include "fmMachinParam.h"
 #include "fmMotorCheck.h"
+#include "EQPXML.h"
+
+extern CEQPXML g_eqpXML;
+extern TfrmMain *frmMain;
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -65,4 +70,21 @@ void __fastcall TfrmMachineParam::m_bIsMgzUpFirsClick(TObject *Sender)
 //---------------------------------------------------------------------------
 
 
+
+void __fastcall TfrmMachineParam::m_bIsUseCIMClick(TObject *Sender)
+{
+    if (m_bIsUseCIM->Checked == true)
+    {
+        frmMain->ServerCIM->Active = true;
+        frmMain->AddList("CIM Start!");
+    }
+    else
+    {
+        frmMain->ServerCIM->Active = false;
+        frmMain->AddList("CIM Stop!");
+        frmMain->Shape3->Visible = false;
+        g_eqpXML.m_CIMStatus = "0";
+    }
+}
+//---------------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 object fmManual: TfmManual
   Left = 394
-  Top = 132
+  Top = 148
   BorderStyle = bsDialog
   Caption = 'fmManual'
   ClientHeight = 649

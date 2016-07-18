@@ -13,7 +13,7 @@
 #define Product_Section "Product"
 
 
-#define IniFile_Dir "C:\\Product Data\\"
+#define IniFile_Dir "C:\\Product_Data\\"
 
 #define MAX_AXIS 13     //4+9
 
@@ -65,6 +65,9 @@ public:
   int m_nScaleSprayTimes[2];
   double m_dScaleSprayDelayTime;
   int m_nAutoFillTime;
+  double m_dSpraryDelayTimeB;
+  double m_dSpraryDelayTimeA;
+  double m_dSuccBackDelayTime;
   //double m_dScale
 
   double m_dLDYUnLoadClamperAlarm;
@@ -81,6 +84,7 @@ public:
   bool m_bUseAutoCleanSprayLane;
   bool m_bIsMgzUpFirst;
   bool m_bStopLoader;
+  bool m_bIsUseCIM;
 
   int m_nRailOption;                     //0:All 1:Front 2:Rear
 
