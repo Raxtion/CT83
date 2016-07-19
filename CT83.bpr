@@ -11,7 +11,7 @@
       temp\CtkLedControll.obj temp\MainThread.obj temp\fmMachinParam.obj 
       temp\fmProductParam.obj temp\NHB300.obj temp\frmManual.obj 
       temp\ZEBEXSerial.obj temp\EQPXML.obj temp\tinyxml.obj temp\tinystr.obj 
-      temp\tinyxmlerror.obj temp\tinyxmlparser.obj"/>
+      temp\tinyxmlerror.obj temp\tinyxmlparser.obj temp\RS700HASerial.obj"/>
     <RESFILES value="CT83.res"/>
     <IDLFILES value=""/>
     <IDLGENFILES value=""/>
@@ -39,7 +39,7 @@
       inetdbbde.bpi inetdbxpress.bpi inetdb.bpi nmfast.bpi webdsnap.bpi 
       bcbie.bpi websnap.bpi soaprtl.bpi dclocx.bpi dbexpress.bpi dbxcds.bpi 
       indy.bpi bcb2kaxserver.bpi"/>
-    <PATHCPP value=".;extern\SerialPort;extern\PylonCCD;extern\General;extern\PICM114GL;extern\EVision;extern\CTKLED;extern\NHB300;extern\ZEBEXSerial;extern\EQPXML;extern\TinyXML;extern\TinyXML;extern\TinyXML;extern\TinyXML"/>
+    <PATHCPP value=".;extern\SerialPort;extern\PylonCCD;extern\General;extern\PICM114GL;extern\EVision;extern\CTKLED;extern\NHB300;extern\ZEBEXSerial;extern\EQPXML;extern\TinyXML;extern\TinyXML;extern\TinyXML;extern\TinyXML;extern\RS700HASerial"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
@@ -49,17 +49,18 @@
     <USERDEFINES value="_DEBUG;_WINDOWS;STRICT"/>
     <SYSDEFINES value="_RTLDLL;NO_STRICT;USEPACKAGES"/>
     <MAINSOURCE value="CT83.cpp"/>
-    <INCLUDEPATH value="extern\TinyXML;extern\EQPXML;extern\ZEBEXSerial;extern\NHB300;extern\PCom;extern\CTKLED;extern\EVision\include;extern\EVision;extern\PICM114GL\include;extern\PICM114GL;extern\General;extern\PylonC\include;extern\PylonCCD;extern\PylonC;extern\SerialPort;&quot;C:\Program Files\Borland\CBuilder6\Projects&quot;;C:\Work\CLARE_PROGRAM\C83;$(BCB)\include;$(BCB)\include\vcl"/>
-    <LIBPATH value="extern\TinyXML;extern\EQPXML;extern\ZEBEXSerial;extern\NHB300;extern\PCom;extern\CTKLED;extern\EVision\bcb6;extern\EVision;extern\PICM114GL\lib;extern\PICM114GL;extern\General;extern\PylonC\lib;extern\PylonCCD;extern\SerialPort;&quot;C:\Program Files\Borland\CBuilder6\Projects&quot;;C:\Work\CLARE_PROGRAM\C83;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <INCLUDEPATH value="extern\RS700HASerial;extern\TinyXML;extern\EQPXML;extern\ZEBEXSerial;extern\NHB300;extern\PCom;extern\CTKLED;extern\EVision\include;extern\EVision;extern\PICM114GL\include;extern\PICM114GL;extern\General;extern\PylonC\include;extern\PylonCCD;extern\PylonC;extern\SerialPort;&quot;C:\Program Files\Borland\CBuilder6\Projects&quot;;C:\Work\CLARE_PROGRAM\C83;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="extern\RS700HASerial;extern\TinyXML;extern\EQPXML;extern\ZEBEXSerial;extern\NHB300;extern\PCom;extern\CTKLED;extern\EVision\bcb6;extern\EVision;extern\PICM114GL\lib;extern\PICM114GL;extern\General;extern\PylonC\lib;extern\PylonCCD;extern\SerialPort;&quot;C:\Program Files\Borland\CBuilder6\Projects&quot;;C:\Work\CLARE_PROGRAM\C83;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par"/>
     <OTHERFILES value=""/>
   </MACROS>
   <OPTIONS>
-    <IDLCFLAGS value="-Iextern\TinyXML -Iextern\EQPXML -Iextern\ZEBEXSerial -Iextern\NHB300 
-      -Iextern\PCom -Iextern\CTKLED -Iextern\EVision\include -Iextern\EVision 
-      -Iextern\PICM114GL\include -Iextern\PICM114GL -Iextern\General 
-      -Iextern\PylonC\include -Iextern\PylonCCD -Iextern\PylonC 
-      -Iextern\SerialPort -I&quot;C:\Program Files\Borland\CBuilder6\Projects&quot; 
+    <IDLCFLAGS value="-Iextern\RS700HASerial -Iextern\TinyXML -Iextern\EQPXML 
+      -Iextern\ZEBEXSerial -Iextern\NHB300 -Iextern\PCom -Iextern\CTKLED 
+      -Iextern\EVision\include -Iextern\EVision -Iextern\PICM114GL\include 
+      -Iextern\PICM114GL -Iextern\General -Iextern\PylonC\include 
+      -Iextern\PylonCCD -Iextern\PylonC -Iextern\SerialPort 
+      -I&quot;C:\Program Files\Borland\CBuilder6\Projects&quot; 
       -IC:\Work\CLARE_PROGRAM\C83 -I$(BCB)\include -I$(BCB)\include\vcl 
       -src_suffix cpp -D_DEBUG -D_WINDOWS -DSTRICT -boa"/>
     <CFLAG1 value="-Od -H=$(BCB)\lib\vcl60.csm -Hc -Vx -Ve -X- -r- -a8 -b- -k -y -v -vi- -c 
@@ -125,6 +126,7 @@
       <FILE FILENAME="extern\TinyXML\tinystr.cpp" FORMNAME="" UNITNAME="tinystr" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="extern\TinyXML\tinyxmlerror.cpp" FORMNAME="" UNITNAME="tinyxmlerror.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="extern\TinyXML\tinyxmlparser.cpp" FORMNAME="" UNITNAME="tinyxmlparser.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="extern\RS700HASerial\RS700HASerial.cpp" FORMNAME="" UNITNAME="RS700HASerial" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
   </FILELIST>
   <BUILDTOOLS>
   </BUILDTOOLS>

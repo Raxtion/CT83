@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 81
-  Top = 766
+  Left = 79
+  Top = 768
   Width = 1479
   Height = 818
   Caption = 'frmMain'
@@ -56,51 +56,6 @@ object frmMain: TfrmMain
       TabOrder = 0
       object TabSheet1: TTabSheet
         Caption = 'CCD'
-        object SpeedButton11: TSpeedButton
-          Left = 346
-          Top = 32
-          Width = 65
-          Height = 25
-          Caption = 'Disable'
-          Visible = False
-          OnClick = SpeedButton11Click
-        end
-        object SpeedButton12: TSpeedButton
-          Left = 346
-          Top = 64
-          Width = 65
-          Height = 25
-          Caption = 'Enable'
-          Visible = False
-          OnClick = SpeedButton12Click
-        end
-        object SpeedButton13: TSpeedButton
-          Left = 346
-          Top = 96
-          Width = 65
-          Height = 25
-          Caption = 'Sleep'
-          Visible = False
-          OnClick = SpeedButton13Click
-        end
-        object SpeedButton14: TSpeedButton
-          Left = 346
-          Top = 128
-          Width = 65
-          Height = 25
-          Caption = 'Wakeup'
-          Visible = False
-          OnClick = SpeedButton14Click
-        end
-        object SpeedButton15: TSpeedButton
-          Left = 346
-          Top = 160
-          Width = 65
-          Height = 25
-          Caption = 'Initial'
-          Visible = False
-          OnClick = SpeedButton15Click
-        end
         object Shape3: TShape
           Left = 467
           Top = 7
@@ -782,6 +737,73 @@ object frmMain: TfrmMain
           ParentFont = False
           TabOrder = 1
           OnClick = m_bStopLoaderClick
+        end
+      end
+      object TabSheet3: TTabSheet
+        Caption = 'Code Reader'
+        ImageIndex = 2
+        object SpeedButton11: TSpeedButton
+          Left = 346
+          Top = 32
+          Width = 65
+          Height = 25
+          Caption = 'Disable'
+          Visible = False
+          OnClick = SpeedButton11Click
+        end
+        object SpeedButton12: TSpeedButton
+          Left = 346
+          Top = 64
+          Width = 65
+          Height = 25
+          Caption = 'Enable'
+          Visible = False
+          OnClick = SpeedButton12Click
+        end
+        object SpeedButton13: TSpeedButton
+          Left = 346
+          Top = 96
+          Width = 65
+          Height = 25
+          Caption = 'Sleep'
+          Visible = False
+          OnClick = SpeedButton13Click
+        end
+        object SpeedButton14: TSpeedButton
+          Left = 346
+          Top = 128
+          Width = 65
+          Height = 25
+          Caption = 'Wakeup'
+          Visible = False
+          OnClick = SpeedButton14Click
+        end
+        object SpeedButton15: TSpeedButton
+          Left = 346
+          Top = 160
+          Width = 65
+          Height = 25
+          Caption = 'Initial'
+          Visible = False
+          OnClick = SpeedButton15Click
+        end
+        object btn1DRead: TButton
+          Left = 24
+          Top = 32
+          Width = 153
+          Height = 49
+          Caption = #37325#26032#35712#21462'1D Reader'
+          TabOrder = 0
+          OnClick = btn1DReadClick
+        end
+        object btn2DRead: TButton
+          Left = 24
+          Top = 96
+          Width = 153
+          Height = 49
+          Caption = #37325#26032#35712#21462'2D Reader'
+          TabOrder = 1
+          OnClick = btn2DReadClick
         end
       end
     end

@@ -24,7 +24,7 @@ __fastcall CZEBEXSerial::~CZEBEXSerial()
 //---------------------------------------------------------------------------
 bool __fastcall CZEBEXSerial::OpenPort(int nPort)
 {
-    return Open(nPort,B19200,BIT_8|STOP_1|P_NONE);
+    return Open(nPort,B9600,BIT_8|STOP_1|P_NONE);
 }
 //---------------------------------------------------------------------------
 AnsiString __fastcall CZEBEXSerial::GetData()
@@ -34,7 +34,6 @@ AnsiString __fastcall CZEBEXSerial::GetData()
     char strReceive[100]={0};
     if(ReadData(strReceive,'\n'))
     {
-
         return (AnsiString)strReceive;
     }
 

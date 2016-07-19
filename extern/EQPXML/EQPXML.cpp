@@ -404,7 +404,6 @@ void __fastcall CEQPXML::doQueryPPIDFullPath(char *pRx)
 //---------------------------------------------------------------------------
 void __fastcall CEQPXML::doQueryPPBody(char *pRx)
 {
-	/*
     TiXmlDocument doc1;
     doc1.Parse(pRx);
 	TiXmlElement* pRoot1 = doc1.FirstChildElement("Root");
@@ -434,440 +433,171 @@ void __fastcall CEQPXML::doQueryPPBody(char *pRx)
 	pData->SetAttribute("SxFy",strSxFx.c_str());
 
 	char *ParamItem[]={
-        "m_nCols","NULL","A","0","10",               //Layout行數                         //on Paper
-		"m_nRows","NULL","A","0","5",                //Layout列數                         //on Paper
-		"m_dColPitch","mm","A","0","1000",           //Layout行間距
-		"m_dRowPitch","mm","A","0","1000",           //Layout列間距
+		//Loader
+		"m_dLoaderClampMgzPos0","mm","A","0","1000",				//Loader Pos1
+		"m_dLoaderClampMgzPos1","mm","A","0","1000",				//Loader Pos2
+		"m_dLoaderClampMgzPos2","mm","A","0","1000",				//Loader Pos3
+		"m_dMagazinePushPosY","mm","A","0","1000",					//Loader Push PosY
+		"m_dMagazinePushPosZ","mm","A","0","1000",					//Loader Push PosZ
+		"m_dMagazinePushPosUpFirstZ","mm","A","0","1000",			//Loader Push PosZ
+		"m_dLoaderMgzPitch","mm","A","0","100",						//Loader Magzine Pitch
+		"m_dLoaderUnClampMgzPos0","mm","A","0","1000",				//Loader Pos4
+		"m_dLoaderUnClampMgzPos1","mm","A","0","1000",				//Loader Pos5
+		"m_dLoaderUnClampMgzPos2","mm","A","0","1000",				//Loader Pos6
 
-		"m_dLamHeight0","mm","A","0","200",          //後流道 壓合高度
-		"m_dLamHeight1","mm","A","0","200",          //前流道 壓合高度
-		"m_dLamStop0","mm","A","0","200",            //後流道 接片高度
-		"m_dLamStop1","mm","A","0","200",            //前流道 接片高度
-		"m_dLamGetPos0","mm","A","0","200",          //後流道 出片高度
-		"m_dLamGetPos1","mm","A","0","200",          //前流道 出片高度
-		"m_dLamVacHeight0","mm","A","0","200",       // no used
-		"m_dLamVacHeight1","mm","A","0","200",       // no used
+		"m_dLeftLaneChangerMgzPos","mm","A","0","1000",				//Left LC Substrate in Pos
+		"m_dLeftLaneChangerSprayPos0","mm","A","0","1000",			//Left LC Substrate out Rear Pos
+		"m_dLeftLaneChangerSprayPos1","mm","A","0","1000",			//Left LC Substrate out Front Pos
 
-		"m_dLamTime0","s","A","0","1000",            //後流道 壓合時間                    //on Paper
-		"m_dLamTemp0","c","A","0","250",             //後流道 壓合溫度                    //on Paper
-		"m_dLamPress0","kg","A","0","20",            //後流道 壓合力量                    //on Paper
-		"m_dLamTime1","s","A","0","1000",            //前流道 壓合時間                    //on Paper
-		"m_dLamTemp1","c","A","0","250",             //前流道 壓合溫度                    //on Paper
-		"m_dLamPress1","kg","A","0","20",            //前流道 壓合力量                    //on Paper
+		//Work
+		"m_dSprayReadyPos","mm","A","0","150",						//Spray Ready Pos
+		"m_dStartSprayPosX0","mm","A","0","1000",					//Spray Ready Rear PosX
+		"m_dStartSprayPosX1","mm","A","0","1000",					//Spray Ready Front PosX
+		"m_dStartSprayPosY0","mm","A","0","1000",					//Spray Ready Rear PosY
+		"m_dStartSprayPosY1","mm","A","0","1000",					//Spray Ready Front PosY
+		"m_dSprayDistance","mm","A","0","500",						//Spray Distance
+		"m_dSprayPitch","mm","A","0","500",							//Spray Y Pitch
+		"m_dSprayPosZ","mm","A","0","150",							//Spray Ready PosZ
+		"m_nSprayTimes","NULL","A","0","100",						//Spray times
 
-		"m_dLoadCellPosX0","mm","A","0","1000",      //後流道 測重起始X
-		"m_dLoadCellPosY0","mm","A","0","1000",      //後流道 測重起始Y
-		"m_dLaserUpPosX00","mm","A","0","1000",      //後流道 上模測高X1
-		"m_dLaserUpPosY00","mm","A","0","1000",      //後流道 上模測高Y1
-		"m_dLaserUpPosX01","mm","A","0","1000",      //後流道 上模測高X2
-		"m_dLaserUpPosY01","mm","A","0","1000",      //後流道 上模測高Y2
-		"m_dLaserUpPosX02","mm","A","0","1000",      //後流道 上模測高X3
-		"m_dLaserUpPosY02","mm","A","0","1000",      //後流道 上模測高Y3
-		"m_dLaserUpPosX03","mm","A","0","1000",      //後流道 上模測高X4
-		"m_dLaserUpPosY03","mm","A","0","1000",      //後流道 上模測高Y4
-		"m_dLaserDownPosX0","mm","A","0","1000",     //後流道 下模測高X
-		"m_dLaserDownPosY0","mm","A","0","1000",     //後流道 下模測高Y
-		"m_dLoadCellPosX1","mm","A","0","1000",      //前流道 測重起始X
-		"m_dLoadCellPosY1","mm","A","0","1000",      //前流道 測重起始Y
-		"m_dLaserUpPosX10","mm","A","0","1000",      //前流道 上模測高X1
-		"m_dLaserUpPosY10","mm","A","0","1000",      //前流道 上模測高Y1
-		"m_dLaserUpPosX11","mm","A","0","1000",      //前流道 上模測高X2
-		"m_dLaserUpPosY11","mm","A","0","1000",      //前流道 上模測高Y2
-		"m_dLaserUpPosX12","mm","A","0","1000",      //前流道 上模測高X3
-		"m_dLaserUpPosY12","mm","A","0","1000",      //前流道 上模測高Y3
-		"m_dLaserUpPosX13","mm","A","0","1000",      //前流道 上模測高X4
-		"m_dLaserUpPosY13","mm","A","0","1000",      //前流道 上模測高Y4
-		"m_dLaserDownPosX1","mm","A","0","1000",     //前流道 下模測高X
-		"m_dLaserDownPosY1","mm","A","0","1000",     //前流道 下模測高Y
+		"m_dFluxTankAirPressure","NULL","A","0","1600",				//Spray Tank Air in
+		"m_dSprayerAirPressure","NULL","A","0","1600",				//Spray Air out
 
-		"m_nRailOption","NULL","A","0","2",          //流到選擇 0=全開;1=前流道;2=後流道
-		"m_bNotLam","NULL","A","0","1",              //不壓合 0=false;1=true
-		"m_dPressCalRange","%","A","0","100",        //容許誤差(%)
-		"m_dPressCalTime","s","A","0","100",         //穩定時間
-		"m_dLamSecondHeight0","mm","A","0","200",    //後流道 第二段高度
-		"m_dLamSecondHeight1","mm","A","0","200",    //前流道 第二段高度
-		"m_dLamSecondTime0","s","A","0","1000",      //後流道 第二段速度(秒)
-		"m_dLamSecondTime1","s","A","0","1000",      //前流道 第二段速度(秒)
-		"m_dLamThirdHeight0","mm","A","0","200",     //後流道 第三段高度
-		"m_dLamThirdHeight1","mm","A","0","200",     //前流道 第三段高度
-		"m_dLamThirdTime0","s","A","0","1000",       //後流道 第三段速度(秒)
-		"m_dLamThirdTime1","s","A","0","1000",       //前流道 第三段速度(秒)
+		"m_nScaleSprayTime0","s","A","0","1000",					//Weight Scale time
+		"m_nScaleSprayTimes0","NULL","A","0","1000",				//Weight Scale times
+		"m_dWeightScaleAlarmUp","g","A","0","1000",					//Weight Up Limitation
+		"m_dWeightScaleAlarmDown","g","A","0","1000",				//Weight Down Limitation
 
-		"m_dAutoStopRange","%","A","0","100",        //自動校正 自動停機誤差(%)
-		"m_nAutoInterval","NULL","A","0","1000",     //自動校正 間隔盤數
-		"m_dAutoRunTempRange","c","A","0","1000",    //自動模式 容許溫度
-		"m_dVacDelayTime","s","A","0","1000",        //第二次真空檢測延遲時間
-        "m_dScaleOffsetFront","NULL","A","0","1000", //前流道 壓力補償表
-        "m_dScaleOffsetRear","NULL","A","0","1000",  //後流道 壓力補償表
-        "m_nDownPercent","%","A","0","100",          //緩衝壓力下降(%)
+		"m_nAutoFillTime","s","A","0","120",						//Auto Fill Flux Duration
 
-        "m_nHeadType","NULL","A","NULL","NULL",      //熱壓頭型式                     //on Paper
-        "m_strHeadScal","NULL","A","NULL","NULL",    //熱壓頭尺寸                     //on Paper
-        "m_strModuleScal","NULL","A","NULL","NULL",  //下模尺寸                       //on Paper
-        "m_nVacummOn","NULL","A","0","1",            //真空開啟                       //on Paper
-        "m_nPressCheck","NULL","A","0","1",          //壓力認證                       //on Paper
-        "m_nDummyCheck","NULL","A","0","1",          //DummyCheck                     //on Paper
-        "m_strModuleNum","NULL","A","NULL","NULL",   //模具編號                       //on Paper
-        "m_strSetupEENum","NULL","A","NULL","NULL",  //SetupEE                        //on Paper
+		"m_dSprayDelayTimeB","s","A","0","600",						//Delay Time of Before Spray 
+		"m_dSprayDelayTimeA","s","A","0","600",						//Delay Time of After Spray 
+		"m_dSuccBackDelayTime","s","A","0","600",					//Delay Time of Vacuum Off
 
-        "m_dBLT","NULL","A","NULL","NULL",           //BLT                   //on Paper
-        "m_dTilt","NULL","A","NULL","NULL",          //Tilt                  //on Paper
-        "m_dGap","NULL","A","NULL","NULL",           //Gap                   //on Paper
-        "m_dKeyTemp00","c","A","0","1000",           //後 手key溫度1         //on Paper
-        "m_dKeyTemp01","c","A","0","1000",           //後 手key溫度2         //on Paper
-        "m_dKeyTemp02","c","A","0","1000",           //後 手key溫度3         //on Paper
-        "m_dKeyTemp10","c","A","0","1000",           //前 手key溫度1         //on Paper
-        "m_dKeyTemp11","c","A","0","1000",           //前 手key溫度2         //on Paper
-        "m_dKeyTemp12","c","A","0","1000",           //前 手key溫度3         //on Paper
-        //以上為產品參數
+		//UnLoader
+		"m_dRightLaneChangerSprayPos0","mm","A","0","1000",			//Right LC Substrate in Rear Pos
+		"m_dRightLaneChangerSprayPos1","mm","A","0","1000",			//Right LC Substrate in Front Pos
+		"m_dCCDCheckPosX0","mm","A","0","1000",						//CCD Check PosX0
+		"m_dCCDCheckPosY0","mm","A","0","1000",						//CCD Check PosY0
+		"m_dCCDCheckPosX1","mm","A","0","1000",						//CCD Check PosX1
+		"m_dCCDCheckPosY1","mm","A","0","1000",						//CCD Check PosY1
+		"m_dCCDCheckPosX2","mm","A","0","1000",						//CCD Check PosX2
+		"m_dCCDCheckPosY2","mm","A","0","1000",						//CCD Check PosY2
+		"m_dCCDCheckPosX3","mm","A","0","1000",						//CCD Check PosX3
+		"m_dCCDCheckPosY3","mm","A","0","1000",						//CCD Check PosY3
+		"m_dRightLaneChangerDelayTime","s","A","0","600",			//Delay Time After CCD Check
 
-        //以下為機台變數
-        "LastFilePath","NULL","A","NULL","NULL",     //機台當下 FilePath                          //on Paper
-        "LastFileName","NULL","A","NULL","NULL",     //機台當下 FileName                          //on Paper
+		"m_dConveyerPos0","mm","A","0","1000",						//Substrate Out Pos 1
+		"m_dConveyerPos1","mm","A","0","1000",						//Substrate Out Pos 2
+		"m_dConveyerPos2","mm","A","0","1000",						//Substrate Out Pos 3
+		"m_dConveyerPos3","mm","A","0","1000",						//Substrate Out Pos 4
+		"m_dConveyerPos4","mm","A","0","1000",						//Substrate Out Pos 5
+		"m_dNGMagPos","mm","A","0","1000",							//Substrate Out NG Mag Pos
 
-        "FrontPressCal","kg","A","0","1000",         //機台當下 前流道 量測壓力                   //on Paper
-        "RearPressCal","kg","A","0","1000",          //機台當下 後流道 量測壓力                   //on Paper
+		"m_bIsUseCCDCheckPos0","NULL","A","0","1",					//Check Box for using CCD Check Pos0
+		"m_bIsUseCCDCheckPos1","NULL","A","0","1",					//Check Box for using CCD Check Pos1
+		"m_bIsUseCCDCheckPos2","NULL","A","0","1",					//Check Box for using CCD Check Pos2
+		"m_bIsUseCCDCheckPos3","NULL","A","0","1",					//Check Box for using CCD Check Pos3
 
-        "FrontDownLaserDiff","mm","A","0","1000",    //機台當下 前流道 下模誤差                   //on Paper
-        "RearDownLaserDiff","mm","A","0","1000",     //機台當下 後流道 下模誤差                   //on Paper
-        "FrontUpperLaserDiff","mm","A","0","1000",   //機台當下 前流道 上模誤差                   //on Paper
-        "RearUpperLaserDiff","mm","A","0","1000",    //機台當下 後流道 上模誤差                   //on Paper
+		//Vision
+		"m_dMarkScore0","NULL","A","0","255",						//Minimum Score for Black White algorithm
+		"m_nLEDDimmer0","NULL","A","0","255",						//LED Light Scale
 
-        "m_strLogInENGAccount","NULL","A","NULL","NULL",  //機台當下 登入者
-		"END"};                                      //E:End
+		//CleanSprayerLane
+		"m_dCleanSprayPosX0","mm","A","0","1000",					//Spray Clean PosX 0
+		"m_dCleanSprayPosY0","mm","A","0","1000",					//Spray Clean PosY 0
+		"m_dCleanSprayPosX1","mm","A","0","1000",					//Spray Clean PosX 1
+		"m_dCleanSprayPosY1","mm","A","0","1000",					//Spray Clean PosY 1
+		"m_dCleanSprayPosX2","mm","A","0","1000",					//Spray Clean PosX 2
+		"m_dCleanSprayPosY2","mm","A","0","1000",					//Spray Clean PosY 2
+		"m_dCleanSprayPosX3","mm","A","0","1000",					//Spray Clean PosX 3
+		"m_dCleanSprayPosY3","mm","A","0","1000",					//Spray Clean PosY 3
+		"m_dCleanSprayPosZ","mm","A","0","150",						//Spray Clean PosZ 
+		"m_nCleanSprayTimes","NULL","A","0","100",					//Clean X Direction times
+		"m_nFullCleanSprayTimes","NULL","A","0","100",				//Clean Total times
+		"m_dCleanSprayDistance","mm","A","0","500",					//Clean Distance
+		"m_dSprayerCleanWaterPressure","NULL","A","0","1600",		//Clean Water out
+		"m_dSprayerCleanAirPressure","NULL","A","0","1600",			//Clean Air out
 
-    if (FileExists(strData))
+		//Option
+		"m_bUseSprayer","NULL","A","0","1",							//Is Use Sprayer					
+		"m_bUseCCD","NULL","A","0","1",								//Is Use CCD
+		"m_bIsMagazineUpFirst", "NULL", "A", "0", "1",				//Is Use MagazineUpFirst
+		//以上為產品參數
+		"END" };                                      //E:End
+
+
+	if (FileExists(strData))
 	{
-	    int nX=0;
-	    while(1)
-	    {
-		    if(strcmp(ParamItem[nX*5],"END")==0) break;
+		int nX = 0;
+		while (1)
+		{
+			if (strcmp(ParamItem[nX * 5], "END") == 0) break;
 
-		    pParam=new TiXmlElement("PARAMETER");
-		    pParam->SetAttribute("NAME",ParamItem[nX*5]);
-		    ///strTmp.sprintf("%s,%s",ParamItem[nX],pIniFile->ReadString(Product_Section,ParamItem[nX],"Not Valid"));
-		    //pParam->LinkEndChild(new TiXmlText(strTmp.c_str()));
+			pParam = new TiXmlElement("PARAMETER");
+			pParam->SetAttribute("NAME", ParamItem[nX * 5]);
 
-		    pProperty=new TiXmlElement("PROPERTY");
-		    pProperty->LinkEndChild(new TiXmlText("TRUE"));
-		    pParam->LinkEndChild(pProperty);
+			pProperty = new TiXmlElement("PROPERTY");
+			pProperty->LinkEndChild(new TiXmlText("TRUE"));
+			pParam->LinkEndChild(pProperty);
 
-		    for(int t=0;t<3; t++)
-		    {
-			    pProperty=new TiXmlElement("PROPERTY");
-			    pProperty->LinkEndChild(new TiXmlText(ParamItem[nX*5+t]));
-			    pParam->LinkEndChild(pProperty);
-		    }
+			for (int t = 0; t<3; t++)
+			{
+				pProperty = new TiXmlElement("PROPERTY");
+				pProperty->LinkEndChild(new TiXmlText(ParamItem[nX * 5 + t]));
+				pParam->LinkEndChild(pProperty);
+			}
 
+			if (false)
+			//if (strcmp(ParamItem[nX * 5], "m_dLoaderClampMgzPos0") == 0)
+			{
+				/* Here Build Special Product Parameter
+				AnsiString strScaleOffset = "";
+				for (int nx = 0; nx<50; nx++)
+				{
+					strScaleOffset += pIniFile->ReadString("Offset_Table", "m_dScaleOffsetRear" + FormatFloat("0", nx), "0") + "/";
+				}
+				pProperty = new TiXmlElement("PROPERTY");
+				AnsiString strResult = strScaleOffset;
+				if (strResult.IsEmpty()) strResult = "NULL";
+				pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
+				pParam->LinkEndChild(pProperty);
+				*/
+			}
+			else
+			{
+				pProperty = new TiXmlElement("PROPERTY");
+				AnsiString strResult = pIniFile->ReadString(Product_Section, ParamItem[nX * 5], "0");
+				if (strResult.IsEmpty()) strResult = "NULL";
+				pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
+				pParam->LinkEndChild(pProperty);
+			}
 
-            if (strcmp(ParamItem[nX*5],"m_dScaleOffsetFront")==0)
-            {
-                AnsiString strScaleOffset = "";
-                for (int nx=0;nx<50;nx++)
-                {
-                    strScaleOffset += pIniFile->ReadString("Offset_Table","m_dScaleOffsetFront"+FormatFloat("0", nx),"0") + "/";
-                }
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = strScaleOffset;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            else if (strcmp(ParamItem[nX*5],"m_dScaleOffsetRear")==0)
-            {
-                AnsiString strScaleOffset = "";
-                for (int nx=0;nx<50;nx++)
-                {
-                    strScaleOffset += pIniFile->ReadString("Offset_Table","m_dScaleOffsetRear"+FormatFloat("0", nx),"0") + "/";
-                }
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = strScaleOffset;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            else if (strcmp(ParamItem[nX*5],"m_nHeadType")==0)
-            {
-                AnsiString strHeadType; (pIniFile->ReadString(Product_Section,ParamItem[nX*5],"0") == "0") ? strHeadType = "SOLID" : strHeadType = "HOLLOW";
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = strHeadType;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            else if (strcmp(ParamItem[nX*5],"m_nVacummOn")==0)
-            {
-                AnsiString strVacummOn; (pIniFile->ReadString(Product_Section,ParamItem[nX*5],"0") == "0") ? strVacummOn = "FAIL" : strVacummOn = "TRUE";
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = strVacummOn;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            else if (strcmp(ParamItem[nX*5],"m_nPressCheck")==0)
-            {
-                AnsiString strPressCheck; (pIniFile->ReadString(Product_Section,ParamItem[nX*5],"0") == "0") ? strPressCheck = "FAIL" : strPressCheck = "TRUE";
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = strPressCheck;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            else if (strcmp(ParamItem[nX*5],"m_nDummyCheck")==0)
-            {
-                AnsiString strDummyCheck; (pIniFile->ReadString(Product_Section,ParamItem[nX*5],"0") == "0") ? strDummyCheck = "FAIL" : strDummyCheck = "TRUE";
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = strDummyCheck;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            else if (strcmp(ParamItem[nX*5],"m_strSetupEENum")==0)
-            {
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = g_IniFile.m_strSetupEENum;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            //-------------------------------------------------------------------------------------------------------------------------
-            else if (strcmp(ParamItem[nX*5],"m_dBLT")==0)
-            {
-                AnsiString strBLT = "";
-                strBLT += pIniFile->ReadString(Product_Section,"m_dBLT0","0") + "/";
-                strBLT += pIniFile->ReadString(Product_Section,"m_dBLT1","0") + "/";
-                strBLT += pIniFile->ReadString(Product_Section,"m_dBLT2","0") + "/";
-                strBLT += pIniFile->ReadString(Product_Section,"m_dBLT3","0") + "/";
-                strBLT += pIniFile->ReadString(Product_Section,"m_dBLT4","0") + "/";
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = strBLT;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            else if (strcmp(ParamItem[nX*5],"m_dTilt")==0)
-            {
-                AnsiString m_dTilt = "";
-                m_dTilt += pIniFile->ReadString(Product_Section,"m_dTilt0","0") + "/";
-                m_dTilt += pIniFile->ReadString(Product_Section,"m_dTilt1","0") + "/";
-                m_dTilt += pIniFile->ReadString(Product_Section,"m_dTilt2","0") + "/";
-                m_dTilt += pIniFile->ReadString(Product_Section,"m_dTilt3","0") + "/";
-                m_dTilt += pIniFile->ReadString(Product_Section,"m_dTilt4","0") + "/";
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = m_dTilt;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            else if (strcmp(ParamItem[nX*5],"m_dGap")==0)
-            {
-                AnsiString m_dGap = "";
-                m_dGap += pIniFile->ReadString(Product_Section,"m_dGap0","0") + "/";
-                m_dGap += pIniFile->ReadString(Product_Section,"m_dGap1","0") + "/";
-                m_dGap += pIniFile->ReadString(Product_Section,"m_dGap2","0") + "/";
-                m_dGap += pIniFile->ReadString(Product_Section,"m_dGap3","0") + "/";
-                m_dGap += pIniFile->ReadString(Product_Section,"m_dGap4","0") + "/";
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = m_dGap;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            //-------------------------------------------------------------------------------------------------------------------------
-            else if (strcmp(ParamItem[nX*5],"LastFilePath")==0)
-            {
-                TStringList *strList = SplitString(g_IniFile.m_strLastFileName, "\\");
-                AnsiString strLastFilePath = "";
-                for (int i=0;i<strList->Count-1;i++)
-                {
-                    strLastFilePath += strList->Strings[i] + "\\";
-                }
-                delete strList;
+			for (int t = 3; t<5; t++)
+			{
+				pProperty = new TiXmlElement("PROPERTY");
+				pProperty->LinkEndChild(new TiXmlText(ParamItem[nX * 5 + t]));
+				pParam->LinkEndChild(pProperty);
+			}
 
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = strLastFilePath;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            else if (strcmp(ParamItem[nX*5],"LastFileName")==0)
-            {
-                TStringList *strList = SplitString(g_IniFile.m_strLastFileName, "\\");
-                AnsiString strLastFileName = strList->operator [](strList->Count-1);
-                delete strList;
+			pData->LinkEndChild(pParam);
+			nX++;
+		}
 
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = strLastFileName;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            //-------------------------------------------------------------------------------------------------------------------------
-            else if (strcmp(ParamItem[nX*5],"FrontPressCal")==0)
-            {
-                AnsiString strFrontPressCal = "";
-                for (int i=0;i<50;i++)
-                {
-                    strFrontPressCal += FormatFloat("0.000", g_pMainThread->m_dFrontPressCal[i])+"/";
-                }
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = strFrontPressCal;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            else if (strcmp(ParamItem[nX*5],"RearPressCal")==0)
-            {
-                AnsiString strRearPressCal = "";
-                for (int i=0;i<50;i++)
-                {
-                    strRearPressCal += FormatFloat("0.000", g_pMainThread->m_dRearPressCal[i])+"/";
-                }
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = strRearPressCal;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            //-------------------------------------------------------------------------------------------------------------------------
-            else if (strcmp(ParamItem[nX*5],"FrontDownLaserDiff")==0)
-            {
-                TStringList *strStrings = new TStringList;
-                for (int i=0;i<50;i++)
-                {
-                    if (i == 10*(g_IniFile.m_nRows-1)+(g_IniFile.m_nCols-1))
-                    {
-                        strStrings->Add(FormatFloat("0.000", g_pMainThread->m_dFrontDownLaserDiff[i][0]).c_str());
-                    }
-                }
-                strStrings->Delimiter = '/';
-                AnsiString strFDLD = strStrings->DelimitedText;
-                strStrings->Clear();
-                delete strStrings;
-
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = strFDLD;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            else if (strcmp(ParamItem[nX*5],"RearDownLaserDiff")==0)
-            {
-                TStringList *strStrings = new TStringList;
-                for (int i=0;i<50;i++)
-                {
-                    if (i == 10*(g_IniFile.m_nRows-1)+(g_IniFile.m_nCols-1))
-                    {
-                        strStrings->Add(FormatFloat("0.000", g_pMainThread->m_dRearDownLaserDiff[i][0]).c_str());
-                    }
-                }
-                strStrings->Delimiter = '/';
-                AnsiString strRDLD = strStrings->DelimitedText;
-                strStrings->Clear();
-                delete strStrings;
-
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = strRDLD;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            else if (strcmp(ParamItem[nX*5],"FrontUpperLaserDiff")==0)
-            {
-                int m_nCalCol = 0;
-                int m_nCalRow = 0;
-                TStringList *strStrings = new TStringList;
-                for (int i=0;i<50;i++)
-                {
-                    m_nCalCol = i % 10;
-                    m_nCalRow = i / 10;
-                    if (m_nCalCol<g_IniFile.m_nCols && m_nCalRow< g_IniFile.m_nRows)
-                    {
-                        strStrings->Add(FormatFloat("0.000", g_pMainThread->m_dFrontUpperLaserDiff[i][0]).c_str());
-                    }
-                }
-                strStrings->Delimiter = '/';
-                AnsiString strFULD = strStrings->DelimitedText;
-                strStrings->Clear();
-                delete strStrings;
-
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = strFULD;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            else if (strcmp(ParamItem[nX*5],"RearUpperLaserDiff")==0)
-            {
-                int m_nCalCol = 0;
-                int m_nCalRow = 0;
-                TStringList *strStrings = new TStringList;
-                for (int i=0;i<50;i++)
-                {
-                    m_nCalCol = i % 10;
-                    m_nCalRow = i / 10;
-                    if (m_nCalCol<g_IniFile.m_nCols && m_nCalRow< g_IniFile.m_nRows)
-                    {
-                        strStrings->Add(FormatFloat("0.000", g_pMainThread->m_dRearUpperLaserDiff[i][0]).c_str());
-                    }
-                }
-                strStrings->Delimiter = '/';
-                AnsiString strRULD = strStrings->DelimitedText;
-                strStrings->Clear();
-                delete strStrings;
-
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = strRULD;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            //-------------------------------------------------------------------------------------------------------------------------
-            else if (strcmp(ParamItem[nX*5],"m_strLogInENGAccount")==0)
-            {
-                pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = g_IniFile.m_strLogInENGAccount;
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-            else
-            {
-		        pProperty=new TiXmlElement("PROPERTY");
-                AnsiString strResult = pIniFile->ReadString(Product_Section,ParamItem[nX*5],"0");
-                if (strResult.IsEmpty()) strResult = "NULL";
-		        pProperty->LinkEndChild(new TiXmlText(strResult.c_str()));
-		        pParam->LinkEndChild(pProperty);
-            }
-
-		    for(int t=3;t<5; t++)
-		    {
-			    pProperty=new TiXmlElement("PROPERTY");
-			    pProperty->LinkEndChild(new TiXmlText(ParamItem[nX*5+t]));
-			    pParam->LinkEndChild(pProperty);
-		    }
-
-		    pData->LinkEndChild(pParam);
-		    nX++;
-	    }
-
-	    pRoot->LinkEndChild(pData);
-	    doc.LinkEndChild(pRoot);
-	    SendXML(doc);
-    }
-    else
-    {
-        pRoot->LinkEndChild(pData);
-	    doc.LinkEndChild(pRoot);
-	    SendXML(doc);
-    }
-	delete pIniFile;
-    */
+		pRoot->LinkEndChild(pData);
+		doc.LinkEndChild(pRoot);
+		SendXML(doc);
+	}
+	else
+	{
+		pRoot->LinkEndChild(pData);
+		doc.LinkEndChild(pRoot);
+		SendXML(doc);
+	}
 }
 //---------------------------------------------------------------------------
 void __fastcall CEQPXML::doSetPPBody(char *pRx)
 {
-    /*
 	TiXmlDocument doc1;
 	doc1.Parse(pRx);
 	TiXmlElement *pRoot1 = doc1.FirstChildElement("Root");
@@ -876,108 +606,98 @@ void __fastcall CEQPXML::doSetPPBody(char *pRx)
 	AnsiString strData = pData1->Attribute("PPID");
 
     char *ParamItem[]={
-        "m_nCols","NULL","A","0","10",               //Layout行數                         //on Paper
-		"m_nRows","NULL","A","0","5",                //Layout列數                         //on Paper
-		"m_dColPitch","mm","A","0","1000",           //Layout行間距
-		"m_dRowPitch","mm","A","0","1000",           //Layout列間距
+		//Loader
+		"m_dLoaderClampMgzPos0", "mm", "A", "0", "1000",				//Loader Pos1
+		"m_dLoaderClampMgzPos1", "mm", "A", "0", "1000",				//Loader Pos2
+		"m_dLoaderClampMgzPos2", "mm", "A", "0", "1000",				//Loader Pos3
+		"m_dMagazinePushPosY", "mm", "A", "0", "1000",					//Loader Push PosY
+		"m_dMagazinePushPosZ", "mm", "A", "0", "1000",					//Loader Push PosZ
+		"m_dMagazinePushPosUpFirstZ", "mm", "A", "0", "1000",			//Loader Push PosZ
+		"m_dLoaderMgzPitch", "mm", "A", "0", "100",						//Loader Magzine Pitch
+		"m_dLoaderUnClampMgzPos0", "mm", "A", "0", "1000",				//Loader Pos4
+		"m_dLoaderUnClampMgzPos1", "mm", "A", "0", "1000",				//Loader Pos5
+		"m_dLoaderUnClampMgzPos2", "mm", "A", "0", "1000",				//Loader Pos6
 
-		"m_dLamHeight0","mm","A","0","200",          //後流道 壓合高度
-		"m_dLamHeight1","mm","A","0","200",          //前流道 壓合高度
-		"m_dLamStop0","mm","A","0","200",            //後流道 接片高度
-		"m_dLamStop1","mm","A","0","200",            //前流道 接片高度
-		"m_dLamGetPos0","mm","A","0","200",          //後流道 出片高度
-		"m_dLamGetPos1","mm","A","0","200",          //前流道 出片高度
-		"m_dLamVacHeight0","mm","A","0","200",       // no used
-		"m_dLamVacHeight1","mm","A","0","200",       // no used
+		"m_dLeftLaneChangerMgzPos", "mm", "A", "0", "1000",				//Left LC Substrate in Pos
+		"m_dLeftLaneChangerSprayPos0", "mm", "A", "0", "1000",			//Left LC Substrate out Rear Pos
+		"m_dLeftLaneChangerSprayPos1", "mm", "A", "0", "1000",			//Left LC Substrate out Front Pos
 
-		"m_dLamTime0","s","A","0","1000",            //後流道 壓合時間                    //on Paper
-		"m_dLamTemp0","c","A","0","250",             //後流道 壓合溫度                    //on Paper
-		"m_dLamPress0","kg","A","0","20",            //後流道 壓合力量                    //on Paper
-		"m_dLamTime1","s","A","0","1000",            //前流道 壓合時間                    //on Paper
-		"m_dLamTemp1","c","A","0","250",             //前流道 壓合溫度                    //on Paper
-		"m_dLamPress1","kg","A","0","20",            //前流道 壓合力量                    //on Paper
+		//Work
+		"m_dSprayReadyPos", "mm", "A", "0", "150",						//Spray Ready Pos
+		"m_dStartSprayPosX0", "mm", "A", "0", "1000",					//Spray Ready Rear PosX
+		"m_dStartSprayPosX1", "mm", "A", "0", "1000",					//Spray Ready Front PosX
+		"m_dStartSprayPosY0", "mm", "A", "0", "1000",					//Spray Ready Rear PosY
+		"m_dStartSprayPosY1", "mm", "A", "0", "1000",					//Spray Ready Front PosY
+		"m_dSprayDistance", "mm", "A", "0", "500",						//Spray Distance
+		"m_dSprayPitch", "mm", "A", "0", "500",							//Spray Y Pitch
+		"m_dSprayPosZ", "mm", "A", "0", "150",							//Spray Ready PosZ
+		"m_nSprayTimes", "NULL", "A", "0", "100",						//Spray times
 
-		"m_dLoadCellPosX0","mm","A","0","1000",      //後流道 測重起始X
-		"m_dLoadCellPosY0","mm","A","0","1000",      //後流道 測重起始Y
-		"m_dLaserUpPosX00","mm","A","0","1000",      //後流道 上模測高X1
-		"m_dLaserUpPosY00","mm","A","0","1000",      //後流道 上模測高Y1
-		"m_dLaserUpPosX01","mm","A","0","1000",      //後流道 上模測高X2
-		"m_dLaserUpPosY01","mm","A","0","1000",      //後流道 上模測高Y2
-		"m_dLaserUpPosX02","mm","A","0","1000",      //後流道 上模測高X3
-		"m_dLaserUpPosY02","mm","A","0","1000",      //後流道 上模測高Y3
-		"m_dLaserUpPosX03","mm","A","0","1000",      //後流道 上模測高X4
-		"m_dLaserUpPosY03","mm","A","0","1000",      //後流道 上模測高Y4
-		"m_dLaserDownPosX0","mm","A","0","1000",     //後流道 下模測高X
-		"m_dLaserDownPosY0","mm","A","0","1000",     //後流道 下模測高Y
-		"m_dLoadCellPosX1","mm","A","0","1000",      //前流道 測重起始X
-		"m_dLoadCellPosY1","mm","A","0","1000",      //前流道 測重起始Y
-		"m_dLaserUpPosX10","mm","A","0","1000",      //前流道 上模測高X1
-		"m_dLaserUpPosY10","mm","A","0","1000",      //前流道 上模測高Y1
-		"m_dLaserUpPosX11","mm","A","0","1000",      //前流道 上模測高X2
-		"m_dLaserUpPosY11","mm","A","0","1000",      //前流道 上模測高Y2
-		"m_dLaserUpPosX12","mm","A","0","1000",      //前流道 上模測高X3
-		"m_dLaserUpPosY12","mm","A","0","1000",      //前流道 上模測高Y3
-		"m_dLaserUpPosX13","mm","A","0","1000",      //前流道 上模測高X4
-		"m_dLaserUpPosY13","mm","A","0","1000",      //前流道 上模測高Y4
-		"m_dLaserDownPosX1","mm","A","0","1000",     //前流道 下模測高X
-		"m_dLaserDownPosY1","mm","A","0","1000",     //前流道 下模測高Y
+		"m_dFluxTankAirPressure", "NULL", "A", "0", "1600",				//Spray Tank Air in
+		"m_dSprayerAirPressure", "NULL", "A", "0", "1600",				//Spray Air out
 
-		"m_nRailOption","NULL","A","0","2",          //流到選擇 0=全開;1=前流道;2=後流道
-		"m_bNotLam","NULL","A","0","1",              //不壓合 0=false;1=true
-		"m_dPressCalRange","%","A","0","100",        //容許誤差(%)
-		"m_dPressCalTime","s","A","0","100",         //穩定時間
-		"m_dLamSecondHeight0","mm","A","0","200",    //後流道 第二段高度
-		"m_dLamSecondHeight1","mm","A","0","200",    //前流道 第二段高度
-		"m_dLamSecondTime0","s","A","0","1000",      //後流道 第二段速度(秒)
-		"m_dLamSecondTime1","s","A","0","1000",      //前流道 第二段速度(秒)
-		"m_dLamThirdHeight0","mm","A","0","200",     //後流道 第三段高度
-		"m_dLamThirdHeight1","mm","A","0","200",     //前流道 第三段高度
-		"m_dLamThirdTime0","s","A","0","1000",       //後流道 第三段速度(秒)
-		"m_dLamThirdTime1","s","A","0","1000",       //前流道 第三段速度(秒)
+		"m_nScaleSprayTime0", "s", "A", "0", "1000",					//Weight Scale time
+		"m_nScaleSprayTimes0", "NULL", "A", "0", "1000",				//Weight Scale times
+		"m_dWeightScaleAlarmUp", "g", "A", "0", "1000",					//Weight Up Limitation
+		"m_dWeightScaleAlarmDown", "g", "A", "0", "1000",				//Weight Down Limitation
 
-		"m_dAutoStopRange","%","A","0","100",        //自動校正 自動停機誤差(%)
-		"m_nAutoInterval","NULL","A","0","1000",     //自動校正 間隔盤數
-		"m_dAutoRunTempRange","c","A","0","1000",    //自動模式 容許溫度
-		"m_dVacDelayTime","s","A","0","1000",        //第二次真空檢測延遲時間
-        "m_dScaleOffsetFront","NULL","A","0","1000", //前流道 壓力補償表
-        "m_dScaleOffsetRear","NULL","A","0","1000",  //後流道 壓力補償表
-        "m_nDownPercent","%","A","0","100",          //緩衝壓力下降(%)
+		"m_nAutoFillTime", "s", "A", "0", "120",						//Auto Fill Flux Duration
 
-        "m_nHeadType","NULL","A","NULL","NULL",      //熱壓頭型式                     //on Paper
-        "m_strHeadScal","NULL","A","NULL","NULL",    //熱壓頭尺寸                     //on Paper
-        "m_strModuleScal","NULL","A","NULL","NULL",  //下模尺寸                       //on Paper
-        "m_nVacummOn","NULL","A","0","1",            //真空開啟                       //on Paper
-        "m_nPressCheck","NULL","A","0","1",          //壓力認證                       //on Paper
-        "m_nDummyCheck","NULL","A","0","1",          //DummyCheck                     //on Paper
-        "m_strModuleNum","NULL","A","NULL","NULL",   //模具編號                       //on Paper
-        "m_strSetupEENum","NULL","A","NULL","NULL",  //SetupEE                        //on Paper
+		"m_dSprayDelayTimeB", "s", "A", "0", "600",						//Delay Time of Before Spray 
+		"m_dSprayDelayTimeA", "s", "A", "0", "600",						//Delay Time of After Spray 
+		"m_dSuccBackDelayTime", "s", "A", "0", "600",					//Delay Time of Vacuum Off
 
-        "m_dBLT","NULL","A","NULL","NULL",           //BLT                   //on Paper
-        "m_dTilt","NULL","A","NULL","NULL",          //Tilt                  //on Paper
-        "m_dGap","NULL","A","NULL","NULL",           //Gap                   //on Paper
-        "m_dKeyTemp00","c","A","0","1000",           //後 手key溫度1         //on Paper
-        "m_dKeyTemp01","c","A","0","1000",           //後 手key溫度2         //on Paper
-        "m_dKeyTemp02","c","A","0","1000",           //後 手key溫度3         //on Paper
-        "m_dKeyTemp10","c","A","0","1000",           //前 手key溫度1         //on Paper
-        "m_dKeyTemp11","c","A","0","1000",           //前 手key溫度2         //on Paper
-        "m_dKeyTemp12","c","A","0","1000",           //前 手key溫度3         //on Paper
-        //以上為產品參數
+		//UnLoader
+		"m_dRightLaneChangerSprayPos0", "mm", "A", "0", "1000",			//Right LC Substrate in Rear Pos
+		"m_dRightLaneChangerSprayPos1", "mm", "A", "0", "1000",			//Right LC Substrate in Front Pos
+		"m_dCCDCheckPosX0", "mm", "A", "0", "1000",						//CCD Check PosX0
+		"m_dCCDCheckPosY0", "mm", "A", "0", "1000",						//CCD Check PosY0
+		"m_dCCDCheckPosX1", "mm", "A", "0", "1000",						//CCD Check PosX1
+		"m_dCCDCheckPosY1", "mm", "A", "0", "1000",						//CCD Check PosY1
+		"m_dCCDCheckPosX2", "mm", "A", "0", "1000",						//CCD Check PosX2
+		"m_dCCDCheckPosY2", "mm", "A", "0", "1000",						//CCD Check PosY2
+		"m_dCCDCheckPosX3", "mm", "A", "0", "1000",						//CCD Check PosX3
+		"m_dCCDCheckPosY3", "mm", "A", "0", "1000",						//CCD Check PosY3
+		"m_dRightLaneChangerDelayTime", "s", "A", "0", "600",			//Delay Time After CCD Check
 
-        //以下為機台變數
-        "LastFilePath","NULL","A","NULL","NULL",     //機台當下 FilePath                          //on Paper
-        "LastFileName","NULL","A","NULL","NULL",     //機台當下 FileName                          //on Paper
+		"m_dConveyerPos0", "mm", "A", "0", "1000",						//Substrate Out Pos 1
+		"m_dConveyerPos1", "mm", "A", "0", "1000",						//Substrate Out Pos 2
+		"m_dConveyerPos2", "mm", "A", "0", "1000",						//Substrate Out Pos 3
+		"m_dConveyerPos3", "mm", "A", "0", "1000",						//Substrate Out Pos 4
+		"m_dConveyerPos4", "mm", "A", "0", "1000",						//Substrate Out Pos 5
+		"m_dNGMagPos", "mm", "A", "0", "1000",							//Substrate Out NG Mag Pos
 
-        "FrontPressCal","kg","A","0","1000",         //機台當下 前流道 量測壓力                   //on Paper
-        "RearPressCal","kg","A","0","1000",          //機台當下 後流道 量測壓力                   //on Paper
+		"m_bIsUseCCDCheckPos0", "NULL", "A", "0", "1",					//Check Box for using CCD Check Pos0
+		"m_bIsUseCCDCheckPos1", "NULL", "A", "0", "1",					//Check Box for using CCD Check Pos1
+		"m_bIsUseCCDCheckPos2", "NULL", "A", "0", "1",					//Check Box for using CCD Check Pos2
+		"m_bIsUseCCDCheckPos3", "NULL", "A", "0", "1",					//Check Box for using CCD Check Pos3
 
-        "FrontDownLaserDiff","mm","A","0","1000",    //機台當下 前流道 下模誤差                   //on Paper
-        "RearDownLaserDiff","mm","A","0","1000",     //機台當下 後流道 下模誤差                   //on Paper
-        "FrontUpperLaserDiff","mm","A","0","1000",   //機台當下 前流道 上模誤差                   //on Paper
-        "RearUpperLaserDiff","mm","A","0","1000",    //機台當下 後流道 上模誤差                   //on Paper
+		//Vision
+		"m_dMarkScore0", "NULL", "A", "0", "255",						//Minimum Score for Black White algorithm
+		"m_nLEDDimmer0", "NULL", "A", "0", "255",						//LED Light Scale
 
-        "m_strLogInENGAccount","NULL","A","NULL","NULL",  //機台當下 登入者
-		"END"};                                      //E:End
+		//CleanSprayerLane
+		"m_dCleanSprayPosX0", "mm", "A", "0", "1000",					//Spray Clean PosX 0
+		"m_dCleanSprayPosY0", "mm", "A", "0", "1000",					//Spray Clean PosY 0
+		"m_dCleanSprayPosX1", "mm", "A", "0", "1000",					//Spray Clean PosX 1
+		"m_dCleanSprayPosY1", "mm", "A", "0", "1000",					//Spray Clean PosY 1
+		"m_dCleanSprayPosX2", "mm", "A", "0", "1000",					//Spray Clean PosX 2
+		"m_dCleanSprayPosY2", "mm", "A", "0", "1000",					//Spray Clean PosY 2
+		"m_dCleanSprayPosX3", "mm", "A", "0", "1000",					//Spray Clean PosX 3
+		"m_dCleanSprayPosY3", "mm", "A", "0", "1000",					//Spray Clean PosY 3
+		"m_dCleanSprayPosZ", "mm", "A", "0", "150",						//Spray Clean PosZ 
+		"m_nCleanSprayTimes", "NULL", "A", "0", "100",					//Clean X Direction times
+		"m_nFullCleanSprayTimes", "NULL", "A", "0", "100",				//Clean Total times
+		"m_dCleanSprayDistance", "mm", "A", "0", "500",					//Clean Distance
+		"m_dSprayerCleanWaterPressure", "NULL", "A", "0", "1600",		//Clean Water out
+		"m_dSprayerCleanAirPressure", "NULL", "A", "0", "1600",			//Clean Air out
 
+		//Option
+		"m_bUseSprayer", "NULL", "A", "0", "1",							//Is Use Sprayer					
+		"m_bUseCCD", "NULL", "A", "0", "1",								//Is Use CCD
+		"m_bIsMagazineUpFirst", "NULL", "A", "0", "1",				    //Is Use MagazineUpFirst
+		//以上為產品參數
+		"END" };                                      //E:End
 
     TiXmlElement *pParam = pData1->FirstChildElement("PARAMETER");
     bool bResult = false;
@@ -996,7 +716,7 @@ void __fastcall CEQPXML::doSetPPBody(char *pRx)
         nX++;
         pParam = pParam->NextSiblingElement("PARAMETER");
     }
-    if (nSize != 87) bResult = false;
+    if (nSize != 72) bResult = false;
 
     if (bResult == true)
     {
@@ -1023,10 +743,11 @@ void __fastcall CEQPXML::doSetPPBody(char *pRx)
             AnsiString strA = strParam.SubString(1, nPos - 1);
             AnsiString strB = strParam.SubString(nPos + 1, strParam.Length() - strA.Length() + 1);
 
-
-            if (strA == "m_strHeadScal")
+			if (false)
+            //if (strA == "m_strHeadScal")
             {
-                //if not in MachineParam then add.
+                /*  Here Build Special Product Parameter 
+				//if not in MachineParam then add.
                 TStringList* strList = SplitString(g_IniFile.m_strHeadScals, "/");
                 bool bIsInputINstrList = false;
                 for (int i=0;i<strList->Count;i++)
@@ -1046,112 +767,8 @@ void __fastcall CEQPXML::doSetPPBody(char *pRx)
                 delete strList;
                 //add in ProductParam
                 pIniFile->WriteString(Product_Section, strA, strB);
+				*/
             }
-            else if (strA == "m_strModuleScal")
-            {
-                //if not in MachineParam then add.
-                TStringList* strList = SplitString(g_IniFile.m_strModuleScals, "/");
-                bool bIsInputINstrList = false;
-                for (int i=0;i<strList->Count;i++)
-                {
-                    if (strB == strList->Strings[i])
-                    {
-                        bIsInputINstrList = true;
-                        break;
-                    }
-                    else bIsInputINstrList = false;
-                }
-                if (bIsInputINstrList == false && strB != "")
-                {
-                    g_IniFile.m_strModuleScals += (strB+"/");
-                    g_IniFile.MachineFile(false);
-                }
-                delete strList;
-                //add in ProductParam
-                pIniFile->WriteString(Product_Section, strA, strB);
-            }
-            else if (strA == "m_dScaleOffsetFront")
-            {
-                TStringList *StrList = SplitString(strB, '/');
-                for (int nx=0;nx<StrList->Count;nx++)
-                {
-                    pIniFile->WriteString("Offset_Table", strA+FormatFloat("0",nx), StrList->Strings[nx]);
-                }
-                delete StrList;
-            }
-            else if (strA == "m_dScaleOffsetRear")
-            {
-                TStringList *StrList = SplitString(strB, '/');
-                for (int nx=0;nx<StrList->Count;nx++)
-                {
-                    pIniFile->WriteString("Offset_Table", strA+FormatFloat("0",nx), StrList->Strings[nx]);
-                }
-                delete StrList;
-            }
-            else if (strA == "m_nHeadType")
-            {
-                if (strB == "SOLID") pIniFile->WriteString(Product_Section, strA, "0");
-                else if (strB == "HOLLOW") pIniFile->WriteString(Product_Section, strA, "1");
-                else pIniFile->WriteString(Product_Section, strA, "0");
-            }
-            else if (strA == "m_nVacummOn")
-            {
-                if (strB == "FAIL") pIniFile->WriteString(Product_Section, strA, "0");
-                else if (strB == "TRUE") pIniFile->WriteString(Product_Section, strA, "1");
-                else pIniFile->WriteString(Product_Section, strA, "0");
-            }
-            else if (strA == "m_nPressCheck")
-            {
-                if (strB == "FAIL") pIniFile->WriteString(Product_Section, strA, "0");
-                else if (strB == "TRUE") pIniFile->WriteString(Product_Section, strA, "1");
-                else pIniFile->WriteString(Product_Section, strA, "0");
-            }
-            else if (strA == "m_nDummyCheck")
-            {
-                if (strB == "FAIL") pIniFile->WriteString(Product_Section, strA, "0");
-                else if (strB == "TRUE") pIniFile->WriteString(Product_Section, strA, "1");
-                else pIniFile->WriteString(Product_Section, strA, "0");
-            }
-            else if (strA == "m_strSetupEENum")
-            {
-                pIniFile->WriteString(Product_Section, strA, "CIM");
-            }
-            else if (strA == "m_dBLT")
-            {
-                TStringList* strInp = SplitString(strB, "/");
-                for (int nX=0;nX<strInp->Count-1;nX++)
-                {
-                    pIniFile->WriteString(Product_Section, "m_dBLT"+IntToStr(nX), strInp->operator [](nX));
-                }
-                delete strInp;
-            }
-            else if (strA == "m_dTilt")
-            {
-                TStringList* strInp = SplitString(strB, "/");
-                for (int nX=0;nX<strInp->Count-1;nX++)
-                {
-                    pIniFile->WriteString(Product_Section, "m_dTilt"+IntToStr(nX), strInp->operator [](nX));
-                }
-                delete strInp;
-            }
-            else if (strA == "m_dGap")
-            {
-                TStringList* strInp = SplitString(strB, "/");
-                for (int nX=0;nX<strInp->Count-1;nX++)
-                {
-                    pIniFile->WriteString(Product_Section, "m_dGap"+IntToStr(nX), strInp->operator [](nX));
-                }
-                delete strInp;
-            }
-            else if (strA == "LastFilePath") {}
-            else if (strA == "LastFileName") {}
-            else if (strA == "FrontPressCal") {}
-            else if (strA == "RearPressCal") {}
-            else if (strA == "FrontDownLaserDiff") {}
-            else if (strA == "RearDownLaserDiff") {}
-            else if (strA == "FrontUpperLaserDiff") {}
-            else if (strA == "RearUpperLaserDiff") {}
-            else if (strA == "m_strLogInENGAccount") {}
             else
             {
                 pIniFile->WriteString(Product_Section, strA, strB);
@@ -1164,7 +781,6 @@ void __fastcall CEQPXML::doSetPPBody(char *pRx)
 	    delete pIniFile;
     }
     else SendXML("SET_PPBODY", "ACK", "ACK", "3");
-    */
 }
 //---------------------------------------------------------------------------
 void __fastcall CEQPXML::SendXML(char *pMSGID, char *pType, char *pTextName, char *pValue, char *pTID)
@@ -1460,4 +1076,5 @@ void __fastcall CEQPXML::SendAlarmMessage(char *pID,char *pText)
     </DEVICE_INFO>	
 </CMD>
 */
+
 

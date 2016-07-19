@@ -25,6 +25,7 @@
 #include "PCIM114GL.H"
 #include "NHB300.h"
 #include "ZEBEXSerial.h"
+#include "RS700HASerial.h"
 #include "EQPXML.h"
 
 extern CPylonCCD *g_pCCD;
@@ -37,11 +38,69 @@ extern PCIM114GL g_MNet;
 extern CNHB300 g_Scale;
 extern TfmManual *fmManual;
 extern CZEBEXSerial g_1DScanner;
+extern RS700HASerial g_2DReader;
 extern CEQPXML g_eqpXML;
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 TfrmMain *frmMain;
+
+//CGetRealTimeValueThread.h start
+//---------------------------------------------------------------------------
+class CGetRealTimeValueThread : public TThread
+{
+private:
+protected:
+	void __fastcall Execute();
+public:
+	__fastcall CGetRealTimeValueThread(bool CreateSuspended);
+};
+
+CGetRealTimeValueThread *g_pGetRealTimeValueThread;
+bool g_bStopGetRealTimeValueThread = false;
+
+//CGetRealTimeValueThread.cpp start
+//---------------------------------------------------------------------------
+__fastcall CGetRealTimeValueThread::CGetRealTimeValueThread(bool CreateSuspended)
+	: TThread(CreateSuspended)
+{
+}
+//---------------------------------------------------------------------------
+void __fastcall CGetRealTimeValueThread::Execute()
+{
+    g_bStopGetRealTimeValueThread = false;
+    AnsiString strtemp1;
+    AnsiString strtemp2;
+
+    while (true)
+	{
+		if (g_bStopGetRealTimeValueThread) break;
+        //--- Query RS232 Value
+
+        //---Query Mag 1D Reader
+        strtemp1 = "Error!";
+        if (g_1DScanner.m_bInitOK) strtemp1 = g_1DScanner.GetData();
+        if (strtemp1 != "Error!")
+        {
+            frmMain->AddList("1D Reader Read: " + strtemp1);
+            g_eqpXML.m_strMagzin1DCode = strtemp1;
+        }
+        ::Sleep(100);
+
+        //---Query Substrate 2D Reader
+        strtemp2 = "Error!";
+        if (g_2DReader.m_bInitOK) strtemp2 = g_2DReader.GetData();
+        if (strtemp2 != "Error!")
+        {
+            frmMain->AddList("2D Reader Read: " + strtemp2);
+            g_eqpXML.m_strSubstrate2DCode = strtemp2;
+        }
+        ::Sleep(100);
+    }
+}
+//---------------------------------------------------------------------------
+
+
 //---------------------------------------------------------------------------
 __fastcall TfrmMain::TfrmMain(TComponent* Owner)
 	: TForm(Owner)
@@ -55,6 +114,8 @@ __fastcall TfrmMain::TfrmMain(TComponent* Owner)
 void __fastcall TfrmMain::FormCreate(TObject *Sender)
 {
 	g_pMainThread = new CMainThread(false);
+
+    g_pGetRealTimeValueThread = new CGetRealTimeValueThread(false);
 
     if (!FileExists("C:\\Product_Data\\")) _mkdir("C:\\Product_Data\\");
 
@@ -479,15 +540,6 @@ void __fastcall TfrmMain::timerMessageTimer(TObject *Sender)
 
     //---Renew CIM signal
     Shape3->Brush->Color = clLime;
-
-    //---Query Mag 1D Reader
-    AnsiString strtemp = "Error!";
-    //if (g_1DScanner.m_bInitOK) strtemp = g_1DScanner.GetData();
-    if (strtemp != "Error!")
-    {
-        AddList(strtemp);
-        g_eqpXML.m_strMagzin1DCode = strtemp;
-    }
 
 	timerMessage->Enabled = true;
 }
@@ -1773,8 +1825,25 @@ void __fastcall TfrmMain::SpeedButton15Click(TObject *Sender)
     g_1DScanner.Initial();
 }
 //---------------------------------------------------------------------------
+void __fastcall TfrmMain::btn1DReadClick(TObject *Sender)
+{
+    g_1DScanner.Disable();
+    ::Sleep(100);
+    g_1DScanner.Sleep();
+    ::Sleep(100);
+    g_1DScanner.Enable();
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::btn2DReadClick(TObject *Sender)
+{
+    g_2DReader.Read();
+}
+//---------------------------------------------------------------------------
 
 #pragma endregion
+
+
+
 
 
 

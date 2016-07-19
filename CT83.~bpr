@@ -11,7 +11,7 @@
       temp\CtkLedControll.obj temp\MainThread.obj temp\fmMachinParam.obj 
       temp\fmProductParam.obj temp\NHB300.obj temp\frmManual.obj 
       temp\ZEBEXSerial.obj temp\EQPXML.obj temp\tinyxml.obj temp\tinystr.obj 
-      temp\XmlWriter.obj temp\tinyxmlerror.obj temp\tinyxmlparser.obj"/>
+      temp\tinyxmlerror.obj temp\tinyxmlparser.obj"/>
     <RESFILES value="CT83.res"/>
     <IDLFILES value=""/>
     <IDLGENFILES value=""/>
@@ -39,7 +39,7 @@
       inetdbbde.bpi inetdbxpress.bpi inetdb.bpi nmfast.bpi webdsnap.bpi 
       bcbie.bpi websnap.bpi soaprtl.bpi dclocx.bpi dbexpress.bpi dbxcds.bpi 
       indy.bpi bcb2kaxserver.bpi"/>
-    <PATHCPP value=".;extern\SerialPort;extern\PylonCCD;extern\General;extern\PICM114GL;extern\EVision;extern\CTKLED;extern\NHB300;extern\ZEBEXSerial;extern\EQPXML;extern\TinyXML;extern\TinyXML;extern\TinyXML;extern\TinyXML;extern\TinyXML"/>
+    <PATHCPP value=".;extern\SerialPort;extern\PylonCCD;extern\General;extern\PICM114GL;extern\EVision;extern\CTKLED;extern\NHB300;extern\ZEBEXSerial;extern\EQPXML;extern\TinyXML;extern\TinyXML;extern\TinyXML;extern\TinyXML"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
@@ -123,7 +123,6 @@
       <FILE FILENAME="extern\EQPXML\EQPXML.cpp" FORMNAME="" UNITNAME="EQPXML" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="extern\TinyXML\tinyxml.cpp" FORMNAME="" UNITNAME="tinyxml" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="extern\TinyXML\tinystr.cpp" FORMNAME="" UNITNAME="tinystr" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
-      <FILE FILENAME="extern\TinyXML\XmlWriter.cpp" FORMNAME="" UNITNAME="XmlWriter.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="extern\TinyXML\tinyxmlerror.cpp" FORMNAME="" UNITNAME="tinyxmlerror.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="extern\TinyXML\tinyxmlparser.cpp" FORMNAME="" UNITNAME="tinyxmlparser.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
   </FILELIST>

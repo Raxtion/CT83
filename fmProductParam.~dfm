@@ -1,6 +1,6 @@
 object frmProductParam: TfrmProductParam
-  Left = 194
-  Top = 123
+  Left = 285
+  Top = 113
   BorderStyle = bsDialog
   Caption = 'frmProductParam'
   ClientHeight = 640
@@ -1308,7 +1308,7 @@ object frmProductParam: TfrmProductParam
         end
         object StaticText121: TStaticText
           Left = 13
-          Top = 60
+          Top = 52
           Width = 108
           Height = 21
           Hint = 'm_dSprayDistance'
@@ -1325,7 +1325,7 @@ object frmProductParam: TfrmProductParam
         end
         object m_dSpraryDelayTimeA: TEdit
           Left = 128
-          Top = 58
+          Top = 50
           Width = 65
           Height = 24
           TabOrder = 4
@@ -1333,7 +1333,7 @@ object frmProductParam: TfrmProductParam
         end
         object StaticText122: TStaticText
           Left = 200
-          Top = 58
+          Top = 50
           Width = 65
           Height = 22
           AutoSize = False
@@ -1345,6 +1345,46 @@ object frmProductParam: TfrmProductParam
           Color = clSkyBlue
           ParentColor = False
           TabOrder = 5
+        end
+        object StaticText123: TStaticText
+          Left = 13
+          Top = 76
+          Width = 108
+          Height = 21
+          Hint = 'm_dSprayDistance'
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #20498#21560' '#24310#36978#26178#38291
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 6
+        end
+        object m_dSuccBackDelayTime: TEdit
+          Left = 128
+          Top = 74
+          Width = 65
+          Height = 24
+          TabOrder = 7
+          Text = 'editAcc1'
+        end
+        object StaticText124: TStaticText
+          Left = 200
+          Top = 74
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #31186
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 8
         end
       end
     end

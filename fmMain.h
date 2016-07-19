@@ -114,14 +114,17 @@ __published:	// IDE-managed Components
     TShape *Shape00;
     TShape *Shape01;
     TShape *Shape02;
+    TServerSocket *ServerCIM;
+    TShape *Shape3;
+    TSpeedButton *SpeedButton16;
+    TTabSheet *TabSheet3;
     TSpeedButton *SpeedButton11;
     TSpeedButton *SpeedButton12;
     TSpeedButton *SpeedButton13;
     TSpeedButton *SpeedButton14;
     TSpeedButton *SpeedButton15;
-    TServerSocket *ServerCIM;
-    TShape *Shape3;
-    TSpeedButton *SpeedButton16;
+    TButton *btn1DRead;
+    TButton *btn2DRead;
         void __fastcall DIDO1Click(TObject *Sender);
         void __fastcall Motor1Click(TObject *Sender);
         void __fastcall Exit1Click(TObject *Sender);
@@ -188,6 +191,8 @@ __published:	// IDE-managed Components
     void __fastcall ServerCIMClientRead(TObject *Sender,
           TCustomWinSocket *Socket);
     void __fastcall SpeedButton16Click(TObject *Sender);
+    void __fastcall btn1DReadClick(TObject *Sender);
+    void __fastcall btn2DReadClick(TObject *Sender);
 private:	// User declarations
         int m_nUserLevel; //0:OP 1:Engineer 2:adm
         C_GetTime tm1MSLogOut;
