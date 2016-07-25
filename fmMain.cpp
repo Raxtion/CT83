@@ -503,7 +503,6 @@ void __fastcall TfrmMain::timerMessageTimer(TObject *Sender)
 		{
 			AnsiString strMsg = g_IniFile.GetErrorString("SYSTEM", g_IniFile.m_nErrorCode);
 			AddList(strMsg);
-
 		}
 	}
 
@@ -715,6 +714,7 @@ void __fastcall TfrmMain::Machine1Click(TObject *Sender)
     DDX_Check(bRead, g_IniFile.m_bUseAutoCleanSprayLane, pMachineDlg->m_bUseAutoCleanSprayLane);
     DDX_Check(bRead, g_IniFile.m_bIsMgzUpFirst, pMachineDlg->m_bIsMgzUpFirst);
     DDX_Check(bRead, g_IniFile.m_bIsUseCIM, pMachineDlg->m_bIsUseCIM);
+    DDX_Check(bRead, g_IniFile.m_bIsUseRightLCPusher, pMachineDlg->m_bIsUseRightLCPusher);
 
     DDX_Radio(bRead, g_IniFile.m_nRailOption, pMachineDlg->m_nRailOption);
 
@@ -827,6 +827,7 @@ void __fastcall TfrmMain::Machine1Click(TObject *Sender)
                 DDX_Check(bRead, g_IniFile.m_bUseAutoCleanSprayLane, pMachineDlg->m_bUseAutoCleanSprayLane);
                 DDX_Check(bRead, g_IniFile.m_bIsMgzUpFirst, pMachineDlg->m_bIsMgzUpFirst);
                 DDX_Check(bRead, g_IniFile.m_bIsUseCIM, pMachineDlg->m_bIsUseCIM);
+                DDX_Check(bRead, g_IniFile.m_bIsUseRightLCPusher, pMachineDlg->m_bIsUseRightLCPusher);
 
                 DDX_Radio(bRead, g_IniFile.m_nRailOption, pMachineDlg->m_nRailOption);
 
@@ -1827,11 +1828,15 @@ void __fastcall TfrmMain::SpeedButton15Click(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmMain::btn1DReadClick(TObject *Sender)
 {
+    btn1DRead->Enabled = false;
     g_1DScanner.Disable();
-    ::Sleep(100);
+    ::Sleep(300);
     g_1DScanner.Sleep();
-    ::Sleep(100);
+    ::Sleep(300);
+    g_1DScanner.Wakeup();
+    ::Sleep(300);
     g_1DScanner.Enable();
+    btn1DRead->Enabled = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmMain::btn2DReadClick(TObject *Sender)

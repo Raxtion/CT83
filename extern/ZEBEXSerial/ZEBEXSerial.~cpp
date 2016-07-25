@@ -32,9 +32,8 @@ AnsiString __fastcall CZEBEXSerial::GetData()
     if(!m_bInitOK) return "Error!";
 
     char strReceive[100]={0};
-    if(ReadData(strReceive,'\n'))
+    if(ReadData(strReceive,'\r\n'))
     {
-
         return (AnsiString)strReceive;
     }
 

@@ -1,6 +1,6 @@
 object frmMachineParam: TfrmMachineParam
-  Left = 270
-  Top = 156
+  Left = 254
+  Top = 33
   Width = 951
   Height = 677
   Caption = 'frmMachineParam'
@@ -1598,6 +1598,15 @@ object frmMachineParam: TfrmMachineParam
     Height = 17
     Caption = #21855#29992'CIM'
     TabOrder = 11
+    OnClick = m_bIsUseCIMClick
+  end
+  object m_bIsUseRightLCPusher: TCheckBox
+    Left = 24
+    Top = 552
+    Width = 129
+    Height = 17
+    Caption = #21855#29992#20986#26009#25512#26751
+    TabOrder = 12
     OnClick = m_bIsUseCIMClick
   end
 end

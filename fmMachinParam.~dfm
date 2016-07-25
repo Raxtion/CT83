@@ -1275,7 +1275,7 @@ object frmMachineParam: TfrmMachineParam
     Top = 336
     Width = 289
     Height = 185
-    Caption = 'Clean Sprayer'
+    Caption = 'Flux '#22132#22615#20301#32622
     TabOrder = 7
     object StaticText76: TStaticText
       Tag = 7

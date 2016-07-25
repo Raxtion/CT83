@@ -1,8 +1,8 @@
 object frmMain: TfrmMain
-  Left = 79
-  Top = 768
-  Width = 1479
-  Height = 818
+  Left = 103
+  Top = 256
+  Width = 1378
+  Height = 780
   Caption = 'frmMain'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,33 +18,33 @@ object frmMain: TfrmMain
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter1: TSplitter
-    Left = 964
+    Left = 863
     Top = 0
     Width = 10
-    Height = 637
+    Height = 599
     Cursor = crHSplit
     Align = alRight
   end
   object Splitter2: TSplitter
     Left = 0
-    Top = 637
-    Width = 1471
+    Top = 599
+    Width = 1370
     Height = 8
     Cursor = crVSplit
     Align = alBottom
   end
   object Panel1: TPanel
-    Left = 974
+    Left = 873
     Top = 0
     Width = 497
-    Height = 637
+    Height = 599
     Align = alRight
     Anchors = [akRight, akBottom]
     Caption = 'Panel1'
     TabOrder = 0
     DesignSize = (
       497
-      637)
+      599)
     object PageControl1: TPageControl
       Left = 1
       Top = 56
@@ -1242,8 +1242,8 @@ object frmMain: TfrmMain
   end
   object listHistory: TListBox
     Left = 0
-    Top = 645
-    Width = 1471
+    Top = 607
+    Width = 1370
     Height = 119
     Align = alBottom
     Color = clBlack
@@ -1259,14 +1259,14 @@ object frmMain: TfrmMain
   object Panel2: TPanel
     Left = 0
     Top = 0
-    Width = 964
-    Height = 637
+    Width = 863
+    Height = 599
     Align = alClient
     TabOrder = 2
     object Splitter3: TSplitter
       Left = 1
-      Top = 458
-      Width = 962
+      Top = 420
+      Width = 861
       Height = 10
       Cursor = crVSplit
       Align = alBottom
@@ -1274,8 +1274,8 @@ object frmMain: TfrmMain
     object ScrollBox1: TScrollBox
       Left = 1
       Top = 1
-      Width = 962
-      Height = 457
+      Width = 861
+      Height = 419
       Align = alClient
       TabOrder = 0
       object ImagePaintBox: TPaintBox
@@ -1289,8 +1289,8 @@ object frmMain: TfrmMain
     end
     object PageControl2: TPageControl
       Left = 1
-      Top = 468
-      Width = 962
+      Top = 430
+      Width = 861
       Height = 168
       ActivePage = TabSheet4
       Align = alBottom

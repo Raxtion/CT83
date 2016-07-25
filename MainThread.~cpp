@@ -493,6 +493,8 @@ bool __fastcall CMainThread::InitialMachine(int &nThreadIndex)
 		g_Motion.SetAO(0, g_IniFile.m_dFluxTankAirPressure);
 		g_Motion.SetAO(1, g_IniFile.m_dSprayerAirPressure);
 
+		m_listPickLane.clear();
+
 		m_bConveyerMagazineReady = false;
 		m_bConveyerMagazineOutReady = false;
 		m_bLoaderClamperReady = false;
@@ -642,7 +644,7 @@ void __fastcall CMainThread::CheckAlarm()
 	else if (g_Motion.GetAxisStatus(Axis_Const::RLC, Axis_Const::ALM)) g_IniFile.m_nErrorCode = 209;
 
 	if (!g_DIO.ReadDIBit(DI::MainAir)) g_IniFile.m_nErrorCode = 6; 
-	//if(!g_DIO.ReadDIBit(DI::SafetyDoor) ) g_IniFile.m_nErrorCode=7; //debug
+	if (!g_DIO.ReadDIBit(DI::SafetyDoor)) g_IniFile.m_nErrorCode = 7;
 }
 //---------------------------------------------------------------------------
 bool __fastcall CMainThread::CheckRelMoveAlarm(unsigned short nAxis, bool bIsForward, double dMoveDistance)
@@ -1362,7 +1364,7 @@ void __fastcall CMainThread::doSprayerLane(int &nThreadIndex, bool bFront)
 	case 11:
         if (!g_Motion.GetDI(iLaneSprayIn) && g_Motion.GetDI(iLaneSprayInp))
 		{
-			p_tm1MS->timeStart(300);
+			p_tm1MS->timeStart(100); 
 			nThreadIndex++;
 		}
         else if (!g_Motion.GetDO(oLaneSprayMotor))
@@ -1382,17 +1384,18 @@ void __fastcall CMainThread::doSprayerLane(int &nThreadIndex, bool bFront)
 			if (bFront) m_arraybShape[1] = true;
 			else m_arraybShape[2] = true;
 			
+			bFront ? m_listPickLane.push_back("FRONT") : m_listPickLane.push_back("REAR");
+
 			g_Motion.SetDO(DO::LeftLaneChangerMotor, false);
 			g_Motion.SetDO(oLaneSprayMotor, false);
 			g_Motion.SetDO(DO::LeftLaneChangerStopper, true);
-			p_tm1MS->timeStart(1000);
+			//p_tm1MS->timeStart(1000); //for UPH
 			nThreadIndex++;
 		}
 		break;
 	case 13:
 		if (p_tm1MS->timeUp())
-		{
-            //Move to Top for UPH
+		{   
 			m_bLeftLaneChangerReady = false;
 			m_bIsLeftLaneChangerLock = false;
 
@@ -1507,22 +1510,48 @@ void __fastcall CMainThread::doCCDBufferLane(int &nThreadIndex)
 		else if (g_Motion.GetDI(DI::RightLaneChangerIn)) g_IniFile.m_nErrorCode = 702;
 		else if (g_Motion.GetDI(DI::RightLaneChangerOut)) g_IniFile.m_nErrorCode = 703;
 		else if (!g_Motion.GetDI(DI::RightPusherBwd)) g_IniFile.m_nErrorCode = 704;
-		else if (n_bLaneSprayReady[1] || n_bLaneSprayReady[0])
+		else if (g_Motion.IsLastPosDone(Axis_Const::RLC))
 		{
-			if (n_bLaneSprayReady[1]) bFront = true;
-			else if (n_bLaneSprayReady[0]) bFront = false;
+			if (m_listPickLane.size()>0)
+			{
+				if ((m_listPickLane.front() == "FRONT")) bFront = true;
+				else if ((m_listPickLane.front() == "REAR")) bFront = false;
 
-			g_Motion.AbsMove(Axis_Const::RLC, g_IniFile.m_dRightLaneChangerSprayPos[bFront]);
-
-			nThreadIndex++;
+				g_Motion.AbsMove(Axis_Const::RLC, g_IniFile.m_dRightLaneChangerSprayPos[bFront]);
+				nThreadIndex++;
+			}
+			else
+			{
+				bFront = true;
+				g_Motion.AbsMove(Axis_Const::RLC, g_IniFile.m_dRightLaneChangerSprayPos[bFront]);
+				nThreadIndex++;
+			}
 		}
 		break;
 	case 1:
-		if (!g_Motion.GetDI(DI::RightLaneChangerIn) && g_Motion.GetDI(DI::RightLaneChangerInp) && !g_Motion.GetDI(DI::RearLaneSprayOut))
+		if (g_Motion.GetDI(DI::FrontLaneSprayOut)) g_IniFile.m_nErrorCode = 700;
+		else if (g_Motion.GetDI(DI::RearLaneSprayOut)) g_IniFile.m_nErrorCode = 701;
+		else if (g_Motion.GetDI(DI::RightLaneChangerIn)) g_IniFile.m_nErrorCode = 702;
+		else if (g_Motion.GetDI(DI::RightLaneChangerOut)) g_IniFile.m_nErrorCode = 703;
+		else if (!g_Motion.GetDI(DI::RightPusherBwd)) g_IniFile.m_nErrorCode = 704;
+		else if ((n_bLaneSprayReady[1] || n_bLaneSprayReady[0]) && g_Motion.IsLastPosDone(Axis_Const::RLC))
+		{
+			if (m_listPickLane.size() > 0)
+			{
+				if (n_bLaneSprayReady[1] && (m_listPickLane.front() == "FRONT")) bFront = true;
+				else if (n_bLaneSprayReady[0] && (m_listPickLane.front() == "REAR")) bFront = false;
+
+				m_listPickLane.pop_front();
+
+				g_Motion.AbsMove(Axis_Const::RLC, g_IniFile.m_dRightLaneChangerSprayPos[bFront]);
+
+				nThreadIndex++;
+			}
+		}
+		else if (!g_Motion.GetDI(DI::RightLaneChangerIn) && g_Motion.GetDI(DI::RightLaneChangerInp) && !g_Motion.GetDI(DI::RearLaneSprayOut))
 		{
 			nThreadIndex = nTagReadyWork;
 		}
-		else nThreadIndex++;
 		break;
 	case 2:
 		if (g_Motion.IsLastPosDone(Axis_Const::RLC))
@@ -1717,13 +1746,18 @@ void __fastcall CMainThread::doCCDBufferLane(int &nThreadIndex)
 	case 17:
 		if (tm1MS.timeUp())
 		{
-			g_Motion.SetDO(DO::RightLaneChangerPusher, true);
+			if (g_IniFile.m_bIsUseRightLCPusher) g_Motion.SetDO(DO::RightLaneChangerPusher, true);
 			tm1MS.timeStart(5000);
 			nThreadIndex++;
 		}
 		break;
 	case 18:
-		if (g_Motion.GetDI(DI::RightPusherFwd))
+		if (!g_IniFile.m_bIsUseRightLCPusher)
+		{
+			tm1MS.timeStart(5000);
+			nThreadIndex++;
+		}
+		else if (g_Motion.GetDI(DI::RightPusherFwd))
 		{
 			g_Motion.SetDO(DO::RightLaneChangerPusher, false);
 			tm1MS.timeStart(5000);
@@ -2114,7 +2148,7 @@ void __fastcall CMainThread::doSBTSpray(int &nThreadIndex, bool bFront)
 		if (g_Motion.IsPosDone(Axis_Const::SPZ, g_IniFile.m_dSprayPosZ))
 		{
 			g_Motion.SetDO(DO::SprayerFluxOn, true);
-			//g_Motion.SetDO(DO::SprayerAirOn, true);                                      //PlayHere
+			g_Motion.SetDO(DO::SprayerAirOn, true);
 
 			tm1MS.timeStart(g_IniFile.m_dSpraryDelayTimeB * 1000);
 			nThreadIndex++;
@@ -2734,6 +2768,11 @@ void __fastcall CMainThread::doUnLoadClamper(int &nThreadIndex)
 		nThreadIndex = 0;
 		break;
 	}
+
+    if (g_IniFile.m_nErrorCode > 0)
+    {
+        m_bStartUnLoadClamper = false;
+    }
 }
 //---------------------------------------------------------------------------
 void __fastcall CMainThread::doReLoadClamper(int &nThreadIndex)
@@ -2846,8 +2885,16 @@ void __fastcall CMainThread::doReLoadClamper(int &nThreadIndex)
 		nThreadIndex = 0;
 		break;
 	}
+
+    if (g_IniFile.m_nErrorCode > 0)
+    {
+        m_bStartReLoadClamper = false;
+    }
 }
 #pragma endregion
+
+
+
 
 
 

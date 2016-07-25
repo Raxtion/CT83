@@ -83,6 +83,7 @@ void __fastcall CIniFile::MachineFile(bool bRead)
   DDXFile_Bool(bRead,pIniFile,Machine_Section,"m_bIsMgzUpFirst",m_bIsMgzUpFirst,false);
   DDXFile_Bool(bRead,pIniFile,Machine_Section,"m_bStopLoader",m_bStopLoader,false);
   DDXFile_Bool(bRead,pIniFile,Machine_Section,"m_bIsUseCIM",m_bIsUseCIM,true);
+  DDXFile_Bool(bRead,pIniFile,Machine_Section,"m_bIsUseRightLCPusher",m_bIsUseRightLCPusher,true);
 
   DDXFile_Int(bRead,pIniFile,Machine_Section,"m_nRailOption",m_nRailOption);
   delete pIniFile;

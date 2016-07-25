@@ -10,7 +10,7 @@
 
 #pragma package(smart_init)
 
-CZEBEXSerial g_1DScanner(1);
+CZEBEXSerial g_1DScanner(3);
 //---------------------------------------------------------------------------
 __fastcall CZEBEXSerial::CZEBEXSerial(int nPort)
 {
@@ -32,7 +32,7 @@ AnsiString __fastcall CZEBEXSerial::GetData()
     if(!m_bInitOK) return "Error!";
 
     char strReceive[100]={0};
-    if(ReadData(strReceive,'\n'))
+    if(ReadData(strReceive,'\r\n'))
     {
         return (AnsiString)strReceive;
     }

@@ -34,6 +34,7 @@ public:
         std::list<AnsiString> m_listLog;
         std::list<AnsiString> m_listTX;     //for all serial command
         std::list<AnsiString> m_listCCDRX;
+		std::list<AnsiString> m_listPickLane;
 		std::vector<double> m_listScaleWeight;
 
         int nThreadIndex[MAX_PROCESS];		//0:Inti 19:PreAuto

@@ -10,7 +10,7 @@
 
 #pragma package(smart_init)
 
-RS700HASerial g_2DReader(2);
+RS700HASerial g_2DReader(4);
 //---------------------------------------------------------------------------
 __fastcall RS700HASerial::RS700HASerial(int nPort)
 {
@@ -32,7 +32,7 @@ AnsiString __fastcall RS700HASerial::GetData()
     if(!m_bInitOK) return "Error!";
 
     char strReceive[100]={0};
-    if(ReadData(strReceive,'\n'))
+    if(ReadData(strReceive,'\r\n'))
     {
         return (AnsiString)strReceive;
     }
