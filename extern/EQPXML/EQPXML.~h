@@ -53,6 +53,7 @@ public:
 	AnsiString m_strSubstrate2DCode;
 	AnsiString m_strCurrentSchedule;
     AnsiString m_strMagzin1DCode;
+    AnsiString m_strMagzin1DCodeRX;                                                                //Always=""; OK GO="Y"; Not to GO="N" 
     std::list<AnsiString> m_liststrForderName;
     std::list<AnsiString> m_liststrFileName;
     AnsiString m_strBuffer;

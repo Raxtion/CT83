@@ -125,6 +125,7 @@ __published:	// IDE-managed Components
     TSpeedButton *SpeedButton15;
     TButton *btn1DRead;
     TButton *btn2DRead;
+    TLabel *labFluxLifetime;
         void __fastcall DIDO1Click(TObject *Sender);
         void __fastcall Motor1Click(TObject *Sender);
         void __fastcall Exit1Click(TObject *Sender);

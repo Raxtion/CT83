@@ -147,6 +147,7 @@ __published:	// IDE-managed Components
     TCheckBox *m_bUseAutoCleanSprayLane;
     TCheckBox *m_bIsUseCIM;
     TCheckBox *m_bIsUseRightLCPusher;
+    TCheckBox *m_bIsResetFluxLifetime;
         void __fastcall StaticText5Click(TObject *Sender);
     void __fastcall m_bIsMgzUpFirsClick(TObject *Sender);
     void __fastcall m_bIsUseCIMClick(TObject *Sender);

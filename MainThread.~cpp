@@ -53,6 +53,7 @@ __fastcall CMainThread::CMainThread(bool CreateSuspended)
     m_bIsSprayerWeightAlarm = false;
     m_bIsStopLoader = false;
     m_bIsNeedPreMoveSprayer = false;
+    m_bIsFluxLifetimeTimeUp = false;
 
     m_bIsStartProcessbyDIO = false;
 	m_bIsStartProcessbyCIM = false;
@@ -68,6 +69,8 @@ __fastcall CMainThread::CMainThread(bool CreateSuspended)
     {
         m_arraybShape[nX] = false;
     }
+
+    tm1MSFluxLifeTime.timeDevStart();
 }
 //---------------------------------------------------------------------------
 void __fastcall CMainThread::Execute()
@@ -271,8 +274,8 @@ void __fastcall CMainThread::Execute()
 			case 0:                                                                              //Offline
 				if ((g_DIO.ReadDIBit(DI::StartBtn) && m_bStartAgain) || m_bSoftStart)
 				{
-					m_listLog.push_back("機台啟動");
 					m_bIsStartProcessbyDIO = true;
+                    m_listLog.push_back("機台啟動");
 					m_bStartAgain = false;
                     m_bSoftStart = false;
 				}
@@ -280,8 +283,8 @@ void __fastcall CMainThread::Execute()
 			case 1:                                                                              //online/local
 				if ((g_DIO.ReadDIBit(DI::StartBtn) && m_bStartAgain) || m_bSoftStart)
                 {
-					//g_eqpXML.SendEventReport("115");
-					m_listLog.push_back("發送啟動請求，等待CIM回應...");
+                    m_bIsStartProcessbyDIO = true;
+					m_listLog.push_back("機台啟動");
 					m_bStartAgain = false;
                     m_bSoftStart = false;
                 }
@@ -289,7 +292,8 @@ void __fastcall CMainThread::Execute()
 			case 2:                                                                             //online/remote
 				if ((g_DIO.ReadDIBit(DI::StartBtn) && m_bStartAgain) || m_bSoftStart)
                 {
-					m_listLog.push_back("CIM online/remote啟動無效...");
+                    m_bIsStartProcessbyDIO = true;
+					m_listLog.push_back("機台啟動");
 					m_bStartAgain = false;
                     m_bSoftStart = false;
                 }
@@ -301,7 +305,6 @@ void __fastcall CMainThread::Execute()
 			{
                 if (m_bIsStartProcessbyDIO == true) m_listLog.push_back("[Execute]由DIO啟動");
                 else if (m_bIsStartProcessbyCIM == true) m_listLog.push_back("[Execute]由CIM啟動");
-                else if (m_bIsStartProcessbyCIM == true) m_listLog.push_back("[Execute]由軟體啟動");
 
 				bPreAuto = true;
 				nThreadIndex[19] = 0;
@@ -518,6 +521,7 @@ bool __fastcall CMainThread::InitialMachine(int &nThreadIndex)
 		m_bStartReLoadClamper = false;
 		m_bStartUnLoadClamper = false;
 
+		m_listReaderTX.push_back("SHUTDOWN_1D_CODE");
         //ShowNow
         for (int nX = 0; nX<4; nX++)
 		{
@@ -616,6 +620,7 @@ bool __fastcall CMainThread::InitialLoader(int &nThreadIndex)
 		m_bConveyerMagazineOutReady = false;
 		m_bLoaderClamperReady = false;
 
+		m_listReaderTX.push_back("SHUTDOWN_1D_CODE");
 		m_listLog.push_back("Loader復歸完成.");
 		nThreadIndex++;
 		break;
@@ -643,7 +648,8 @@ void __fastcall CMainThread::CheckAlarm()
 	else if (g_Motion.GetAxisStatus(Axis_Const::CDX, Axis_Const::ALM)) g_IniFile.m_nErrorCode = 208;
 	else if (g_Motion.GetAxisStatus(Axis_Const::RLC, Axis_Const::ALM)) g_IniFile.m_nErrorCode = 209;
 
-	if (!g_DIO.ReadDIBit(DI::MainAir)) g_IniFile.m_nErrorCode = 6; 
+    if (m_bIsFluxLifetimeTimeUp) g_IniFile.m_nErrorCode = 8;
+	if (!g_DIO.ReadDIBit(DI::MainAir)) g_IniFile.m_nErrorCode = 6;
 	if (!g_DIO.ReadDIBit(DI::SafetyDoor)) g_IniFile.m_nErrorCode = 7;
 }
 //---------------------------------------------------------------------------
@@ -887,8 +893,11 @@ void __fastcall CMainThread::doLoadConveyerDown(int &nThreadIndex)
 //---------------------------------------------------------------------------
 void __fastcall CMainThread::doLoadClamper(int &nThreadIndex)
 {
-	const int nTagPush = 1000;
+	const int nTagReRead1D = 1000;
+    const int nTagClampMag = 2000;
+	const int nTagPush = 3000;
 
+	
 	static C_GetTime tm1MS(EX_SCALE::TIME_1MS, false);
 	static int nMgzIndex = 0;
 
@@ -910,21 +919,64 @@ void __fastcall CMainThread::doLoadClamper(int &nThreadIndex)
 		}
 		break;
 	case 2:
+	case nTagReRead1D: nThreadIndex = 2;
 		if (m_bConveyerMagazineReady && g_Motion.IsLastPosDone(Axis_Const::LDZ))
 		{
+            if (g_eqpXML.m_CIMStatus.ToInt() < 2)
+            {
+                nThreadIndex = nTagClampMag;
+            }
+            else
+            {
+			    m_list1DReaderRX.clear();
+			    m_listReaderTX.push_back("READ_1D_CODE");
+
+			    tm1MS.timeStart(10000);
+			    nThreadIndex++;
+            }
+		}
+		break;
+	case 3:
+		if (m_list1DReaderRX.size()>0)
+		{
+			if (m_list1DReaderRX.back() == "READ_1D_CODE_OK")
+			{
+				tm1MS.timeStart(5000);
+				nThreadIndex++;
+			}
+			else
+			{
+				g_IniFile.m_nErrorCode = 802;
+				nThreadIndex--;
+			}
+			m_list1DReaderRX.clear();
+		}
+		else if (tm1MS.timeUp()) g_IniFile.m_nErrorCode = 801;
+		break;
+	case 4:
+    case nTagClampMag:nThreadIndex = 4;
+		if (g_eqpXML.m_strMagzin1DCodeRX == "Y" || g_eqpXML.m_CIMStatus.ToInt() < 2)
+		{
+            g_eqpXML.m_strMagzin1DCodeRX = "";
+			m_listReaderTX.push_back("SHUTDOWN_1D_CODE");
 			m_listLog.push_back("Start Clamp Magazin");
 			g_Motion.AbsMove(Axis_Const::LDY, g_IniFile.m_dLoaderClampMgzPos[1]);
 			nThreadIndex++;
 		}
+		else if (tm1MS.timeUp())
+		{
+			g_IniFile.m_nErrorCode = 803;
+			nThreadIndex = nTagReRead1D;
+		}
 		break;
-	case 3:
+	case 5:
 		if (g_Motion.IsLastPosDone(Axis_Const::LDY))
 		{
 			g_Motion.AbsMove(Axis_Const::LDZ, g_IniFile.m_dLoaderClampMgzPos[2]);
 			nThreadIndex++;
 		}
 		break;
-	case 4:
+	case 6:
 		if (g_Motion.IsLastPosDone(Axis_Const::LDZ))
 		{
 			g_Motion.SetDO(DO::LoaderClamper, false);        //Clamp sensor reversed
@@ -932,7 +984,7 @@ void __fastcall CMainThread::doLoadClamper(int &nThreadIndex)
 			nThreadIndex++;
 		}
 		break;
-	case 5:
+	case 7:
         /* Error much
 		if (g_Motion.GetDI(DI::LoaderClamperDown))
 		{
@@ -946,7 +998,7 @@ void __fastcall CMainThread::doLoadClamper(int &nThreadIndex)
 			nThreadIndex++;
 		}
 		break;
-	case 6:
+	case 8:
 		if (!g_Motion.GetDI(DI::LoaderClamperMgzExist)) g_IniFile.m_nErrorCode = 407;
 		else
 		{
@@ -954,7 +1006,7 @@ void __fastcall CMainThread::doLoadClamper(int &nThreadIndex)
 			nThreadIndex++;
 		}
 		break;
-	case 7:
+	case 9:
 		if (g_Motion.IsLastPosDone(Axis_Const::LDZ))
 		{
 			m_bConveyerMagazineReady = false;
@@ -963,8 +1015,8 @@ void __fastcall CMainThread::doLoadClamper(int &nThreadIndex)
 			nThreadIndex++;
 		}
 		break;
-	case 8:
-	case nTagPush:nThreadIndex = 8;
+	case 10:
+	case nTagPush:nThreadIndex = 10;
 		if (g_Motion.IsLastPosDone(Axis_Const::LDY))
 		{
 			if (!g_Motion.GetDI(DI::LeftLaneChangerIn))
@@ -979,14 +1031,14 @@ void __fastcall CMainThread::doLoadClamper(int &nThreadIndex)
 			else g_IniFile.m_nErrorCode = 302;
 		}
 		break;
-	case 9:
+	case 11:
 		if (g_Motion.IsLastPosDone(Axis_Const::LDZ))
 		{
 			m_bLoaderClamperReady = true;
 			nThreadIndex++;
 		}
 		break;
-	case 10:
+	case 12:
         if (!m_bLoaderClamperReady && !g_Motion.GetDI(DI::LeftLaneChangerIn))
         {
             g_Motion.SetDO(DO::LoaderPusher, false);
@@ -994,7 +1046,7 @@ void __fastcall CMainThread::doLoadClamper(int &nThreadIndex)
             nThreadIndex++;
 		}
 		break;
-	case 11:
+	case 13:
 		if (g_Motion.GetDI(DI::LoaderPusherBwd))
 		{
 			nMgzIndex++;
@@ -1009,17 +1061,17 @@ void __fastcall CMainThread::doLoadClamper(int &nThreadIndex)
 		}
 		else if (tm1MS.timeUp()) g_IniFile.m_nErrorCode = 414;
 		break;
-	case 12:
+	case 14:
 		g_Motion.AbsMove(Axis_Const::LDZ, g_IniFile.m_dLoaderUnClampMgzPos[0]);
 		nThreadIndex++;
         break;
-	case 13:
+	case 15:
 		if (g_Motion.IsLastPosDone(Axis_Const::LDZ))
 		{
 			nThreadIndex++;
 		}
 		break;
-	case 14:
+	case 16:
 		if (m_bConveyerMagazineOutReady)
 		{
 			if (g_Motion.GetDI(DI::LoaderOutMgzIn)) m_bConveyerMagazineOutReady = false;
@@ -1030,7 +1082,7 @@ void __fastcall CMainThread::doLoadClamper(int &nThreadIndex)
 			}
 		}
 		break;
-	case 15:
+	case 17:
 		if (g_Motion.IsLastPosDone(Axis_Const::LDY))
 		{
 			g_Motion.SetDO(DO::LoaderClamper, true);            //un-Clamp
@@ -1038,7 +1090,7 @@ void __fastcall CMainThread::doLoadClamper(int &nThreadIndex)
 			nThreadIndex++;
 		}
 		break;
-	case 16:
+	case 18:
 		if (g_Motion.GetDI(DI::LoaderClamperUp))
 		{
 			g_Motion.AbsMove(Axis_Const::LDZ, g_IniFile.m_dLoaderUnClampMgzPos[2]);
@@ -1046,14 +1098,14 @@ void __fastcall CMainThread::doLoadClamper(int &nThreadIndex)
 		}
 		else if (tm1MS.timeUp()) g_IniFile.m_nErrorCode = 405;
 		break;
-	case 17:
+	case 19:
 		if (g_Motion.IsLastPosDone(Axis_Const::LDZ))
 		{
 			g_Motion.AbsMove(Axis_Const::LDY, 0.0);
 			nThreadIndex++;
 		}
 		break;
-	case 18:
+	case 20:
 		if (g_Motion.IsLastPosDone(Axis_Const::LDY))
 		{
 			m_bConveyerMagazineOutReady = false;
@@ -1520,12 +1572,6 @@ void __fastcall CMainThread::doCCDBufferLane(int &nThreadIndex)
 				g_Motion.AbsMove(Axis_Const::RLC, g_IniFile.m_dRightLaneChangerSprayPos[bFront]);
 				nThreadIndex++;
 			}
-			else
-			{
-				bFront = true;
-				g_Motion.AbsMove(Axis_Const::RLC, g_IniFile.m_dRightLaneChangerSprayPos[bFront]);
-				nThreadIndex++;
-			}
 		}
 		break;
 	case 1:
@@ -1939,6 +1985,7 @@ void __fastcall CMainThread::doFillFlux(int &nThreadIndex)
             g_Motion.SetDO(DO::FluxTankFluxIn, false);
             g_Motion.SetDO(DO::FluxTankVacuumIn, false);
             g_Motion.SetDO(DO::FluxTankVacOn, false);
+            tm1MSFluxLifeTime.timeDevStart();
 			nThreadIndex++;
 		}
 		break;
@@ -2892,6 +2939,7 @@ void __fastcall CMainThread::doReLoadClamper(int &nThreadIndex)
     }
 }
 #pragma endregion
+
 
 
 

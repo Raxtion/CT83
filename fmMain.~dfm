@@ -1,8 +1,8 @@
 object frmMain: TfrmMain
-  Left = 128
-  Top = 75
+  Left = 105
+  Top = 722
   Width = 1378
-  Height = 780
+  Height = 773
   Caption = 'frmMain'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -21,13 +21,13 @@ object frmMain: TfrmMain
     Left = 863
     Top = 0
     Width = 10
-    Height = 599
+    Height = 592
     Cursor = crHSplit
     Align = alRight
   end
   object Splitter2: TSplitter
     Left = 0
-    Top = 599
+    Top = 592
     Width = 1370
     Height = 8
     Cursor = crVSplit
@@ -37,19 +37,19 @@ object frmMain: TfrmMain
     Left = 873
     Top = 0
     Width = 497
-    Height = 599
+    Height = 592
     Align = alRight
     Anchors = [akRight, akBottom]
     Caption = 'Panel1'
     TabOrder = 0
     DesignSize = (
       497
-      599)
+      592)
     object PageControl1: TPageControl
       Left = 1
       Top = 56
       Width = 495
-      Height = 1252
+      Height = 1245
       ActivePage = TabSheet2
       Anchors = [akLeft, akTop, akRight, akBottom]
       TabIndex = 1
@@ -614,6 +614,13 @@ object frmMain: TfrmMain
           Height = 57
           Caption = #32066#27490' '#28165#27927#21205#20316#28204#35430
           OnClick = SpeedButton16Click
+        end
+        object labFluxLifetime: TLabel
+          Left = 32
+          Top = 8
+          Width = 71
+          Height = 13
+          Caption = 'Flux Life Time: '
         end
         object GroupBox3: TGroupBox
           Left = 32
@@ -1242,7 +1249,7 @@ object frmMain: TfrmMain
   end
   object listHistory: TListBox
     Left = 0
-    Top = 607
+    Top = 600
     Width = 1370
     Height = 119
     Align = alBottom
@@ -1260,12 +1267,12 @@ object frmMain: TfrmMain
     Left = 0
     Top = 0
     Width = 863
-    Height = 599
+    Height = 592
     Align = alClient
     TabOrder = 2
     object Splitter3: TSplitter
       Left = 1
-      Top = 420
+      Top = 413
       Width = 861
       Height = 10
       Cursor = crVSplit
@@ -1275,7 +1282,7 @@ object frmMain: TfrmMain
       Left = 1
       Top = 1
       Width = 861
-      Height = 419
+      Height = 412
       Align = alClient
       TabOrder = 0
       object ImagePaintBox: TPaintBox
@@ -1289,7 +1296,7 @@ object frmMain: TfrmMain
     end
     object PageControl2: TPageControl
       Left = 1
-      Top = 430
+      Top = 423
       Width = 861
       Height = 168
       ActivePage = TabSheet4

@@ -6,6 +6,7 @@
 #include <Classes.hpp>
 #include <list>
 #include <vector>
+#include "C_GetTime.h"
 #define MAX_PROCESS 20
 
 #define InitialMachine_Index 0
@@ -31,9 +32,14 @@ private:
 protected:
         void __fastcall Execute();
 public:
+        C_GetTime tm1MSFluxLifeTime;
+
         std::list<AnsiString> m_listLog;
         std::list<AnsiString> m_listTX;     //for all serial command
         std::list<AnsiString> m_listCCDRX;
+		std::list<AnsiString> m_listReaderTX;
+		std::list<AnsiString> m_list1DReaderRX;
+		std::list<AnsiString> m_list2DReaderRX;
 		std::list<AnsiString> m_listPickLane;
 		std::vector<double> m_listScaleWeight;
 
@@ -49,6 +55,7 @@ public:
         bool m_bIsSprayerWeightAlarm;
         bool m_bIsStopLoader;
         bool m_bIsNeedPreMoveSprayer;
+        bool m_bIsFluxLifetimeTimeUp;
 
         //Thread HandShake
         bool m_bConveyerMagazineReady;

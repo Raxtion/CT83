@@ -68,14 +68,49 @@ __fastcall CGetRealTimeValueThread::CGetRealTimeValueThread(bool CreateSuspended
 //---------------------------------------------------------------------------
 void __fastcall CGetRealTimeValueThread::Execute()
 {
+    static C_GetTime tm1MS(EX_SCALE::TIME_1MS, false);
+	static C_GetTime tm2MS(EX_SCALE::TIME_1MS, false);
+
     g_bStopGetRealTimeValueThread = false;
     AnsiString strtemp1;
     AnsiString strtemp2;
+	AnsiString strCommand;
+	bool btmRUN = false;
 
     while (true)
 	{
 		if (g_bStopGetRealTimeValueThread) break;
         //--- Query RS232 Value
+
+        if (g_pMainThread->m_listReaderTX.size()>0)
+	    {
+		    strCommand = g_pMainThread->m_listReaderTX.front();
+		    g_pMainThread->m_listReaderTX.pop_front();
+
+		    if (strCommand == "READ_1D_CODE")
+		    {
+			    g_1DScanner.Wakeup();
+			    ::Sleep(300);
+			    g_1DScanner.Enable();
+			    tm1MS.timeStart(5000);
+			    btmRUN = true;
+		    }
+		    if (strCommand == "SHUTDOWN_1D_CODE")
+		    {
+			    g_1DScanner.Disable();
+			    ::Sleep(300);
+			    g_1DScanner.Sleep();
+			    g_pMainThread->m_list1DReaderRX.push_back("SHUTDOWN_1D_CODE_OK");
+		    }
+        }
+        if (btmRUN == true) // timeout process
+        {
+            if (tm1MS.timeUp() && g_pMainThread->m_list1DReaderRX.size())
+            {
+                g_pMainThread->m_list1DReaderRX.push_back("READ_1D_CODE_NG");
+                btmRUN = false;
+            }
+        }
 
         //---Query Mag 1D Reader
         strtemp1 = "Error!";
@@ -84,6 +119,9 @@ void __fastcall CGetRealTimeValueThread::Execute()
         {
             frmMain->AddList("1D Reader Read: " + strtemp1);
             g_eqpXML.m_strMagzin1DCode = strtemp1;
+			g_eqpXML.SendEventReport("125");
+			g_pMainThread->m_list1DReaderRX.push_back("READ_1D_CODE_OK");
+			btmRUN = false;
         }
         ::Sleep(100);
 
@@ -107,6 +145,8 @@ __fastcall TfrmMain::TfrmMain(TComponent* Owner)
 {
 	m_nUserLevel = 0;
     m_bISLoaderConveyerDownRun = false;
+    
+    
 }
 //---------------------------------------------------------------------------
 
@@ -477,6 +517,30 @@ void __fastcall TfrmMain::timerMessageTimer(TObject *Sender)
 		SetPrivilege(0);
 		tm1MSLogOut.timeDevStart();
 	}
+    //--Flux Lifetime---
+    if (g_pMainThread->tm1MSFluxLifeTime.timeDevEnd() < 604800000)
+    {
+        double dTimerDEnd = (double)g_pMainThread->tm1MSFluxLifeTime.timeDevEnd();
+        int nDD = (int)(dTimerDEnd / (24*60*60*1000));
+        dTimerDEnd = dTimerDEnd - (nDD*(24*60*60*1000));
+        int nHH = (int)(dTimerDEnd / (60*60*1000));
+        dTimerDEnd = dTimerDEnd - (nHH*(60*60*1000));
+        int nmm = (int)(dTimerDEnd / (60*1000));
+        dTimerDEnd = dTimerDEnd - (nmm*(60*1000));
+        int nss = (int)(dTimerDEnd / (1000));
+        dTimerDEnd = dTimerDEnd - (nss*(1000));
+        int nms = dTimerDEnd;
+
+        AnsiString strFluxLifetime;
+        strFluxLifetime.sprintf("Flux Life Time: %02d:%02d:%02d:%02d", nDD, nHH, nmm, nss);
+        labFluxLifetime->Caption = strFluxLifetime;
+    }
+    else
+    {
+        labFluxLifetime->Caption = "Flux Life Time: 07:00:00:00";
+        g_pMainThread->m_bIsFluxLifetimeTimeUp = true;
+        labFluxLifetime->Color = clRed;
+    }
 	//--Thread Log---
 	if (g_pMainThread->m_listLog.size()>0)
 	{
@@ -484,7 +548,6 @@ void __fastcall TfrmMain::timerMessageTimer(TObject *Sender)
 		AddList(strLog);
 
 		g_pMainThread->m_listLog.pop_front();
-
 	}
 	//--- Log
 	if (theVision.m_listLog.size()>0)
@@ -833,6 +896,14 @@ void __fastcall TfrmMain::Machine1Click(TObject *Sender)
 
                 //Set timer
                 timerAutoCleanSprayLane->Enabled = g_IniFile.m_bUseAutoCleanSprayLane;
+
+                //Reset FluxLifetime
+                if (pMachineDlg->m_bIsResetFluxLifetime->Checked)
+                {
+                    g_pMainThread->m_bIsFluxLifetimeTimeUp = false;
+                    labFluxLifetime->Color = clBtnFace;
+                    g_pMainThread->tm1MSFluxLifeTime.timeDevStart();
+                }
             }
         }
         else

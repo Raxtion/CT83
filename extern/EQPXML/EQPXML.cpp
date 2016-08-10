@@ -268,6 +268,28 @@ void __fastcall CEQPXML::doRCMD(char *pRx)
 		m_CIMStatus = "2";
 		bRet = true;
 	}
+    else if (strSub == "MES_MOVE_IN")
+	{
+        m_strMagzin1DCodeRX = "";
+        TStringList *StrList = SplitString(strData, ",");
+        for (int nX=0;nX<StrList->Count;nX++)
+        {
+            AnsiString strData1 = StrList->operator [](nX);
+            AnsiString strSub1 = StrList->operator [](nX).SubString(0,14);
+            if (strSub1 == "MOVE_IN_STATUS")
+            {
+                TStringList *StrList1 = SplitString(strData, "=");
+                AnsiString strData2 = StrList1->operator [](1);
+                if (strData2 == "PASS") m_strMagzin1DCodeRX = "Y";
+                else m_strMagzin1DCodeRX = "N";
+                delete StrList1;
+            }
+        }
+
+        delete StrList;
+        if (m_strMagzin1DCodeRX == "Y") bRet = true;
+        else bRet = false;
+	}
 	else
 	{
 		SendXML("RCMD", "ACK", "ACK", "1");
@@ -858,6 +880,7 @@ __fastcall CEQPXML::CEQPXML()
 
     m_strSubstrate2DCode = "Substrate2DCode";
     m_strMagzin1DCode = "Magzin1DCode";
+    m_strMagzin1DCodeRX = "";
     m_strBuffer = "";
 }
 //---------------------------------------------------------------------------

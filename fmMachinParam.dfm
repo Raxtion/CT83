@@ -1,6 +1,6 @@
 object frmMachineParam: TfrmMachineParam
-  Left = 254
-  Top = 33
+  Left = 453
+  Top = 59
   Width = 951
   Height = 677
   Caption = 'frmMachineParam'
@@ -1607,6 +1607,15 @@ object frmMachineParam: TfrmMachineParam
     Height = 17
     Caption = #21855#29992#20986#26009#25512#26751
     TabOrder = 12
+    OnClick = m_bIsUseCIMClick
+  end
+  object m_bIsResetFluxLifetime: TCheckBox
+    Left = 24
+    Top = 623
+    Width = 177
+    Height = 17
+    Caption = 'Reset FluxLifetime'
+    TabOrder = 13
     OnClick = m_bIsUseCIMClick
   end
 end
