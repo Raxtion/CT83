@@ -237,6 +237,9 @@ __published:	// IDE-managed Components
     TStaticText *StaticText123;
     TEdit *m_dSuccBackDelayTime;
     TStaticText *StaticText124;
+    TStaticText *StaticText125;
+    TEdit *m_nAutoFillFulxPerCount;
+    TStaticText *StaticText126;
         void __fastcall m_nLEDDimmer0Change(TObject *Sender);
         void __fastcall FormShow(TObject *Sender);
         void __fastcall m_nLEDDimmer1Change(TObject *Sender);

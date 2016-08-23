@@ -1,8 +1,8 @@
 object frmMain: TfrmMain
-  Left = 105
-  Top = 722
+  Left = 119
+  Top = 724
   Width = 1378
-  Height = 773
+  Height = 771
   Caption = 'frmMain'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -21,13 +21,13 @@ object frmMain: TfrmMain
     Left = 863
     Top = 0
     Width = 10
-    Height = 592
+    Height = 590
     Cursor = crHSplit
     Align = alRight
   end
   object Splitter2: TSplitter
     Left = 0
-    Top = 592
+    Top = 590
     Width = 1370
     Height = 8
     Cursor = crVSplit
@@ -37,19 +37,19 @@ object frmMain: TfrmMain
     Left = 873
     Top = 0
     Width = 497
-    Height = 592
+    Height = 590
     Align = alRight
     Anchors = [akRight, akBottom]
     Caption = 'Panel1'
     TabOrder = 0
     DesignSize = (
       497
-      592)
+      590)
     object PageControl1: TPageControl
       Left = 1
       Top = 56
       Width = 495
-      Height = 1245
+      Height = 1333
       ActivePage = TabSheet2
       Anchors = [akLeft, akTop, akRight, akBottom]
       TabIndex = 1
@@ -617,10 +617,55 @@ object frmMain: TfrmMain
         end
         object labFluxLifetime: TLabel
           Left = 32
-          Top = 8
-          Width = 71
-          Height = 13
+          Top = 0
+          Width = 105
+          Height = 20
           Caption = 'Flux Life Time: '
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -16
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object labRunningCounts: TLabel
+          Left = 184
+          Top = 19
+          Width = 96
+          Height = 16
+          Caption = 'Running Counts:'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -13
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object labLastPassCounts: TLabel
+          Left = 184
+          Top = 35
+          Width = 106
+          Height = 16
+          Caption = 'Last Pass Counts:'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -13
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object labUPU: TLabel
+          Left = 360
+          Top = 19
+          Width = 48
+          Height = 16
+          Caption = '100 Sec'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -13
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
         end
         object GroupBox3: TGroupBox
           Left = 32
@@ -1249,7 +1294,7 @@ object frmMain: TfrmMain
   end
   object listHistory: TListBox
     Left = 0
-    Top = 600
+    Top = 598
     Width = 1370
     Height = 119
     Align = alBottom
@@ -1267,12 +1312,12 @@ object frmMain: TfrmMain
     Left = 0
     Top = 0
     Width = 863
-    Height = 592
+    Height = 590
     Align = alClient
     TabOrder = 2
     object Splitter3: TSplitter
       Left = 1
-      Top = 413
+      Top = 411
       Width = 861
       Height = 10
       Cursor = crVSplit
@@ -1282,7 +1327,7 @@ object frmMain: TfrmMain
       Left = 1
       Top = 1
       Width = 861
-      Height = 412
+      Height = 410
       Align = alClient
       TabOrder = 0
       object ImagePaintBox: TPaintBox
@@ -1296,7 +1341,7 @@ object frmMain: TfrmMain
     end
     object PageControl2: TPageControl
       Left = 1
-      Top = 423
+      Top = 421
       Width = 861
       Height = 168
       ActivePage = TabSheet4

@@ -1,6 +1,6 @@
 object frmProductParam: TfrmProductParam
-  Left = 285
-  Top = 113
+  Left = 265
+  Top = 43
   BorderStyle = bsDialog
   Caption = 'frmProductParam'
   ClientHeight = 640
@@ -38,9 +38,9 @@ object frmProductParam: TfrmProductParam
     Top = 0
     Width = 923
     Height = 545
-    ActivePage = TabSheet4
+    ActivePage = TabSheet5
     Align = alTop
-    TabIndex = 1
+    TabIndex = 2
     TabOrder = 2
     object TabSheet1: TTabSheet
       Caption = 'Load'
@@ -612,7 +612,7 @@ object frmProductParam: TfrmProductParam
         Left = 8
         Top = 8
         Width = 281
-        Height = 337
+        Height = 289
         Caption = #22132'FLUX'#20301#32622
         TabOrder = 0
         object StaticText23: TStaticText
@@ -991,7 +991,7 @@ object frmProductParam: TfrmProductParam
         Left = 304
         Top = 136
         Width = 281
-        Height = 137
+        Height = 161
         Caption = 'Weight Scale'
         TabOrder = 1
         object StaticText73: TStaticText
@@ -1212,10 +1212,10 @@ object frmProductParam: TfrmProductParam
         end
       end
       object GroupBox11: TGroupBox
-        Left = 304
-        Top = 280
+        Left = 600
+        Top = 136
         Width = 281
-        Height = 65
+        Height = 161
         Caption = #33258#21205#35036'Flux'
         TabOrder = 3
         object StaticText117: TStaticText
@@ -1257,6 +1257,46 @@ object frmProductParam: TfrmProductParam
           Color = clSkyBlue
           ParentColor = False
           TabOrder = 2
+        end
+        object StaticText125: TStaticText
+          Left = 13
+          Top = 60
+          Width = 108
+          Height = 21
+          Hint = 'm_dSprayDistance'
+          Alignment = taRightJustify
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #32147#36942#26781#25976
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 3
+        end
+        object m_nAutoFillFulxPerCount: TEdit
+          Left = 128
+          Top = 58
+          Width = 65
+          Height = 24
+          TabOrder = 4
+          Text = 'editAcc1'
+        end
+        object StaticText126: TStaticText
+          Left = 200
+          Top = 58
+          Width = 65
+          Height = 22
+          AutoSize = False
+          BevelInner = bvSpace
+          BevelKind = bkSoft
+          BevelOuter = bvNone
+          BorderStyle = sbsSingle
+          Caption = #26781
+          Color = clSkyBlue
+          ParentColor = False
+          TabOrder = 5
         end
       end
       object GroupBox12: TGroupBox

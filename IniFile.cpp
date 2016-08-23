@@ -79,6 +79,7 @@ void __fastcall CIniFile::MachineFile(bool bRead)
 
   DDXFile_Bool(bRead,pIniFile,Machine_Section,"m_bForceEject",m_bForceEject,false);
   DDXFile_Bool(bRead,pIniFile,Machine_Section,"m_bUsePreAutoWeightScale",m_bUsePreAutoWeightScale,true);
+  DDXFile_Bool(bRead,pIniFile,Machine_Section,"m_bUseUnClampAutoWeightScale",m_bUseUnClampAutoWeightScale,false);
   DDXFile_Bool(bRead,pIniFile,Machine_Section,"m_bUseAutoCleanSprayLane",m_bUseAutoCleanSprayLane,false);
   DDXFile_Bool(bRead,pIniFile,Machine_Section,"m_bIsMgzUpFirst",m_bIsMgzUpFirst,false);
   DDXFile_Bool(bRead,pIniFile,Machine_Section,"m_bStopLoader",m_bStopLoader,false);
@@ -182,6 +183,7 @@ void __fastcall CIniFile::ProductFile(char *strFileName,bool bRead)
   DDXFile_Float(bRead,pIniFile,Product_Section,"m_dNGMagPos",m_dNGMagPos,0.0);
 
   DDXFile_Int(bRead,pIniFile,Product_Section,"m_nAutoFillTime",m_nAutoFillTime);
+  DDXFile_Int(bRead,pIniFile,Product_Section,"m_nAutoFillFulxPerCount",m_nAutoFillFulxPerCount, 100);
   DDXFile_Float(bRead,pIniFile,Product_Section,"m_dSpraryDelayTimeB",m_dSpraryDelayTimeB,0.2);
   DDXFile_Float(bRead,pIniFile,Product_Section,"m_dSpraryDelayTimeA",m_dSpraryDelayTimeA,0.0);
   DDXFile_Float(bRead,pIniFile,Product_Section,"m_dSuccBackDelayTime",m_dSuccBackDelayTime,1.0);

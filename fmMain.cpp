@@ -532,14 +532,31 @@ void __fastcall TfrmMain::timerMessageTimer(TObject *Sender)
         int nms = dTimerDEnd;
 
         AnsiString strFluxLifetime;
-        strFluxLifetime.sprintf("Flux Life Time: %02d:%02d:%02d:%02d", nDD, nHH, nmm, nss);
+        strFluxLifetime.sprintf("Flux Life Time(168H): %02d:%02d:%02d:%02d", nDD, nHH, nmm, nss);
         labFluxLifetime->Caption = strFluxLifetime;
     }
     else
     {
-        labFluxLifetime->Caption = "Flux Life Time: 07:00:00:00";
+        labFluxLifetime->Caption = "Flux Life Time(168H): 07:00:00:00";
         g_pMainThread->m_bIsFluxLifetimeTimeUp = true;
         labFluxLifetime->Color = clRed;
+    }
+    //--Strip Count and Show---
+    labRunningCounts->Caption = "Running Counts: " + IntToStr(g_pMainThread->m_nStripCount);
+    if (g_pMainThread->m_bIsStripCountNeedCopy == true)
+    {
+        g_pMainThread->m_bIsStripCountNeedCopy = false;
+        labLastPassCounts->Caption = "Last Pass Counts: " + IntToStr(g_pMainThread->m_nStripCount);
+        AddList("Last Pass Counts: " + IntToStr(g_pMainThread->m_nStripCount));
+        g_pMainThread->m_nStripCount = 0;
+        g_pMainThread->m_nStripCountForAutoFillFlux = 0;
+    }
+    //--UPUtime to show---
+    if (g_pMainThread->m_listUPUTime.size()>0)
+    {
+        AnsiString strUPU = FormatFloat("CycleTime 0.00", g_pMainThread->m_listUPUTime.front()/ 1000.0) + " Sec";
+        labUPU->Caption = strUPU;
+        g_pMainThread->m_listUPUTime.pop_front();
     }
 	//--Thread Log---
 	if (g_pMainThread->m_listLog.size()>0)
@@ -774,6 +791,7 @@ void __fastcall TfrmMain::Machine1Click(TObject *Sender)
 
 	DDX_Check(bRead, g_IniFile.m_bForceEject, pMachineDlg->m_bForceEject);
     DDX_Check(bRead, g_IniFile.m_bUsePreAutoWeightScale, pMachineDlg->m_bUsePreAutoWeightScale);
+    DDX_Check(bRead, g_IniFile.m_bUseUnClampAutoWeightScale, pMachineDlg->m_bUseUnClampAutoWeightScale);
     DDX_Check(bRead, g_IniFile.m_bUseAutoCleanSprayLane, pMachineDlg->m_bUseAutoCleanSprayLane);
     DDX_Check(bRead, g_IniFile.m_bIsMgzUpFirst, pMachineDlg->m_bIsMgzUpFirst);
     DDX_Check(bRead, g_IniFile.m_bIsUseCIM, pMachineDlg->m_bIsUseCIM);
@@ -887,6 +905,7 @@ void __fastcall TfrmMain::Machine1Click(TObject *Sender)
 
 		        DDX_Check(bRead, g_IniFile.m_bForceEject, pMachineDlg->m_bForceEject);
                 DDX_Check(bRead, g_IniFile.m_bUsePreAutoWeightScale, pMachineDlg->m_bUsePreAutoWeightScale);
+                DDX_Check(bRead, g_IniFile.m_bUseUnClampAutoWeightScale, pMachineDlg->m_bUseUnClampAutoWeightScale);
                 DDX_Check(bRead, g_IniFile.m_bUseAutoCleanSprayLane, pMachineDlg->m_bUseAutoCleanSprayLane);
                 DDX_Check(bRead, g_IniFile.m_bIsMgzUpFirst, pMachineDlg->m_bIsMgzUpFirst);
                 DDX_Check(bRead, g_IniFile.m_bIsUseCIM, pMachineDlg->m_bIsUseCIM);
@@ -1004,6 +1023,7 @@ void __fastcall TfrmMain::Product1Click(TObject *Sender)
 	DDX_Float(bRead, g_IniFile.m_dNGMagPos, pWnd->m_dNGMagPos);
 
     DDX_Int(bRead, g_IniFile.m_nAutoFillTime, pWnd->m_nAutoFillTime);
+    DDX_Int(bRead, g_IniFile.m_nAutoFillFulxPerCount, pWnd->m_nAutoFillFulxPerCount);
     DDX_Float(bRead, g_IniFile.m_dSpraryDelayTimeB, pWnd->m_dSpraryDelayTimeB);
     DDX_Float(bRead, g_IniFile.m_dSpraryDelayTimeA, pWnd->m_dSpraryDelayTimeA);
     DDX_Float(bRead, g_IniFile.m_dSuccBackDelayTime, pWnd->m_dSuccBackDelayTime);
@@ -1120,6 +1140,7 @@ void __fastcall TfrmMain::Product1Click(TObject *Sender)
 		        DDX_Float(bRead, g_IniFile.m_dNGMagPos, pWnd->m_dNGMagPos);
 
                 DDX_Int(bRead, g_IniFile.m_nAutoFillTime, pWnd->m_nAutoFillTime);
+                DDX_Int(bRead, g_IniFile.m_nAutoFillFulxPerCount, pWnd->m_nAutoFillFulxPerCount);
                 DDX_Float(bRead, g_IniFile.m_dSpraryDelayTimeB, pWnd->m_dSpraryDelayTimeB);
                 DDX_Float(bRead, g_IniFile.m_dSpraryDelayTimeA, pWnd->m_dSpraryDelayTimeA);
                 DDX_Float(bRead, g_IniFile.m_dSuccBackDelayTime, pWnd->m_dSuccBackDelayTime);
@@ -1494,6 +1515,7 @@ void __fastcall TfrmMain::SpeedButton1Click(TObject *Sender)
     if (pBtn->Tag) g_pMainThread->m_bStartSBTSprayF = true;
     else g_pMainThread->m_bStartSBTSprayR = true;
 	g_pMainThread->nThreadIndex[17] = 0;
+    g_pMainThread->nThreadIndex[12] = 0;
 
     tm1MS.timeStart(120000);
 	while (1)
@@ -1917,6 +1939,7 @@ void __fastcall TfrmMain::btn2DReadClick(TObject *Sender)
 //---------------------------------------------------------------------------
 
 #pragma endregion
+
 
 
 

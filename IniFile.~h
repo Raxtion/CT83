@@ -65,6 +65,7 @@ public:
   int m_nScaleSprayTimes[2];
   double m_dScaleSprayDelayTime;
   int m_nAutoFillTime;
+  int m_nAutoFillFulxPerCount;
   double m_dSpraryDelayTimeB;
   double m_dSpraryDelayTimeA;
   double m_dSuccBackDelayTime;
@@ -85,6 +86,7 @@ public:
   bool m_bIsMgzUpFirst;
   bool m_bStopLoader;
   bool m_bIsUseCIM;
+  bool m_bIsUseRightLCPusher;
 
   int m_nRailOption;                     //0:All 1:Front 2:Rear
 

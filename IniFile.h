@@ -65,6 +65,7 @@ public:
   int m_nScaleSprayTimes[2];
   double m_dScaleSprayDelayTime;
   int m_nAutoFillTime;
+  int m_nAutoFillFulxPerCount;
   double m_dSpraryDelayTimeB;
   double m_dSpraryDelayTimeA;
   double m_dSuccBackDelayTime;
@@ -81,6 +82,7 @@ public:
 
   bool m_bForceEject;
   bool m_bUsePreAutoWeightScale;
+  bool m_bUseUnClampAutoWeightScale;
   bool m_bUseAutoCleanSprayLane;
   bool m_bIsMgzUpFirst;
   bool m_bStopLoader;

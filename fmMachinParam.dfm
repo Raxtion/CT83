@@ -1,6 +1,6 @@
 object frmMachineParam: TfrmMachineParam
-  Left = 453
-  Top = 59
+  Left = 304
+  Top = 122
   Width = 951
   Height = 677
   Caption = 'frmMachineParam'
@@ -1497,7 +1497,7 @@ object frmMachineParam: TfrmMachineParam
   end
   object m_bUsePreAutoWeightScale: TCheckBox
     Left = 24
-    Top = 576
+    Top = 552
     Width = 209
     Height = 17
     Caption = #27599#27425#21855#21205#20808#22519#34892#22132#37327#28204#35430
@@ -1602,7 +1602,7 @@ object frmMachineParam: TfrmMachineParam
   end
   object m_bIsUseRightLCPusher: TCheckBox
     Left = 24
-    Top = 552
+    Top = 528
     Width = 129
     Height = 17
     Caption = #21855#29992#20986#26009#25512#26751
@@ -1617,5 +1617,13 @@ object frmMachineParam: TfrmMachineParam
     Caption = 'Reset FluxLifetime'
     TabOrder = 13
     OnClick = m_bIsUseCIMClick
+  end
+  object m_bUseUnClampAutoWeightScale: TCheckBox
+    Left = 24
+    Top = 576
+    Width = 209
+    Height = 17
+    Caption = #27599#27425#36864#30418#20808#22519#34892#22132#37327#28204#35430
+    TabOrder = 14
   end
 end

@@ -42,6 +42,7 @@ public:
 		std::list<AnsiString> m_list2DReaderRX;
 		std::list<AnsiString> m_listPickLane;
 		std::vector<double> m_listScaleWeight;
+        std::list<double> m_listUPUTime;	//Substrate per Substrate time 
 
         int nThreadIndex[MAX_PROCESS];		//0:Inti 19:PreAuto
 
@@ -55,12 +56,14 @@ public:
         bool m_bIsSprayerWeightAlarm;
         bool m_bIsStopLoader;
         bool m_bIsNeedPreMoveSprayer;
+        bool m_bIsNeedAutoWeightScale;
         bool m_bIsFluxLifetimeTimeUp;
 
         //Thread HandShake
         bool m_bConveyerMagazineReady;
         bool m_bConveyerMagazineOutReady;
         bool m_bLoaderClamperReady;
+        bool m_bLoaderClamperChangeMgz;
 
         bool m_bLeftLaneChangerReady;
         bool n_bLaneSprayReady[2];              //1: Front 0:Reard
@@ -81,6 +84,8 @@ public:
         bool m_bStartUnLoadClamper;
 		bool m_bStartInitLoader;
 
+        bool m_bIsStripCountNeedCopy;
+		bool m_bIsStripCountNeedAutoFillFlux;
         //Lock
         bool m_bIsLeftLaneChangerLock;
         bool m_bIsSprayerLock;
@@ -94,6 +99,7 @@ public:
         //Counter;
         int m_nStripCount;
         int m_nSprayTimes;
+		int m_nStripCountForAutoFillFlux;
 
         __fastcall CMainThread(bool CreateSuspended);
         void __fastcall SetWorkSpeed();
@@ -145,6 +151,7 @@ public:
 };
 //---------------------------------------------------------------------------
 #endif
+
 
 
 
