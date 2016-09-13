@@ -129,6 +129,7 @@ __published:	// IDE-managed Components
     TLabel *labRunningCounts;
     TLabel *labLastPassCounts;
     TLabel *labUPU;
+    TLabel *lab1DShow;
         void __fastcall DIDO1Click(TObject *Sender);
         void __fastcall Motor1Click(TObject *Sender);
         void __fastcall Exit1Click(TObject *Sender);

@@ -123,7 +123,7 @@ __published:	// IDE-managed Components
     TEdit *m_dScaleSprayPosZ1;
     TStaticText *StaticText81;
     TStaticText *StaticText82;
-    TEdit *m_nScaleSprayTime1;
+    TEdit *m_dScaleSprayTime1;
     TStaticText *StaticText83;
     TStaticText *StaticText86;
     TEdit *m_nScaleSprayTimes1;

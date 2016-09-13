@@ -146,7 +146,7 @@ __published:	// IDE-managed Components
     TStaticText *StaticText52;
     TGroupBox *GroupBox7;
     TStaticText *StaticText73;
-    TEdit *m_nScaleSprayTime0;
+    TEdit *m_dScaleSprayTime0;
     TStaticText *StaticText74;
     TStaticText *StaticText84;
     TEdit *m_nScaleSprayTimes0;

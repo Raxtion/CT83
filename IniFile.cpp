@@ -60,9 +60,7 @@ void __fastcall CIniFile::MachineFile(bool bRead)
   DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dScaleSprayPosX1",m_dScaleSprayPosX[1],0.0);
   DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dScaleSprayPosY1",m_dScaleSprayPosY[1],0.0);
   DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dScaleSprayPosZ1",m_dScaleSprayPosZ[1],0.0);
-  //DDXFile_Int(bRead,pIniFile,Machine_Section,"m_nScaleSprayTime0",m_nScaleSprayTime[0]);        //move to product
-  DDXFile_Int(bRead,pIniFile,Machine_Section,"m_nScaleSprayTime1",m_nScaleSprayTime[1]);
-  //DDXFile_Int(bRead,pIniFile,Machine_Section,"m_nScaleSprayTimes0",m_nScaleSprayTimes[0]);      //move to product
+  DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dScaleSprayTime1",m_dScaleSprayTime[1]);
   DDXFile_Int(bRead,pIniFile,Machine_Section,"m_nScaleSprayTimes1",m_nScaleSprayTimes[1]);
   DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dScaleSprayDelayTime",m_dScaleSprayDelayTime,0.0);
 
@@ -90,10 +88,10 @@ void __fastcall CIniFile::MachineFile(bool bRead)
   delete pIniFile;
 }
 //---------------------------------------------------------------------------
-void __fastcall CIniFile::ProductFile(char *strFileName,bool bRead)                                                            
-{                                                                                                                              
-  AnsiString strName;                                                                                                          
-  TIniFile *pIniFile;                                                                                                          
+void __fastcall CIniFile::ProductFile(char *strFileName,bool bRead)
+{
+  AnsiString strName;
+  TIniFile *pIniFile;
   pIniFile = new TIniFile(strFileName);
 
   DDXFile_Float(bRead,pIniFile,Product_Section,"m_dLoaderClampMgzPos0",m_dLoaderClampMgzPos[0],0.0);
@@ -155,7 +153,7 @@ void __fastcall CIniFile::ProductFile(char *strFileName,bool bRead)
 
   DDXFile_Float(bRead,pIniFile,Product_Section,"m_dMarkScore0",m_dMarkScore0,0.0);
 
-  DDXFile_Int(bRead,pIniFile,Product_Section,"m_nScaleSprayTime0",m_nScaleSprayTime[0]);
+  DDXFile_Float(bRead,pIniFile,Product_Section,"m_dScaleSprayTime0",m_dScaleSprayTime[0]);
   DDXFile_Int(bRead,pIniFile,Product_Section,"m_nScaleSprayTimes0",m_nScaleSprayTimes[0]);
   DDXFile_Float(bRead,pIniFile,Product_Section,"m_dWeightScaleAlarmUp",m_dWeightScaleAlarmUp,0.0);
   DDXFile_Float(bRead,pIniFile,Product_Section,"m_dWeightScaleAlarmDown",m_dWeightScaleAlarmDown,0.0);

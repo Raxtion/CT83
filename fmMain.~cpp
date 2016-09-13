@@ -90,7 +90,7 @@ void __fastcall CGetRealTimeValueThread::Execute()
 		    if (strCommand == "READ_1D_CODE")
 		    {
 			    g_1DScanner.Wakeup();
-			    ::Sleep(300);
+			    ::Sleep(2500);
 			    g_1DScanner.Enable();
 			    tm1MS.timeStart(5000);
 			    btmRUN = true;
@@ -98,14 +98,15 @@ void __fastcall CGetRealTimeValueThread::Execute()
 		    if (strCommand == "SHUTDOWN_1D_CODE")
 		    {
 			    g_1DScanner.Disable();
-			    ::Sleep(300);
+			    ::Sleep(100);
 			    g_1DScanner.Sleep();
+                ::Sleep(100);
 			    g_pMainThread->m_list1DReaderRX.push_back("SHUTDOWN_1D_CODE_OK");
 		    }
         }
         if (btmRUN == true) // timeout process
         {
-            if (tm1MS.timeUp() && g_pMainThread->m_list1DReaderRX.size())
+            if (tm1MS.timeUp() && g_pMainThread->m_list1DReaderRX.size() == 0)
             {
                 g_pMainThread->m_list1DReaderRX.push_back("READ_1D_CODE_NG");
                 btmRUN = false;
@@ -212,6 +213,15 @@ void __fastcall TfrmMain::FormCreate(TObject *Sender)
     timerAutoCleanSprayLane->Enabled = g_IniFile.m_bUseAutoCleanSprayLane;
 
     m_dMarkScore0->Text = FormatFloat("0.000",g_IniFile.m_dMarkScore0);
+
+    //Reset Scale
+    g_Scale.SetZero();
+
+    //Reset1D Reader
+    g_1DScanner.Disable();
+    ::Sleep(100);
+    g_1DScanner.Sleep();
+    ::Sleep(100);
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmMain::FormClose(TObject *Sender, TCloseAction &Action)
@@ -620,6 +630,9 @@ void __fastcall TfrmMain::timerMessageTimer(TObject *Sender)
     //---Renew CIM signal
     Shape3->Brush->Color = clLime;
 
+    //---Renew lab
+    lab1DShow->Caption = "Read: " + g_eqpXML.m_strMagzin1DCode;
+
 	timerMessage->Enabled = true;
 }
 //---------------------------------------------------------------------------
@@ -774,7 +787,7 @@ void __fastcall TfrmMain::Machine1Click(TObject *Sender)
     DDX_Float(bRead, g_IniFile.m_dScaleSprayPosX[1], pMachineDlg->m_dScaleSprayPosX1);
 	DDX_Float(bRead, g_IniFile.m_dScaleSprayPosY[1], pMachineDlg->m_dScaleSprayPosY1);
 	DDX_Float(bRead, g_IniFile.m_dScaleSprayPosZ[1], pMachineDlg->m_dScaleSprayPosZ1);
-    DDX_Int(bRead, g_IniFile.m_nScaleSprayTime[1], pMachineDlg->m_nScaleSprayTime1);
+    DDX_Float(bRead, g_IniFile.m_dScaleSprayTime[1], pMachineDlg->m_dScaleSprayTime1);
     DDX_Int(bRead, g_IniFile.m_nScaleSprayTimes[1], pMachineDlg->m_nScaleSprayTimes1);
     DDX_Float(bRead, g_IniFile.m_dScaleSprayDelayTime, pMachineDlg->m_dScaleSprayDelayTime);
 
@@ -791,6 +804,7 @@ void __fastcall TfrmMain::Machine1Click(TObject *Sender)
 
 	DDX_Check(bRead, g_IniFile.m_bForceEject, pMachineDlg->m_bForceEject);
     DDX_Check(bRead, g_IniFile.m_bUsePreAutoWeightScale, pMachineDlg->m_bUsePreAutoWeightScale);
+    DDX_Check(bRead, g_IniFile.m_bUseUnClampAutoWeightScale, pMachineDlg->m_bUseUnClampAutoWeightScale);
     DDX_Check(bRead, g_IniFile.m_bUseAutoCleanSprayLane, pMachineDlg->m_bUseAutoCleanSprayLane);
     DDX_Check(bRead, g_IniFile.m_bIsMgzUpFirst, pMachineDlg->m_bIsMgzUpFirst);
     DDX_Check(bRead, g_IniFile.m_bIsUseCIM, pMachineDlg->m_bIsUseCIM);
@@ -887,7 +901,7 @@ void __fastcall TfrmMain::Machine1Click(TObject *Sender)
                 DDX_Float(bRead, g_IniFile.m_dScaleSprayPosX[1], pMachineDlg->m_dScaleSprayPosX1);
 	            DDX_Float(bRead, g_IniFile.m_dScaleSprayPosY[1], pMachineDlg->m_dScaleSprayPosY1);
 	            DDX_Float(bRead, g_IniFile.m_dScaleSprayPosZ[1], pMachineDlg->m_dScaleSprayPosZ1);
-                DDX_Int(bRead, g_IniFile.m_nScaleSprayTime[1], pMachineDlg->m_nScaleSprayTime1);
+                DDX_Float(bRead, g_IniFile.m_dScaleSprayTime[1], pMachineDlg->m_dScaleSprayTime1);
                 DDX_Int(bRead, g_IniFile.m_nScaleSprayTimes[1], pMachineDlg->m_nScaleSprayTimes1);
                 DDX_Float(bRead, g_IniFile.m_dScaleSprayDelayTime, pMachineDlg->m_dScaleSprayDelayTime);
 
@@ -904,6 +918,7 @@ void __fastcall TfrmMain::Machine1Click(TObject *Sender)
 
 		        DDX_Check(bRead, g_IniFile.m_bForceEject, pMachineDlg->m_bForceEject);
                 DDX_Check(bRead, g_IniFile.m_bUsePreAutoWeightScale, pMachineDlg->m_bUsePreAutoWeightScale);
+                DDX_Check(bRead, g_IniFile.m_bUseUnClampAutoWeightScale, pMachineDlg->m_bUseUnClampAutoWeightScale);
                 DDX_Check(bRead, g_IniFile.m_bUseAutoCleanSprayLane, pMachineDlg->m_bUseAutoCleanSprayLane);
                 DDX_Check(bRead, g_IniFile.m_bIsMgzUpFirst, pMachineDlg->m_bIsMgzUpFirst);
                 DDX_Check(bRead, g_IniFile.m_bIsUseCIM, pMachineDlg->m_bIsUseCIM);
@@ -993,7 +1008,7 @@ void __fastcall TfrmMain::Product1Click(TObject *Sender)
 
     DDX_Float(bRead, g_IniFile.m_dMarkScore0, pWnd->m_dMarkScore0);
 
-    DDX_Int(bRead, g_IniFile.m_nScaleSprayTime[0], pWnd->m_nScaleSprayTime0);
+    DDX_Float(bRead, g_IniFile.m_dScaleSprayTime[0], pWnd->m_dScaleSprayTime0);
     DDX_Int(bRead, g_IniFile.m_nScaleSprayTimes[0], pWnd->m_nScaleSprayTimes0);
     DDX_Float(bRead, g_IniFile.m_dWeightScaleAlarmUp, pWnd->m_dWeightScaleAlarmUp);
     DDX_Float(bRead, g_IniFile.m_dWeightScaleAlarmDown, pWnd->m_dWeightScaleAlarmDown);
@@ -1110,7 +1125,7 @@ void __fastcall TfrmMain::Product1Click(TObject *Sender)
 
                 DDX_Float(bRead, g_IniFile.m_dMarkScore0, pWnd->m_dMarkScore0);
 
-                DDX_Int(bRead, g_IniFile.m_nScaleSprayTime[0], pWnd->m_nScaleSprayTime0);
+                DDX_Float(bRead, g_IniFile.m_dScaleSprayTime[0], pWnd->m_dScaleSprayTime0);
                 DDX_Int(bRead, g_IniFile.m_nScaleSprayTimes[0], pWnd->m_nScaleSprayTimes0);
                 DDX_Float(bRead, g_IniFile.m_dWeightScaleAlarmUp, pWnd->m_dWeightScaleAlarmUp);
                 DDX_Float(bRead, g_IniFile.m_dWeightScaleAlarmDown, pWnd->m_dWeightScaleAlarmDown);
@@ -1920,13 +1935,14 @@ void __fastcall TfrmMain::SpeedButton15Click(TObject *Sender)
 void __fastcall TfrmMain::btn1DReadClick(TObject *Sender)
 {
     btn1DRead->Enabled = false;
-    g_1DScanner.Disable();
-    ::Sleep(300);
-    g_1DScanner.Sleep();
-    ::Sleep(300);
     g_1DScanner.Wakeup();
-    ::Sleep(300);
+    ::Sleep(2500);
     g_1DScanner.Enable();
+    ::Sleep(2500);
+    g_1DScanner.Disable();
+    ::Sleep(100);
+    g_1DScanner.Sleep();
+    ::Sleep(100);
     btn1DRead->Enabled = true;
 }
 //---------------------------------------------------------------------------

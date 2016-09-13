@@ -267,7 +267,8 @@ void __fastcall CMainThread::Execute()
 			g_DIO.SetDO(DO::StartBtnLamp, false);
 			g_DIO.SetDO(DO::ResetBtnLamp, false);
 
-			SetManualSpeed();
+            //InitLoader need slow move not ManualSpeed
+			if (!m_bStartInitLoader) SetManualSpeed();
 
 			g_DIO.SetDO(DO::GreenLamp, false);
 			g_DIO.SetDO(DO::YellowLamp, true);
@@ -1226,6 +1227,9 @@ void __fastcall CMainThread::doLeftLaneChanger(int &nThreadIndex)
 			m_arraybShape[0] = true;
 			tm1MS.timeStart(10000);
 			nThreadIndex++;
+
+            //If Push Substrate then to 0
+            nReTryPushIndex = 0;
 		}
 		else if (!g_Motion.GetDO(DO::LoaderPusher) && !g_Motion.GetDO(DO::LeftLaneChangerMotor) && !g_Motion.GetDI(DI::LeftLaneChangerInp))
 		{
@@ -1598,7 +1602,6 @@ void __fastcall CMainThread::doSprayerLane(int &nThreadIndex, bool bFront)
 			CMainThread::nThreadIndex[13] = 0;
 			nThreadIndex++;
 		}
-		else g_IniFile.m_nErrorCode = 715;
 		break;
 	case 22:
 		if (!m_bStartFluxScaleSpray)
@@ -2113,7 +2116,7 @@ void __fastcall CMainThread::doFillFlux(int &nThreadIndex)
             tm1MSFluxLifeTime.timeDevStart();
 			
 			g_Motion.SetDO(DO::FluxTankAirOn, true); // For Fix the tank vaccum
-			tm1MS.timeStart(5000);
+			tm1MS.timeStart(8000);
 			nThreadIndex++;
 		}
 		break;
@@ -2796,7 +2799,7 @@ void __fastcall CMainThread::doScaleSpray(int &nThreadIndex, bool bDredge)
 				g_Motion.SetDO(DO::SprayerAirOn, true);
                 g_Motion.SetDO(DO::SprayerPistonOn, true);
 			}
-			tm1MS.timeStart(g_IniFile.m_nScaleSprayTime[bDredge]*1000);                      //delay Start
+			tm1MS.timeStart(g_IniFile.m_dScaleSprayTime[bDredge]*1000);                      //delay Start
 			nThreadIndex++;
 		}
 		break;
@@ -2872,7 +2875,12 @@ void __fastcall CMainThread::doScaleSpray(int &nThreadIndex, bool bDredge)
             m_bIsSprayerLock = false;
         }
 		if (!bDredge) m_bStartFluxScaleSpray = false;
-		else m_bStartDredgeScaleSpray = false;
+		else
+        {
+            m_bStartDredgeScaleSpray = false;
+            //Reset Scale
+			g_Scale.SetZero();
+        }
 		m_bScaleSprayDone = true;
         //m_bIsSprayerLock = false;               // not off by self, off by doSprayerLane
 		nThreadIndex = 0;

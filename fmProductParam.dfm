@@ -1,6 +1,6 @@
 object frmProductParam: TfrmProductParam
-  Left = 343
-  Top = 76
+  Left = 330
+  Top = 43
   BorderStyle = bsDialog
   Caption = 'frmProductParam'
   ClientHeight = 640
@@ -38,9 +38,9 @@ object frmProductParam: TfrmProductParam
     Top = 0
     Width = 923
     Height = 545
-    ActivePage = TabSheet5
+    ActivePage = TabSheet4
     Align = alTop
-    TabIndex = 2
+    TabIndex = 1
     TabOrder = 2
     object TabSheet1: TTabSheet
       Caption = 'Load'
@@ -1010,7 +1010,7 @@ object frmProductParam: TfrmProductParam
           ParentColor = False
           TabOrder = 0
         end
-        object m_nScaleSprayTime0: TEdit
+        object m_dScaleSprayTime0: TEdit
           Left = 131
           Top = 22
           Width = 65

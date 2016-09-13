@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 119
-  Top = 724
+  Left = 127
+  Top = 348
   Width = 1378
   Height = 771
   Caption = 'frmMain'
@@ -795,8 +795,8 @@ object frmMain: TfrmMain
         Caption = 'Code Reader'
         ImageIndex = 2
         object SpeedButton11: TSpeedButton
-          Left = 346
-          Top = 32
+          Left = 34
+          Top = 216
           Width = 65
           Height = 25
           Caption = 'Disable'
@@ -804,8 +804,8 @@ object frmMain: TfrmMain
           OnClick = SpeedButton11Click
         end
         object SpeedButton12: TSpeedButton
-          Left = 346
-          Top = 64
+          Left = 34
+          Top = 248
           Width = 65
           Height = 25
           Caption = 'Enable'
@@ -813,8 +813,8 @@ object frmMain: TfrmMain
           OnClick = SpeedButton12Click
         end
         object SpeedButton13: TSpeedButton
-          Left = 346
-          Top = 96
+          Left = 34
+          Top = 280
           Width = 65
           Height = 25
           Caption = 'Sleep'
@@ -822,8 +822,8 @@ object frmMain: TfrmMain
           OnClick = SpeedButton13Click
         end
         object SpeedButton14: TSpeedButton
-          Left = 346
-          Top = 128
+          Left = 34
+          Top = 312
           Width = 65
           Height = 25
           Caption = 'Wakeup'
@@ -831,13 +831,26 @@ object frmMain: TfrmMain
           OnClick = SpeedButton14Click
         end
         object SpeedButton15: TSpeedButton
-          Left = 346
-          Top = 160
+          Left = 34
+          Top = 344
           Width = 65
           Height = 25
           Caption = 'Initial'
           Visible = False
           OnClick = SpeedButton15Click
+        end
+        object lab1DShow: TLabel
+          Left = 192
+          Top = 40
+          Width = 141
+          Height = 24
+          Caption = 'Read: KX804851'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -19
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
         end
         object btn1DRead: TButton
           Left = 24

@@ -61,7 +61,7 @@ public:
   double m_dScaleSprayPosX[2];
   double m_dScaleSprayPosY[2];
   double m_dScaleSprayPosZ[2];
-  int m_nScaleSprayTime[2];
+  double m_dScaleSprayTime[2];
   int m_nScaleSprayTimes[2];
   double m_dScaleSprayDelayTime;
   int m_nAutoFillTime;
