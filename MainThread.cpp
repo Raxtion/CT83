@@ -979,6 +979,7 @@ void __fastcall CMainThread::doLoadClamper(int &nThreadIndex)
 		else if (tm1MS.timeUp())
 		{
 			g_IniFile.m_nErrorCode = 803;
+            m_listReaderTX.push_back("SHUTDOWN_1D_CODE");
 			nThreadIndex = nTagReRead1D;
 		}
 		break;
@@ -1183,7 +1184,7 @@ void __fastcall CMainThread::doLeftLaneChanger(int &nThreadIndex)
 		break;
 	case 4:
 	case nTagPushStrip:nThreadIndex = 4;
-		if (m_bLoaderClamperReady && !g_IniFile.m_bStopLoader)
+		if (m_bLoaderClamperReady && !g_IniFile.m_bStopLoader && ((int)g_Motion.GetFeedbackPos(Axis_Const::LLC) == (int)g_IniFile.m_dLeftLaneChangerMgzPos))
 		{
 			g_Motion.SetDO(DO::LoaderPusher, true);
 			g_Motion.SetDO(DO::LeftLaneChangerMotor, true);
@@ -1193,6 +1194,10 @@ void __fastcall CMainThread::doLeftLaneChanger(int &nThreadIndex)
 		}
 		else if (g_Motion.GetDI(DI::LoaderPusherBwd)
 			&& !g_Motion.GetDI(DI::LeftLaneChangerIn) && g_Motion.GetDI(DI::LeftLaneChangerInp) && !g_Motion.GetDI(DI::LeftLaneChangerOut))
+		{
+			nThreadIndex = 0;
+		}
+		else if ((int)g_Motion.GetFeedbackPos(Axis_Const::LLC) != (int)g_IniFile.m_dLeftLaneChangerMgzPos)
 		{
 			nThreadIndex = 0;
 		}
@@ -3088,6 +3093,7 @@ void __fastcall CMainThread::doReLoadClamper(int &nThreadIndex)
     }
 }
 #pragma endregion
+
 
 
 

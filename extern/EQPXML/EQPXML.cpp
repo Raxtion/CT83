@@ -241,7 +241,10 @@ void __fastcall CEQPXML::doRCMD(char *pRx)
 	TiXmlElement *pData = pRoot->FirstChildElement("DATA");
 
 	AnsiString strData = pData->GetText();            //RUN/STOP/PAUSE/RESUME/PPSELECT,PPID/LOCAL/REMOTE
-	AnsiString strSub = strData.SubString(0, 8);
+	TStringList *StrList = SplitString(strData, ",");
+	AnsiString strSub = StrList->operator [](0);
+	delete StrList;
+	//AnsiString strSub = strData.SubString(0, 11);
 
 	if (strSub == "RUN") bRet = StartProcess(true);
 	else if (strSub == "RESUME") bRet = StartProcess(true);
@@ -278,7 +281,7 @@ void __fastcall CEQPXML::doRCMD(char *pRx)
             AnsiString strSub1 = StrList->operator [](nX).SubString(0,14);
             if (strSub1 == "MOVE_IN_STATUS")
             {
-                TStringList *StrList1 = SplitString(strData, "=");
+                TStringList *StrList1 = SplitString(strData1, "=");
                 AnsiString strData2 = StrList1->operator [](1);
                 if (strData2 == "PASS") m_strMagzin1DCodeRX = "Y";
                 else m_strMagzin1DCodeRX = "N";
