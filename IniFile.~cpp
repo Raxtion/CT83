@@ -60,7 +60,7 @@ void __fastcall CIniFile::MachineFile(bool bRead)
   DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dScaleSprayPosX1",m_dScaleSprayPosX[1],0.0);
   DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dScaleSprayPosY1",m_dScaleSprayPosY[1],0.0);
   DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dScaleSprayPosZ1",m_dScaleSprayPosZ[1],0.0);
-  DDXFile_Int(bRead,pIniFile,Machine_Section,"m_dScaleSprayTime1",m_dScaleSprayTime[1]);
+  DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dScaleSprayTime1",m_dScaleSprayTime[1]);
   DDXFile_Int(bRead,pIniFile,Machine_Section,"m_nScaleSprayTimes1",m_nScaleSprayTimes[1]);
   DDXFile_Float(bRead,pIniFile,Machine_Section,"m_dScaleSprayDelayTime",m_dScaleSprayDelayTime,0.0);
 
@@ -202,6 +202,25 @@ AnsiString __fastcall CIniFile::GetErrorString(char *SectionName,int nCode,int n
 
   strCode.sprintf("E%04d",nCode);
   if(nLanMode==0) strErrMsg=pIniFile->ReadString(SectionName,strCode,"未定義錯誤碼!!");
+  else strErrMsg=pIniFile->ReadString(SectionName,strCode,"Not Defined Error Code!!!");
+  strErrMsg1.sprintf("[%s] %s=%s",SectionName,strCode,strErrMsg);
+  delete pIniFile;
+
+  return strErrMsg1+"\n";
+}
+//---------------------------------------------------------------------------
+AnsiString __fastcall CIniFile::GetErrorStringENG(char *SectionName,int nCode)
+{
+  AnsiString strFileName,strErrMsg,strErrMsg1,strCode,strErrName;
+  TIniFile *pIniFile;
+
+  strErrName=ErrorMessageEngFileName;
+
+  strFileName.sprintf("%s%s%s",IniFile_Dir,ErrorMessage_Dir,strErrName);
+  pIniFile = new TIniFile(strFileName);
+
+  strCode.sprintf("E%04d",nCode);
+  if(m_nLanguageMode==0) strErrMsg=pIniFile->ReadString(SectionName,strCode,"未定義錯誤碼!!");
   else strErrMsg=pIniFile->ReadString(SectionName,strCode,"Not Defined Error Code!!!");
   strErrMsg1.sprintf("[%s] %s=%s",SectionName,strCode,strErrMsg);
   delete pIniFile;

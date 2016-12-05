@@ -241,7 +241,10 @@ void __fastcall CEQPXML::doRCMD(char *pRx)
 	TiXmlElement *pData = pRoot->FirstChildElement("DATA");
 
 	AnsiString strData = pData->GetText();            //RUN/STOP/PAUSE/RESUME/PPSELECT,PPID/LOCAL/REMOTE
-	AnsiString strSub = strData.SubString(0, 11);
+	TStringList *StrList = SplitString(strData, ",");
+	AnsiString strSub = StrList->operator [](0);
+	delete StrList;
+	//AnsiString strSub = strData.SubString(0, 11);
 
 	if (strSub == "RUN") bRet = StartProcess(true);
 	else if (strSub == "RESUME") bRet = StartProcess(true);
@@ -408,7 +411,7 @@ void __fastcall CEQPXML::doQueryPPIDFullPath(char *pRx)
         }
 
         TStringList* strSplitPath = SplitString(m_liststrFileName.front(), "\\");
-        if (strSplitPath->operator [](2) != "Error Message" && strSplitPath->Count != 3)
+        if (strSplitPath->operator [](2) != "Error Message" && strSplitPath->Count != 2)
         {
             pIDE = new TiXmlElement("PPID");
             pIDE->LinkEndChild(new TiXmlText(m_liststrFileName.front().c_str()));

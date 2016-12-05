@@ -90,6 +90,8 @@ bool __fastcall CSerialPort::ReadData(char *pBuffer,char EndByte,int nTimeOut)
 //---------------------------------------------------------------------------
 bool __fastcall CSerialPort::ReadSizeData(char *pBuffer,int nTimeOut)
 {
+        sio_flush(m_nPortNo,0);
+        ::Sleep(300);
         DWORD dwStart=GetTickCount();
         char Rx[MAX_BUFFER]={0};
 

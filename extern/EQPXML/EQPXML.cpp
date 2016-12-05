@@ -257,8 +257,9 @@ void __fastcall CEQPXML::doRCMD(char *pRx)
 		//AnsiString strFile;
 		//strFile.sprintf("C:\\Product_Data\\%s\\%s.ini", strName, strName);
 		//bRet = OpenFile(strFile);
-        bRet = OpenFile(StrList->Strings[1]);
-
+        if (StrList->Count > 1) bRet = OpenFile(StrList->Strings[1]);
+        else bRet = false;
+        
         delete StrList;
 	}
 	else if (strSub == "LOCAL")
@@ -411,7 +412,7 @@ void __fastcall CEQPXML::doQueryPPIDFullPath(char *pRx)
         }
 
         TStringList* strSplitPath = SplitString(m_liststrFileName.front(), "\\");
-        if (strSplitPath->operator [](2) != "Error Message" && strSplitPath->Count != 3)
+        if (strSplitPath->operator [](2) != "Error Message" && strSplitPath->Count != 2)
         {
             pIDE = new TiXmlElement("PPID");
             pIDE->LinkEndChild(new TiXmlText(m_liststrFileName.front().c_str()));

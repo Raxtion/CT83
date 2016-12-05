@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 127
-  Top = 348
+  Left = 102
+  Top = 332
   Width = 1378
   Height = 771
   Caption = 'frmMain'
@@ -448,7 +448,7 @@ object frmMain: TfrmMain
           object Label3: TLabel
             Left = 16
             Top = 56
-            Width = 24
+            Width = 28
             Height = 13
             Caption = #37325#37327
           end

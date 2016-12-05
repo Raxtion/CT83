@@ -591,8 +591,14 @@ void __fastcall TfrmMain::timerMessageTimer(TObject *Sender)
 	{
 		//if(m_pMessageDlg)
 		{
+            //process in Machine
 			AnsiString strMsg = g_IniFile.GetErrorString("SYSTEM", g_IniFile.m_nErrorCode);
 			AddList(strMsg);
+			//process in CIM
+			AnsiString strMsgCIM = g_IniFile.GetErrorString("SYSTEM", g_IniFile.m_nErrorCode,1);
+			AnsiString strCode;
+			strCode.sprintf("%04d", g_IniFile.m_nErrorCode);
+			g_eqpXML.SendAlarmMessage(strCode.c_str(), strMsgCIM.c_str());
 		}
 	}
 
