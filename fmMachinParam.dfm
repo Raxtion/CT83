@@ -1626,4 +1626,13 @@ object frmMachineParam: TfrmMachineParam
     Caption = #27599#27425#36864#30418#20808#22519#34892#22132#37327#28204#35430
     TabOrder = 14
   end
+  object m_bIsUse1DReader: TCheckBox
+    Left = 120
+    Top = 600
+    Width = 129
+    Height = 17
+    Caption = #20351#29992'1D Reader'
+    TabOrder = 15
+    OnClick = m_bIsUseCIMClick
+  end
 end

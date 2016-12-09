@@ -209,25 +209,6 @@ AnsiString __fastcall CIniFile::GetErrorString(char *SectionName,int nCode,int n
   return strErrMsg1+"\n";
 }
 //---------------------------------------------------------------------------
-AnsiString __fastcall CIniFile::GetErrorStringENG(char *SectionName,int nCode)
-{
-  AnsiString strFileName,strErrMsg,strErrMsg1,strCode,strErrName;
-  TIniFile *pIniFile;
-
-  strErrName=ErrorMessageEngFileName;
-
-  strFileName.sprintf("%s%s%s",IniFile_Dir,ErrorMessage_Dir,strErrName);
-  pIniFile = new TIniFile(strFileName);
-
-  strCode.sprintf("E%04d",nCode);
-  if(m_nLanguageMode==0) strErrMsg=pIniFile->ReadString(SectionName,strCode,"¥¼©w¸q¿ù»~½X!!");
-  else strErrMsg=pIniFile->ReadString(SectionName,strCode,"Not Defined Error Code!!!");
-  strErrMsg1.sprintf("[%s] %s=%s",SectionName,strCode,strErrMsg);
-  delete pIniFile;
-
-  return strErrMsg1+"\n";
-}
-//---------------------------------------------------------------------------
 void __fastcall CIniFile::StoreHistory(int nYear,int nMonth,int nDate,AnsiString strMessage)
 {
   AnsiString strFileName;

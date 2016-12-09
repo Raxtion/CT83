@@ -88,6 +88,7 @@ public:
   bool m_bStopLoader;
   bool m_bIsUseCIM;
   bool m_bIsUseRightLCPusher;
+  bool m_bIsUse1DReader;
 
   int m_nRailOption;                     //0:All 1:Front 2:Rear
 

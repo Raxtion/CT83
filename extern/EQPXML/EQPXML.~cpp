@@ -257,8 +257,9 @@ void __fastcall CEQPXML::doRCMD(char *pRx)
 		//AnsiString strFile;
 		//strFile.sprintf("C:\\Product_Data\\%s\\%s.ini", strName, strName);
 		//bRet = OpenFile(strFile);
-        bRet = OpenFile(StrList->Strings[1]);
-
+        if (StrList->Count > 1) bRet = OpenFile(StrList->Strings[1]);
+        else bRet = false;
+        
         delete StrList;
 	}
 	else if (strSub == "LOCAL")

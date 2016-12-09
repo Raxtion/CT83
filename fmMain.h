@@ -130,6 +130,7 @@ __published:	// IDE-managed Components
     TLabel *labLastPassCounts;
     TLabel *labUPU;
     TLabel *lab1DShow;
+    TButton *btn1DSleep;
         void __fastcall DIDO1Click(TObject *Sender);
         void __fastcall Motor1Click(TObject *Sender);
         void __fastcall Exit1Click(TObject *Sender);
@@ -198,6 +199,7 @@ __published:	// IDE-managed Components
     void __fastcall SpeedButton16Click(TObject *Sender);
     void __fastcall btn1DReadClick(TObject *Sender);
     void __fastcall btn2DReadClick(TObject *Sender);
+    void __fastcall btn1DSleepClick(TObject *Sender);
 private:	// User declarations
         int m_nUserLevel; //0:OP 1:Engineer 2:adm
         C_GetTime tm1MSLogOut;

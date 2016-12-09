@@ -149,6 +149,7 @@ __published:	// IDE-managed Components
     TCheckBox *m_bIsUseRightLCPusher;
     TCheckBox *m_bIsResetFluxLifetime;
     TCheckBox *m_bUseUnClampAutoWeightScale;
+    TCheckBox *m_bIsUse1DReader;
         void __fastcall StaticText5Click(TObject *Sender);
     void __fastcall m_bIsMgzUpFirsClick(TObject *Sender);
     void __fastcall m_bIsUseCIMClick(TObject *Sender);

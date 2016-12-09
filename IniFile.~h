@@ -139,7 +139,6 @@ public:
   void __fastcall MachineFile(bool bRead);
   void __fastcall ProductFile(char *strFileName,bool bRead);
   AnsiString __fastcall GetErrorString(char *SectionName,int nCode,int nLanMode=0);  //LanMode 0: CHT 1:ENG
-  AnsiString __fastcall GetErrorStringENG(char *SectionName,int nCode);
   void __fastcall StoreHistory(int nYear,int nMonth,int nDate,AnsiString strMessage);
   void __fastcall StoreHistoryNew();
   bool __fastcall SearchFile(AnsiString strBarCode,AnsiString &strFileName);

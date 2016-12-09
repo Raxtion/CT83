@@ -89,6 +89,10 @@ void __fastcall CGetRealTimeValueThread::Execute()
 
 		    if (strCommand == "READ_1D_CODE")
 		    {
+                g_1DScanner.Disable();
+			    ::Sleep(100);
+			    g_1DScanner.Sleep();
+                ::Sleep(100);
 			    g_1DScanner.Wakeup();
 			    ::Sleep(2500);
 			    g_1DScanner.Enable();
@@ -597,7 +601,7 @@ void __fastcall TfrmMain::timerMessageTimer(TObject *Sender)
 			//process in CIM
 			AnsiString strMsgCIM = g_IniFile.GetErrorString("SYSTEM", g_IniFile.m_nErrorCode,1);
 			AnsiString strCode;
-			strCode.sprintf("E%04d", g_IniFile.m_nErrorCode);
+			strCode.sprintf("%04d", g_IniFile.m_nErrorCode);
 			g_eqpXML.SendAlarmMessage(strCode.c_str(), strMsgCIM.c_str());
 		}
 	}
@@ -815,6 +819,7 @@ void __fastcall TfrmMain::Machine1Click(TObject *Sender)
     DDX_Check(bRead, g_IniFile.m_bIsMgzUpFirst, pMachineDlg->m_bIsMgzUpFirst);
     DDX_Check(bRead, g_IniFile.m_bIsUseCIM, pMachineDlg->m_bIsUseCIM);
     DDX_Check(bRead, g_IniFile.m_bIsUseRightLCPusher, pMachineDlg->m_bIsUseRightLCPusher);
+    DDX_Check(bRead, g_IniFile.m_bIsUse1DReader, pMachineDlg->m_bIsUse1DReader);
 
     DDX_Radio(bRead, g_IniFile.m_nRailOption, pMachineDlg->m_nRailOption);
 
@@ -929,6 +934,7 @@ void __fastcall TfrmMain::Machine1Click(TObject *Sender)
                 DDX_Check(bRead, g_IniFile.m_bIsMgzUpFirst, pMachineDlg->m_bIsMgzUpFirst);
                 DDX_Check(bRead, g_IniFile.m_bIsUseCIM, pMachineDlg->m_bIsUseCIM);
                 DDX_Check(bRead, g_IniFile.m_bIsUseRightLCPusher, pMachineDlg->m_bIsUseRightLCPusher);
+                DDX_Check(bRead, g_IniFile.m_bIsUse1DReader, pMachineDlg->m_bIsUse1DReader);
 
                 DDX_Radio(bRead, g_IniFile.m_nRailOption, pMachineDlg->m_nRailOption);
 
@@ -1957,8 +1963,40 @@ void __fastcall TfrmMain::btn2DReadClick(TObject *Sender)
     g_2DReader.Read();
 }
 //---------------------------------------------------------------------------
+void __fastcall TfrmMain::btn1DSleepClick(TObject *Sender)
+{
+    static C_GetTime tm1MS(EX_SCALE::TIME_1MS, false);
+
+    AnsiString strCommand = "";
+    bool bIsReturnOK = false;
+    g_pMainThread->m_listReaderTX.clear();
+    g_pMainThread->m_listReaderTX.push_back("SHUTDOWN_1D_CODE");
+
+    tm1MS.timeStart(10000);
+	while (1)
+	{
+		if (g_pMainThread->m_listReaderTX.size()>0)
+        {
+            strCommand = g_pMainThread->m_listReaderTX.front();
+		    g_pMainThread->m_listReaderTX.pop_front();
+            if (strCommand == "SHUTDOWN_1D_CODE_OK")
+            {
+                bIsReturnOK = true;
+                break;
+            }
+            else break;
+        }
+		Application->ProcessMessages();
+        if (tm1MS.timeUp()) break;
+	}
+
+    if (bIsReturnOK == true) g_pMainThread->m_listLog.push_back("1D Reader 已關閉");
+    else g_pMainThread->m_listLog.push_back("1D Reader 關閉失敗");
+}
+//---------------------------------------------------------------------------
 
 #pragma endregion
+
 
 
 

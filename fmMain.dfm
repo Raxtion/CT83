@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 102
-  Top = 332
+  Left = 34
+  Top = 166
   Width = 1378
   Height = 771
   Caption = 'frmMain'
@@ -869,6 +869,15 @@ object frmMain: TfrmMain
           Caption = #37325#26032#35712#21462'2D Reader'
           TabOrder = 1
           OnClick = btn2DReadClick
+        end
+        object btn1DSleep: TButton
+          Left = 352
+          Top = 32
+          Width = 121
+          Height = 49
+          Caption = #38364#38281'1D Reader'
+          TabOrder = 2
+          OnClick = btn1DSleepClick
         end
       end
     end

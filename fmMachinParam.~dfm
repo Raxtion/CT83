@@ -1,6 +1,6 @@
 object frmMachineParam: TfrmMachineParam
-  Left = 304
-  Top = 122
+  Left = 262
+  Top = 118
   Width = 951
   Height = 677
   Caption = 'frmMachineParam'
@@ -1419,7 +1419,7 @@ object frmMachineParam: TfrmMachineParam
       ParentColor = False
       TabOrder = 9
     end
-    object m_nScaleSprayTime1: TEdit
+    object m_dScaleSprayTime1: TEdit
       Left = 131
       Top = 94
       Width = 65

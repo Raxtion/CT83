@@ -95,7 +95,7 @@ bool __fastcall CSerialPort::ReadSizeData(char *pBuffer,int nTimeOut)
         DWORD dwStart=GetTickCount();
         char Rx[MAX_BUFFER]={0};
 
-        int nRet; 
+        int nRet;
         
         while(1)
         {
