@@ -861,7 +861,7 @@ void __fastcall CEQPXML::SendXML(TiXmlDocument &theDoc)
 			//m_pSocket->SendBuf(send,MAX_SEND_BUFF);                  //note To write log
 			//g_IniFile.AddLog("Send XML",8);                          //note To write log
 
-            AnsiString AAA = printer.CStr();
+            AnsiString AAA = *NewString;
             g_IniFile.AddLog(AAA.c_str(), AAA.Length());
 		}
 		delete send;

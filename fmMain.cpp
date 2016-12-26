@@ -89,6 +89,7 @@ void __fastcall CGetRealTimeValueThread::Execute()
 
 		    if (strCommand == "READ_1D_CODE")
 		    {
+                g_pMainThread->m_listReaderTX.clear();
                 g_1DScanner.Disable();
 			    ::Sleep(100);
 			    g_1DScanner.Sleep();

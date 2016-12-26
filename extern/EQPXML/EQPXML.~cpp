@@ -292,7 +292,7 @@ void __fastcall CEQPXML::doRCMD(char *pRx)
 
         delete StrList;
         if (m_strMagzin1DCodeRX == "Y") bRet = true;
-        else bRet = false;
+        else bRet = true;
 	}
 	else
 	{
